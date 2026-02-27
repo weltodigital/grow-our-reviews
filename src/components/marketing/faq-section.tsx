@@ -91,18 +91,12 @@ export function FaqSection() {
             <p className="text-gray-600 mb-6">
               Our team is here to help. Get in touch and we'll answer any questions you have.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <a
                 href="mailto:hello@growourreviews.com"
-                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-              >
-                Email us
-              </a>
-              <a
-                href="tel:+447700123456"
                 className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
-                Call us
+                Email us
               </a>
             </div>
           </div>

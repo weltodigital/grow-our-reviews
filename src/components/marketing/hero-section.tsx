@@ -15,12 +15,11 @@ export function HeroSection() {
       <div className="container mx-auto px-4">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            Turn Happy Customers Into{' '}
-            <span className="text-blue-600">5-Star Reviews</span> — Automatically
+            Get Found on Google.{' '}
+            <span className="text-blue-600">Win More Local Work.</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">
-            Grow Our Reviews sends your customers a quick review request after every job.
-            More Google reviews, better rankings, more work. Set it up in 2 minutes.
+            Google reviews are the #1 factor in local search rankings. When someone searches 'plumber near me', businesses with more recent 5-star reviews show up first. Grow Our Reviews automates the whole process — so your phone rings more.
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-x-6">
@@ -41,11 +40,11 @@ export function HeroSection() {
           <div className="mt-12 flex items-center justify-center space-x-8 text-sm text-gray-500">
             <div className="flex items-center space-x-2">
               <Shield className="h-5 w-5 text-green-500" />
-              <span>7-day free trial</span>
+              <span>14-day free trial</span>
             </div>
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-blue-500" />
-              <span>No spam, one gentle request</span>
+              <span>No spam, one polite request</span>
             </div>
             <div className="flex items-center space-x-2">
               <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
@@ -60,7 +59,7 @@ export function HeroSection() {
                 <div className="rounded-2xl bg-white p-4">
                   <div className="space-y-4">
                     <div className="text-left">
-                      <div className="text-xs text-gray-500 mb-1">SMS from +447700123456</div>
+                      <div className="text-xs text-gray-500 mb-1">SMS from Grow Our Reviews</div>
                       <div className="bg-blue-500 text-white text-sm p-3 rounded-2xl rounded-bl-md max-w-[85%] md:max-w-[80%]">
                         Hi Sarah, thanks for choosing Smith Plumbing! If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds 👇<br />
                         <br />

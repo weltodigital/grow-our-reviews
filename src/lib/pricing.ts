@@ -5,9 +5,9 @@ export const PRICING_PLANS = {
     price: 49,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 20,
+    monthlyRequestLimit: 50,
     features: [
-      'Up to 20 review requests per month',
+      'Up to 50 review requests per month',
       'SMS review requests',
       'Sentiment gate (review filtering)',
       'Simple dashboard',
@@ -18,12 +18,12 @@ export const PRICING_PLANS = {
   },
   growth: {
     name: 'Growth',
-    price: 129,
+    price: 79,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 100,
+    monthlyRequestLimit: 150,
     features: [
-      'Up to 100 review requests per month',
+      'Up to 150 review requests per month',
       'Everything in Starter',
       'Automatic 48-hour nudge follow-ups',
       'Priority support'
@@ -38,8 +38,8 @@ export type Plan = typeof PRICING_PLANS[PlanKey]
 
 // Trial configuration
 export const TRIAL_CONFIG = {
-  durationDays: 7,
-  requiresCard: true,
+  durationDays: 14,
+  requiresCard: false,
   defaultPlan: 'starter' as PlanKey,
 } as const
 

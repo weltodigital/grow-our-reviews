@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
                   body: JSON.stringify({
                     email: profile.email,
                     businessName: profile.business_name,
-                    planName: priceInfo.monthlyRequestLimit === 20 ? 'Starter' : 'Growth',
+                    planName: priceInfo.monthlyRequestLimit === 50 ? 'Starter' : 'Growth',
                   }),
                 })
               }

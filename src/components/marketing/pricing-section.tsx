@@ -11,9 +11,9 @@ export function PricingSection() {
     {
       name: 'Starter',
       price: 49,
-      requests: 20,
+      requests: 50,
       features: [
-        'Up to 20 review requests per month',
+        'Up to 50 review requests per month',
         'SMS review requests',
         'Sentiment gate (review filtering)',
         'Simple dashboard',
@@ -23,10 +23,10 @@ export function PricingSection() {
     },
     {
       name: 'Growth',
-      price: 129,
-      requests: 100,
+      price: 79,
+      requests: 150,
       features: [
-        'Up to 100 review requests per month',
+        'Up to 150 review requests per month',
         'Everything in Starter',
         'Automatic 48-hour nudge follow-ups',
         'Priority support',
@@ -44,7 +44,7 @@ export function PricingSection() {
             Simple, transparent pricing
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Start with a 7-day free trial. No hidden fees, cancel anytime.
+            Start with a 14-day free trial. No hidden fees, cancel anytime.
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export function PricingSection() {
                   }`}
                   asChild
                 >
-                  <a href={getAppUrl('/signup')}>Start 7-Day Free Trial</a>
+                  <a href={getAppUrl('/signup')}>Start 14-Day Free Trial</a>
                 </Button>
               </div>
             </div>
@@ -108,16 +108,16 @@ export function PricingSection() {
         <div className="mt-12 text-center">
           <div className="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto">
             <h4 className="font-semibold text-gray-900 mb-2">
-              7-Day Free Trial Includes:
+              14-Day Free Trial Includes:
             </h4>
             <div className="text-sm text-gray-600 space-y-1">
               <p>✓ Full access to all features</p>
-              <p>✓ Send up to 20 review requests</p>
+              <p>✓ Full access to all features for 14 days</p>
               <p>✓ No setup fees or hidden costs</p>
               <p>✓ Cancel anytime with one click</p>
             </div>
             <p className="text-xs text-gray-500 mt-3">
-              Card required to start trial. You won't be charged until your trial ends.
+              No credit card required to start your trial.
             </p>
           </div>
         </div>

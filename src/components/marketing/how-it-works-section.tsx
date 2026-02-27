@@ -4,21 +4,21 @@ export function HowItWorksSection() {
   const steps = [
     {
       icon: CheckCircle,
-      title: 'Finish a job',
-      description: "Enter your customer's name and phone number",
-      detail: 'Takes 10 seconds after completing work'
+      title: 'Finish a job, enter the details',
+      description: "Takes 10 seconds. Just type your customer's name and phone number.",
+      detail: ''
     },
     {
       icon: MessageSquare,
-      title: 'We send the request',
-      description: 'A friendly SMS goes out automatically asking for a review',
-      detail: 'Sent at your preferred time delay'
+      title: 'We send a friendly review request',
+      description: 'A polite SMS goes out automatically at the right time. No awkward asking, no forgetting.',
+      detail: ''
     },
     {
       icon: Star,
-      title: 'Reviews roll in',
-      description: 'Happy customers go to Google. Unhappy ones give you private feedback instead.',
-      detail: 'Your public rating is protected'
+      title: 'Your Google ranking climbs',
+      description: 'Happy customers leave 5-star reviews on Google. Unhappy ones give you private feedback instead — so your public rating stays strong and your local search ranking improves.',
+      detail: ''
     }
   ]
 
@@ -59,9 +59,11 @@ export function HowItWorksSection() {
                       <p className="mt-2 text-base text-gray-600">
                         {step.description}
                       </p>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {step.detail}
-                      </p>
+                      {step.detail && (
+                        <p className="mt-1 text-sm text-gray-500">
+                          {step.detail}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

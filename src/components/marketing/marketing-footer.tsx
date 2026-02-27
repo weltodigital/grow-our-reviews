@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Star, Mail, Phone } from 'lucide-react'
+import { Star, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getAppUrl } from '@/lib/utils'
 
@@ -14,7 +14,7 @@ export function MarketingFooter() {
               Ready to grow your reviews?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join hundreds of tradespeople who are already getting more Google reviews and growing their business.
+              Your competitors are getting reviewed. Are you?
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700">
@@ -25,7 +25,7 @@ export function MarketingFooter() {
               </Button>
             </div>
             <p className="text-sm text-gray-400 mt-4">
-              7-day free trial • No setup fees • Cancel anytime
+              14-day free trial • No credit card required • Cancel anytime
             </p>
           </div>
         </div>
@@ -52,12 +52,6 @@ export function MarketingFooter() {
                 <Mail className="h-4 w-4" />
                 <a href="mailto:hello@growourreviews.com" className="hover:text-white transition-colors">
                   hello@growourreviews.com
-                </a>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-400">
-                <Phone className="h-4 w-4" />
-                <a href="tel:+447700123456" className="hover:text-white transition-colors">
-                  +44 7700 123456
                 </a>
               </div>
             </div>
@@ -87,16 +81,7 @@ export function MarketingFooter() {
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-3 text-gray-400">
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">About</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-              </li>
-              <li>
-                <Link href="/support" className="hover:text-white transition-colors">Support</Link>
-              </li>
-              <li>
-                <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+                <a href="mailto:hello@growourreviews.com" className="hover:text-white transition-colors">Contact</a>
               </li>
             </ul>
           </div>
@@ -106,7 +91,7 @@ export function MarketingFooter() {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <p className="text-gray-400 text-sm">
-              © 2024 Grow Our Reviews. All rights reserved.
+              © 2026 Grow Our Reviews. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">

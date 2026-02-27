@@ -35,7 +35,7 @@ export function PricingComparison() {
     {
       category: 'Support & Limits',
       items: [
-        { feature: 'Monthly request limit', starter: '20 requests', growth: '100 requests' },
+        { feature: 'Monthly request limit', starter: '50 requests', growth: '150 requests' },
         { feature: 'Email support', starter: 'Standard', growth: 'Priority' },
         { feature: 'Setup assistance', starter: 'Self-service', growth: 'Guided setup' },
         { feature: 'Phone support', starter: false, growth: 'Coming soon' }
@@ -77,7 +77,7 @@ export function PricingComparison() {
                 </div>
                 <div className="text-center">
                   <div className="font-semibold text-gray-900">Growth</div>
-                  <div className="text-sm text-gray-600">£129/month</div>
+                  <div className="text-sm text-gray-600">£79/month</div>
                   <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mt-1">
                     Popular
                   </div>
