@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Format the data for the frontend
-    const formattedFeedback = feedbackData?.map(feedback => ({
+    const formattedFeedback = feedbackData?.map((feedback: any) => ({
       id: feedback.id,
       customer_name: feedback.review_requests?.customers?.name || 'Unknown Customer',
       customer_phone: feedback.review_requests?.customers?.phone || '',
