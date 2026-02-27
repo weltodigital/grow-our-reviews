@@ -59,5 +59,22 @@ export async function completeOnboarding(data: OnboardingData) {
     return { error: 'Failed to save your business information. Please try again.' }
   }
 
+  // Send welcome email
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: user.email,
+        businessName: data.businessName.trim(),
+      }),
+    })
+  } catch (error) {
+    // Don't fail onboarding if email fails
+    console.error('Failed to send welcome email:', error)
+  }
+
   return { success: true }
 }

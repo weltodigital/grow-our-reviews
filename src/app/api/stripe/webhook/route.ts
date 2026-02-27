@@ -95,6 +95,31 @@ export async function POST(request: NextRequest) {
               limit: priceInfo.monthlyRequestLimit,
               trialEnd: trialEnd.toISOString(),
             })
+
+            // Send subscription confirmation email
+            try {
+              const { data: profile } = await (supabase as any)
+                .from('profiles')
+                .select('email, business_name')
+                .eq('id', userId)
+                .single()
+
+              if (profile?.email) {
+                await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-confirmation`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    email: profile.email,
+                    businessName: profile.business_name,
+                    planName: priceInfo.monthlyRequestLimit === 20 ? 'Starter' : 'Growth',
+                  }),
+                })
+              }
+            } catch (error) {
+              console.error('Failed to send subscription confirmation email:', error)
+            }
           }
         }
         break
