@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 
-export default function ConfirmResetPasswordPage() {
+function ConfirmResetPasswordForm() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -108,5 +108,13 @@ export default function ConfirmResetPasswordPage() {
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+export default function ConfirmResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ConfirmResetPasswordForm />
+    </Suspense>
   )
 }

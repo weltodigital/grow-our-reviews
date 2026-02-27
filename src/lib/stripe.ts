@@ -1,13 +1,12 @@
 import Stripe from 'stripe'
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is required')
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2026-01-28.clover',
-  typescript: true,
-})
+// Initialize Stripe only if the secret key is available
+export const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2026-01-28.clover',
+      typescript: true,
+    })
+  : null
 
 // Stripe configuration for our pricing
 export const STRIPE_CONFIG = {
@@ -43,6 +42,10 @@ export async function createCheckoutSession({
   customerEmail: string
   userId: string
 }) {
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -78,6 +81,10 @@ export async function createCustomerPortalSession({
   customerId: string
   returnUrl: string
 }) {
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
@@ -88,6 +95,10 @@ export async function createCustomerPortalSession({
 
 // Get subscription status
 export async function getSubscriptionStatus(subscriptionId: string) {
+  if (!stripe) {
+    return null
+  }
+
   try {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId)
     return {
@@ -104,6 +115,10 @@ export async function getSubscriptionStatus(subscriptionId: string) {
 
 // Cancel subscription at period end
 export async function cancelSubscription(subscriptionId: string) {
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   return await stripe.subscriptions.update(subscriptionId, {
     cancel_at_period_end: true,
   })
@@ -111,6 +126,10 @@ export async function cancelSubscription(subscriptionId: string) {
 
 // Reactivate subscription
 export async function reactivateSubscription(subscriptionId: string) {
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   return await stripe.subscriptions.update(subscriptionId, {
     cancel_at_period_end: false,
   })
@@ -118,6 +137,10 @@ export async function reactivateSubscription(subscriptionId: string) {
 
 // Get customer's payment methods
 export async function getCustomerPaymentMethods(customerId: string) {
+  if (!stripe) {
+    return { data: [] }
+  }
+
   return await stripe.paymentMethods.list({
     customer: customerId,
     type: 'card',
@@ -126,6 +149,10 @@ export async function getCustomerPaymentMethods(customerId: string) {
 
 // Create setup intent for adding payment method
 export async function createSetupIntent(customerId: string) {
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   return await stripe.setupIntents.create({
     customer: customerId,
     usage: 'off_session',
@@ -134,6 +161,10 @@ export async function createSetupIntent(customerId: string) {
 
 // Webhook event handling
 export function constructWebhookEvent(body: Buffer, signature: string) {
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   if (!webhookSecret) {
     throw new Error('STRIPE_WEBHOOK_SECRET is required')

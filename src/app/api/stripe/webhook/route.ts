@@ -45,9 +45,13 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session
 
         if (session.mode === 'subscription') {
-          const subscription = await import('@/lib/stripe').then(m =>
-            m.stripe.subscriptions.retrieve(session.subscription as string)
-          )
+          const { stripe } = await import('@/lib/stripe')
+          if (!stripe) {
+            console.error('Stripe is not configured')
+            return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
+          }
+
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
 
           const userId = session.metadata?.userId
           if (!userId) {

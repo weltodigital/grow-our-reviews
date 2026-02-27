@@ -1,3 +1,5 @@
+'use client'
+
 import { CheckCircle, X } from 'lucide-react'
 
 export function PricingComparison() {
