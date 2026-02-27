@@ -11,17 +11,17 @@ export function MarketingFooter() {
         <div className="container mx-auto px-4 py-16">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">
-              Ready to grow your reviews?
+              Your competitors are getting reviewed. Are you?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Your competitors are getting reviewed. Are you?
+              Every job you finish without sending a review request is a missed opportunity to climb Google's local rankings. Start your free trial today and turn your happy customers into the 5-star reviews your business deserves.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700">
                 <a href={getAppUrl('/signup')}>Start Your Free Trial</a>
               </Button>
               <Button size="lg" variant="outline" asChild className="border-gray-600 text-gray-300 hover:bg-gray-800">
-                <a href={getAppUrl('/login')}>Sign In</a>
+                <Link href="#pricing">See Pricing</Link>
               </Button>
             </div>
             <p className="text-sm text-gray-400 mt-4">

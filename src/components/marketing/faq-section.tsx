@@ -8,6 +8,10 @@ export function FaqSection() {
 
   const faqs = [
     {
+      question: 'How do Google reviews affect my local search ranking?',
+      answer: 'Google uses three main factors to rank businesses in local search: relevance, distance, and prominence. Reviews are the biggest part of prominence. Businesses with more reviews, higher ratings, and recent review activity rank higher in the Google Map Pack — the box at the top of search results that gets the most clicks. More reviews means more visibility, which means more calls and more work.'
+    },
+    {
       question: 'How does it work?',
       answer: 'After you complete a job, you enter your customer\'s name and phone number into our simple dashboard. We automatically send them a friendly SMS with a link to rate their experience. If they give 4-5 stars, they go to Google Reviews. If they give 1-3 stars, they see a private feedback form instead.'
     },
@@ -17,7 +21,7 @@ export function FaqSection() {
     },
     {
       question: 'What if a customer is unhappy?',
-      answer: 'This is where our system really shines. Unhappy customers (1-3 star ratings) get a private feedback form instead of being sent to Google. You see the feedback in your dashboard, can address their concerns directly, and it never goes public. This protects your online reputation while helping you improve.'
+      answer: 'This is where our system really shines. Unhappy customers (1-3 star ratings) get a private feedback form instead of being sent to Google. You see the feedback in your dashboard, can address their concerns directly, and it never goes public. This protects your online reputation while helping you improve. This actually helps your local SEO too. By keeping negative feedback private, your public Google rating stays higher, which directly improves your search ranking.'
     },
     {
       question: 'Do I need any technical knowledge?',
@@ -29,7 +33,7 @@ export function FaqSection() {
     },
     {
       question: 'How long until I see results?',
-      answer: 'Most businesses see their first new Google review within 24-48 hours of sending their first request. However, we recommend sending requests consistently for 2-3 weeks to see the full impact on your online presence.'
+      answer: 'Most businesses see their first new Google review within 48 hours of sending their first request. Within a month of consistent use, you should see a noticeable increase in your review count. Local search ranking improvements typically follow within 4-8 weeks as Google processes the reviews.'
     },
     {
       question: 'What if someone gives me a bad review anyway?',

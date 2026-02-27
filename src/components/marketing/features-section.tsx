@@ -4,27 +4,27 @@ export function FeaturesSection() {
   const features = [
     {
       icon: Shield,
-      title: 'Sentiment Gate',
-      description: "Only happy customers get sent to Google. If someone's unhappy, they tell you privately instead. Your public rating is protected.",
-      benefits: ['Filter out negative reviews', 'Get private feedback instead', 'Maintain high Google rating']
+      title: 'Sentiment Gate — Protect Your Star Rating',
+      description: "Your Google rating directly affects your ranking. Our smart filter asks customers to rate their experience first. 4-5 stars? They go straight to Google. 1-3 stars? They see a private feedback form instead. Your public rating stays high, your ranking stays strong, and you still get useful feedback to improve.",
+      benefits: ['Negative feedback stays private', 'Your Google rating is protected', 'Improve your service with honest feedback']
     },
     {
       icon: RefreshCw,
-      title: 'Automatic Follow-Up',
-      description: "If they don't respond, we send one gentle nudge 48 hours later. No spam, just a polite reminder.",
-      benefits: ['One gentle reminder only', 'Customizable timing', 'No pushy messages']
+      title: 'Auto Reviews Coming In',
+      description: "Google rewards businesses that get reviews consistently — not just in bursts. If a customer doesn't respond to the first request, we send one gentle nudge. That's it. No spam, no hassle. Just a steady drip of fresh reviews that tells Google your business is active and trusted.",
+      benefits: ['One polite reminder, nothing more', 'Customisable timing', 'Keeps your review flow consistent']
     },
     {
       icon: BarChart3,
-      title: 'Simple Dashboard',
-      description: "See every request, every click, every review. Know exactly what's working.",
-      benefits: ['Track all activity', 'Monitor success rates', 'Export your data']
+      title: 'Simple Dashboard — Know What\'s Working',
+      description: "See how many review requests you've sent, how many customers clicked, and how many left a review. Track your progress week by week and watch your Google presence grow.",
+      benefits: ['Real-time tracking', 'Click and conversion rates', 'See all customer feedback in one place']
     },
     {
       icon: Users,
-      title: 'Works for Any Trade',
-      description: 'Plumbers, electricians, builders, roofers, landscapers, cleaners — if you do great work, this tool makes sure people say so.',
-      benefits: ['Any trade or service', 'Customizable for your business', 'Industry-proven approach']
+      title: 'Built for Tradespeople — Not Tech Companies',
+      description: "No apps to install, no complicated setup, no jargon. If you can send a text message, you can use Grow Our Reviews. Enter a name and number after each job and we handle the rest. Works for plumbers, electricians, builders, roofers, landscapers, cleaners — any trade.",
+      benefits: ['10-second setup per job', 'Works on your phone between jobs', 'No technical knowledge needed']
     }
   ]
 
@@ -81,15 +81,15 @@ export function FeaturesSection() {
             </h3>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold">2 minutes</div>
-                <div className="text-blue-100">Setup time</div>
+                <div className="text-3xl font-bold">Quick setup</div>
+                <div className="text-blue-100">per job</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold">3x more</div>
-                <div className="text-blue-100">Google reviews</div>
+                <div className="text-3xl font-bold">Higher rankings</div>
+                <div className="text-blue-100">on Google</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold">0 spam</div>
+                <div className="text-3xl font-bold">No spam</div>
                 <div className="text-blue-100">complaints</div>
               </div>
             </div>
