@@ -89,7 +89,7 @@ export function FaqSection() {
               Still have questions?
             </h3>
             <p className="text-gray-600 mb-6">
-              Our team is here to help. Get in touch and we&apos;ll answer any questions you have.
+              Our team is here to help. Get in touch and we'll answer any questions you have.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

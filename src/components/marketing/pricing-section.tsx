@@ -117,7 +117,7 @@ export function PricingSection() {
               <p>✓ Cancel anytime with one click</p>
             </div>
             <p className="text-xs text-gray-500 mt-3">
-              Card required to start trial. You won&apos;t be charged until your trial ends.
+              Card required to start trial. You won't be charged until your trial ends.
             </p>
           </div>
         </div>

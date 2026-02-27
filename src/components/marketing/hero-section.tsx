@@ -62,7 +62,7 @@ export function HeroSection() {
                     <div className="text-left">
                       <div className="text-xs text-gray-500 mb-1">SMS from +447700123456</div>
                       <div className="bg-blue-500 text-white text-sm p-3 rounded-2xl rounded-bl-md max-w-[85%] md:max-w-[80%]">
-                        Hi Sarah, thanks for choosing Smith Plumbing! If you were happy with our work, we&apos;d really appreciate a quick review — it only takes 30 seconds 👇<br />
+                        Hi Sarah, thanks for choosing Smith Plumbing! If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds 👇<br />
                         <br />
                         <span className="text-blue-200 underline">https://review.example.com/abc123</span>
                       </div>

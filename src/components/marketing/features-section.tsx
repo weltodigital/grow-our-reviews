@@ -5,19 +5,19 @@ export function FeaturesSection() {
     {
       icon: Shield,
       title: 'Sentiment Gate',
-      description: 'Only happy customers get sent to Google. If someone&apos;s unhappy, they tell you privately instead. Your public rating is protected.',
+      description: "Only happy customers get sent to Google. If someone's unhappy, they tell you privately instead. Your public rating is protected.",
       benefits: ['Filter out negative reviews', 'Get private feedback instead', 'Maintain high Google rating']
     },
     {
       icon: RefreshCw,
       title: 'Automatic Follow-Up',
-      description: 'If they don&apos;t respond, we send one gentle nudge 48 hours later. No spam, just a polite reminder.',
+      description: "If they don't respond, we send one gentle nudge 48 hours later. No spam, just a polite reminder.",
       benefits: ['One gentle reminder only', 'Customizable timing', 'No pushy messages']
     },
     {
       icon: BarChart3,
       title: 'Simple Dashboard',
-      description: 'See every request, every click, every review. Know exactly what&apos;s working.',
+      description: "See every request, every click, every review. Know exactly what's working.",
       benefits: ['Track all activity', 'Monitor success rates', 'Export your data']
     },
     {

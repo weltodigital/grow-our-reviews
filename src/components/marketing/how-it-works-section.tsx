@@ -5,7 +5,7 @@ export function HowItWorksSection() {
     {
       icon: CheckCircle,
       title: 'Finish a job',
-      description: 'Enter your customer&apos;s name and phone number',
+      description: "Enter your customer's name and phone number",
       detail: 'Takes 10 seconds after completing work'
     },
     {
@@ -130,7 +130,7 @@ export function HowItWorksSection() {
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-gray-600">
-                    One gentle nudge if they don&apos;t respond (optional)
+                    One gentle nudge if they don't respond (optional)
                   </p>
                 </div>
               </div>

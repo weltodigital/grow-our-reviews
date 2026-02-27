@@ -7,7 +7,7 @@ export function SocialProofSection() {
       business: 'Thompson Plumbing',
       location: 'Manchester',
       rating: 5,
-      text: 'Since using Grow Our Reviews, we&apos;ve gone from 12 Google reviews to 67 in three months. The sentiment gate is brilliant — no more angry customers leaving 1-star reviews when they&apos;re just having a bad day.',
+      text: "Since using Grow Our Reviews, we've gone from 12 Google reviews to 67 in three months. The sentiment gate is brilliant — no more angry customers leaving 1-star reviews when they're just having a bad day.",
       beforeReviews: 12,
       afterReviews: 67,
       timeframe: '3 months'
@@ -17,7 +17,7 @@ export function SocialProofSection() {
       business: 'Elite Electrical',
       location: 'Birmingham',
       rating: 5,
-      text: 'Game changer for our business. The private feedback feature helped us improve our service, and now we&apos;re getting more 5-star reviews than ever. Setup took literally 2 minutes.',
+      text: "Game changer for our business. The private feedback feature helped us improve our service, and now we're getting more 5-star reviews than ever. Setup took literally 2 minutes.",
       beforeReviews: 8,
       afterReviews: 45,
       timeframe: '4 months'
@@ -27,7 +27,7 @@ export function SocialProofSection() {
       business: 'Roberts Roofing',
       location: 'Leeds',
       rating: 5,
-      text: 'I was skeptical at first, but this actually works. Customers don&apos;t find it annoying at all — it&apos;s just one polite text. We&apos;re booked solid now thanks to our improved online reputation.',
+      text: "I was skeptical at first, but this actually works. Customers don't find it annoying at all — it's just one polite text. We're booked solid now thanks to our improved online reputation.",
       beforeReviews: 5,
       afterReviews: 38,
       timeframe: '5 months'
