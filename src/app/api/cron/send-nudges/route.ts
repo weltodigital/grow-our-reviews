@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     const now = new Date()
     const eligibleRequests = nudgeRequests.filter((request: any) => {
       const sentAt = new Date(request.sent_at!)
-      const nudgeDelayMs = request.profiles.nudge_delay_hours * 60 * 60 * 1000
+      const nudgeDelayMs = (request as any).profiles.nudge_delay_hours * 60 * 60 * 1000
       const nudgeTime = new Date(sentAt.getTime() + nudgeDelayMs)
 
       return now >= nudgeTime
@@ -113,40 +113,40 @@ export async function GET(request: NextRequest) {
 
         // Create the nudge SMS message
         const message = createNudgeMessage({
-          customerName: request.customers.name,
-          businessName: request.profiles.business_name,
+          customerName: (request as any).customers.name,
+          businessName: (request as any).profiles.business_name,
           sentimentGateUrl,
         })
 
         // Send nudge SMS
-        const smsResult = await sendSMS(request.customers.phone, message)
+        const smsResult = await sendSMS((request as any).customers.phone, message)
 
         // Update nudge_sent status regardless of SMS success/failure
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from('review_requests')
           .update({
             nudge_sent: true,
             nudge_sent_at: new Date().toISOString(),
           })
-          .eq('id', request.id)
+          .eq('id', (request as any).id)
 
         if (updateError) {
-          console.error(`Error updating nudge status for request ${request.id}:`, updateError)
+          console.error(`Error updating nudge status for request ${(request as any).id}:`, updateError)
         }
 
         if (smsResult.success) {
           sentCount.success++
           results.push({
-            id: request.id,
-            customer: request.customers.name,
+            id: (request as any).id,
+            customer: (request as any).customers.name,
             status: 'success',
             messageSid: smsResult.messageSid,
           })
         } else {
           sentCount.failed++
           results.push({
-            id: request.id,
-            customer: request.customers.name,
+            id: (request as any).id,
+            customer: (request as any).customers.name,
             status: 'failed',
             error: smsResult.error,
           })
@@ -156,11 +156,11 @@ export async function GET(request: NextRequest) {
         await new Promise(resolve => setTimeout(resolve, 100))
 
       } catch (error) {
-        console.error(`Unexpected error processing nudge request ${request.id}:`, error)
+        console.error(`Unexpected error processing nudge request ${(request as any).id}:`, error)
         sentCount.failed++
         results.push({
-          id: request.id,
-          customer: request.customers?.name || 'Unknown',
+          id: (request as any).id,
+          customer: (request as any).customers?.name || 'Unknown',
           status: 'error',
           error: error instanceof Error ? error.message : 'Unknown error',
         })

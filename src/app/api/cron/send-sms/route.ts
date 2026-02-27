@@ -5,7 +5,7 @@ import type { Database } from '@/types/database'
 
 // Protect the cron endpoint with a secret
 function validateCronSecret(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization')
+  const authHeader = (request as any).headers.get('authorization')
   const expectedSecret = process.env.CRON_SECRET
 
   if (!expectedSecret) {
@@ -35,11 +35,11 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return (request as any).cookies.getAll()
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set({ name, value, ...options })
+            (request as any).cookies.set({ name, value, ...options })
             response.cookies.set({ name, value, ...options })
           })
         },
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     // Find all review requests that should be sent now
     const now = new Date().toISOString()
 
-    const { data: pendingRequests, error: fetchError } = await supabase
+    const { data: pendingRequests, error: fetchError } = await (supabase as any)
       .from('review_requests')
       .select(`
         *,
@@ -84,65 +84,65 @@ export async function GET(request: NextRequest) {
     for (const request of pendingRequests) {
       try {
         // Create the sentiment gate URL
-        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${request.token}`
+        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 
         // Create the SMS message
         const message = createInitialReviewMessage({
-          customerName: request.customers.name,
-          businessName: request.profiles.business_name,
+          customerName: (request as any).customers.name,
+          businessName: (request as any).profiles.business_name,
           sentimentGateUrl,
         })
 
         // Send SMS
-        const smsResult = await sendSMS(request.customers.phone, message)
+        const smsResult = await sendSMS((request as any).customers.phone, message)
 
         if (smsResult.success) {
           // Update request status to 'sent'
-          const { error: updateError } = await supabase
+          const { error: updateError } = await (supabase as any)
             .from('review_requests')
             .update({
               status: 'sent',
               sent_at: new Date().toISOString(),
               sms_message_sid: smsResult.messageSid,
             })
-            .eq('id', request.id)
+            .eq('id', (request as any).id)
 
           if (updateError) {
-            console.error(`Error updating request ${request.id}:`, updateError)
+            console.error(`Error updating request ${(request as any).id}:`, updateError)
             results.push({
-              id: request.id,
-              customer: request.customers.name,
+              id: (request as any).id,
+              customer: (request as any).customers.name,
               status: 'sms_sent_but_db_update_failed',
               error: updateError.message,
             })
           } else {
             sentCount.success++
             results.push({
-              id: request.id,
-              customer: request.customers.name,
+              id: (request as any).id,
+              customer: (request as any).customers.name,
               status: 'success',
               messageSid: smsResult.messageSid,
             })
           }
         } else {
           // Mark as failed
-          const { error: updateError } = await supabase
+          const { error: updateError } = await (supabase as any)
             .from('review_requests')
             .update({
               status: 'failed',
             })
-            .eq('id', request.id)
+            .eq('id', (request as any).id)
 
           sentCount.failed++
           results.push({
-            id: request.id,
-            customer: request.customers.name,
+            id: (request as any).id,
+            customer: (request as any).customers.name,
             status: 'failed',
             error: smsResult.error,
           })
 
           if (updateError) {
-            console.error(`Error updating failed request ${request.id}:`, updateError)
+            console.error(`Error updating failed request ${(request as any).id}:`, updateError)
           }
         }
 
@@ -150,11 +150,11 @@ export async function GET(request: NextRequest) {
         await new Promise(resolve => setTimeout(resolve, 100))
 
       } catch (error) {
-        console.error(`Unexpected error processing request ${request.id}:`, error)
+        console.error(`Unexpected error processing request ${(request as any).id}:`, error)
         sentCount.failed++
         results.push({
-          id: request.id,
-          customer: request.customers?.name || 'Unknown',
+          id: (request as any).id,
+          customer: (request as any).customers?.name || 'Unknown',
           status: 'error',
           error: error instanceof Error ? error.message : 'Unknown error',
         })
