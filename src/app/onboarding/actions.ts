@@ -16,7 +16,7 @@ export async function completeOnboarding(data: OnboardingData) {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await (supabase as any).auth.getUser()
 
   if (authError || !user) {
     return { error: 'Not authenticated' }
@@ -39,7 +39,7 @@ export async function completeOnboarding(data: OnboardingData) {
   }
 
   // Create or update the profile
-  const { error: upsertError } = await supabase
+  const { error: upsertError } = await (supabase as any)
     .from('profiles')
     .upsert(
       {

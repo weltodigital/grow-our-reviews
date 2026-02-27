@@ -5,7 +5,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2026-01-28.clover',
   typescript: true,
 })
 
@@ -92,9 +92,9 @@ export async function getSubscriptionStatus(subscriptionId: string) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId)
     return {
       status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+      trialEnd: (subscription as any).trial_end ? new Date((subscription as any).trial_end * 1000) : null,
     }
   } catch (error) {
     console.error('Error retrieving subscription:', error)

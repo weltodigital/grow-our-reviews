@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
             : calculateTrialEndDate()
 
           // Update profile with subscription info
-          const { error: updateError } = await supabase
+          const { error: updateError } = await (supabase as any)
             .from('profiles')
             .update({
               stripe_customer_id: session.customer as string,
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
         if (!userId) {
           // Try to find user by subscription ID
-          const { data: profile } = await supabase
+          const { data: profile } = await (supabase as any)
             .from('profiles')
             .select('id')
             .eq('stripe_subscription_id', subscription.id)
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Update profile
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from('profiles')
           .update(updateData)
           .eq(userId ? 'id' : 'stripe_subscription_id', userId || subscription.id)
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription
 
         // Update profile to cancelled status
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from('profiles')
           .update({
             subscription_status: 'cancelled',
@@ -173,20 +173,20 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
 
-        if (invoice.subscription) {
+        if ((invoice as any).subscription) {
           // Update subscription status to past_due
-          const { error: updateError } = await supabase
+          const { error: updateError } = await (supabase as any)
             .from('profiles')
             .update({
               subscription_status: 'past_due',
               updated_at: new Date().toISOString(),
             })
-            .eq('stripe_subscription_id', invoice.subscription as string)
+            .eq('stripe_subscription_id', (invoice as any).subscription as string)
 
           if (updateError) {
             console.error('Error updating past_due subscription:', updateError)
           } else {
-            console.log(`Payment failed for subscription: ${invoice.subscription}`)
+            console.log(`Payment failed for subscription: ${(invoice as any).subscription}`)
           }
         }
         break
@@ -195,20 +195,20 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice
 
-        if (invoice.subscription && invoice.billing_reason === 'subscription_cycle') {
+        if ((invoice as any).subscription && invoice.billing_reason === 'subscription_cycle') {
           // Payment succeeded for recurring subscription
-          const { error: updateError } = await supabase
+          const { error: updateError } = await (supabase as any)
             .from('profiles')
             .update({
               subscription_status: 'active',
               updated_at: new Date().toISOString(),
             })
-            .eq('stripe_subscription_id', invoice.subscription as string)
+            .eq('stripe_subscription_id', (invoice as any).subscription as string)
 
           if (updateError) {
             console.error('Error updating paid subscription:', updateError)
           } else {
-            console.log(`Payment succeeded for subscription: ${invoice.subscription}`)
+            console.log(`Payment succeeded for subscription: ${(invoice as any).subscription}`)
           }
         }
         break

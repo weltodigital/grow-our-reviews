@@ -64,7 +64,7 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await (supabase as any).auth.getUser()
 
   if (authError || !user) {
     return { error: 'Not authenticated' }
@@ -80,7 +80,7 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
   }
 
   // Get user's profile for settings and limits
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await (supabase as any)
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -91,13 +91,13 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
   }
 
   // Check subscription status
-  if (!['active', 'trialing'].includes(profile.subscription_status)) {
+  if (!['active', 'trialing'].includes((profile as any).subscription_status)) {
     return { error: 'Your subscription is inactive. Please update your payment to send review requests.' }
   }
 
   // If trialing, check if trial has expired
-  if (profile.subscription_status === 'trialing' && profile.trial_ends_at) {
-    const trialEnd = new Date(profile.trial_ends_at)
+  if ((profile as any).subscription_status === 'trialing' && (profile as any).trial_ends_at) {
+    const trialEnd = new Date((profile as any).trial_ends_at)
     if (trialEnd < new Date()) {
       return { error: 'Your free trial has expired. Please upgrade your plan to continue sending review requests.' }
     }
@@ -108,14 +108,14 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
   startOfMonth.setDate(1)
   startOfMonth.setHours(0, 0, 0, 0)
 
-  const { count: requestsThisMonth } = await supabase
+  const { count: requestsThisMonth } = await (supabase as any)
     .from('review_requests')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .gte('created_at', startOfMonth.toISOString())
 
-  if (requestsThisMonth && requestsThisMonth >= profile.monthly_request_limit) {
-    return { error: `You've reached your monthly limit of ${profile.monthly_request_limit} requests. Upgrade your plan to send more.` }
+  if (requestsThisMonth && requestsThisMonth >= (profile as any).monthly_request_limit) {
+    return { error: `You've reached your monthly limit of ${(profile as any).monthly_request_limit} requests. Upgrade your plan to send more.` }
   }
 
   try {
@@ -124,7 +124,7 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
 
     // Find or create customer
     let customer
-    const { data: existingCustomer } = await supabase
+    const { data: existingCustomer } = await (supabase as any)
       .from('customers')
       .select('*')
       .eq('user_id', user.id)
@@ -133,7 +133,7 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
 
     if (existingCustomer) {
       // Update existing customer's name in case it changed
-      const { data: updatedCustomer, error: updateError } = await supabase
+      const { data: updatedCustomer, error: updateError } = await (supabase as any)
         .from('customers')
         .update({
           name: data.customerName.trim()
@@ -150,7 +150,7 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
       customer = updatedCustomer
     } else {
       // Create new customer
-      const { data: newCustomer, error: createError } = await supabase
+      const { data: newCustomer, error: createError } = await (supabase as any)
         .from('customers')
         .insert({
           user_id: user.id,
@@ -172,10 +172,10 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
     const token = generateToken()
 
     // Calculate scheduled time
-    const scheduledFor = calculateScheduledTime(profile.sms_delay_hours)
+    const scheduledFor = calculateScheduledTime((profile as any).sms_delay_hours)
 
     // Create review request
-    const { data: reviewRequest, error: createRequestError } = await supabase
+    const { data: reviewRequest, error: createRequestError } = await (supabase as any)
       .from('review_requests')
       .insert({
         user_id: user.id,

@@ -11,7 +11,7 @@ function validateTwilioSignature(
 ): boolean {
   try {
     const authToken = process.env.TWILIO_AUTH_TOKEN!
-    return twilioClient.validateRequest(authToken, signature, url, params)
+    return (twilioClient as any).validateRequest(authToken, signature, url, params)
   } catch (error) {
     console.error('Error validating Twilio signature:', error)
     return false
@@ -88,44 +88,44 @@ export async function POST(request: NextRequest) {
     }
 
     // Update status based on Twilio message status
-    let newStatus = reviewRequest.status
+    let newStatus = (reviewRequest as any).status
 
     switch (messageStatus) {
       case 'delivered':
         // Message was delivered successfully
-        console.log(`SMS delivered for request ${reviewRequest.id}`)
+        console.log(`SMS delivered for request ${(reviewRequest as any).id}`)
         break
 
       case 'failed':
       case 'undelivered':
         // Message failed to deliver
         newStatus = 'failed'
-        console.error(`SMS failed for request ${reviewRequest.id}: ${errorMessage} (Code: ${errorCode})`)
+        console.error(`SMS failed for request ${(reviewRequest as any).id}: ${errorMessage} (Code: ${errorCode})`)
         break
 
       case 'sent':
         // Message was sent from Twilio (intermediate status)
-        console.log(`SMS sent from Twilio for request ${reviewRequest.id}`)
+        console.log(`SMS sent from Twilio for request ${(reviewRequest as any).id}`)
         break
 
       default:
-        console.log(`SMS status update for request ${reviewRequest.id}: ${messageStatus}`)
+        console.log(`SMS status update for request ${(reviewRequest as any).id}: ${messageStatus}`)
     }
 
     // Update the review request if status changed
-    if (newStatus !== reviewRequest.status) {
-      const { error: updateError } = await supabase
+    if (newStatus !== (reviewRequest as any).status) {
+      const { error: updateError } = await (supabase as any)
         .from('review_requests')
         .update({ status: newStatus })
-        .eq('id', reviewRequest.id)
+        .eq('id', (reviewRequest as any).id)
 
       if (updateError) {
-        console.error(`Error updating review request ${reviewRequest.id}:`, updateError)
+        console.error(`Error updating review request ${(reviewRequest as any).id}:`, updateError)
       }
     }
 
     // Log delivery status for monitoring
-    console.log(`Twilio webhook: MessageSid=${messageSid}, Status=${messageStatus}, RequestId=${reviewRequest.id}`)
+    console.log(`Twilio webhook: MessageSid=${messageSid}, Status=${messageStatus}, RequestId=${(reviewRequest as any).id}`)
 
     return response
 

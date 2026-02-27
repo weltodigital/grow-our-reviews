@@ -3,7 +3,7 @@ import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Plus, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { Plus, Clock, CheckCircle, XCircle, MessageSquare } from 'lucide-react'
 
 async function getDashboardStats(userId: string) {
   try {
@@ -84,7 +84,7 @@ async function getDashboardStats(userId: string) {
     const clicks = clicksThisMonth.count || 0
     const reviews = reviewsThisMonth.count || 0
     const feedback = feedbackThisMonth.count || 0
-    const monthlyLimit = profile?.monthly_request_limit || 50
+    const monthlyLimit = (profile as any)?.monthly_request_limit || 50
 
     // Calculate click through rate
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0
@@ -138,7 +138,7 @@ async function getRecentActivity(userId: string) {
       return []
     }
 
-    return recentRequests.map(request => ({
+    return recentRequests.map((request: any) => ({
       id: request.id,
       customerName: request.customers?.name || 'Unknown Customer',
       status: request.status,
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Welcome back, {profile.business_name}
+            Welcome back, {(profile as any).business_name}
           </h1>
           <p className="text-gray-600">
             Here's how your review requests are performing this month

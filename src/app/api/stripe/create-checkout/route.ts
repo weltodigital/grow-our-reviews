@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let response = NextResponse.json({ message: 'Processing checkout' })
+    let response: NextResponse
 
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already has an active subscription
-    if (profile.stripe_subscription_id && profile.subscription_status === 'active') {
+    if ((profile as any).stripe_subscription_id && (profile as any).subscription_status === 'active') {
       return NextResponse.json(
         { error: 'You already have an active subscription' },
         { status: 400 }

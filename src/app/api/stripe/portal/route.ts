@@ -5,7 +5,7 @@ import type { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
-    let response = NextResponse.json({ message: 'Creating portal session' })
+    let response: NextResponse
 
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!profile.stripe_customer_id) {
+    if (!(profile as any).stripe_customer_id) {
       return NextResponse.json(
         { error: 'No Stripe customer found. Please subscribe to a plan first.' },
         { status: 400 }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     // Create customer portal session
     const session = await createCustomerPortalSession({
-      customerId: profile.stripe_customer_id,
+      customerId: (profile as any).stripe_customer_id,
       returnUrl: `${baseUrl}/dashboard/billing`,
     })
 

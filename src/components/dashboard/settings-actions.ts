@@ -29,7 +29,7 @@ export async function updateBusinessInfo(data: BusinessInfoData) {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await (supabase as any).auth.getUser()
 
   if (authError || !user) {
     return { error: 'Not authenticated' }
@@ -52,7 +52,7 @@ export async function updateBusinessInfo(data: BusinessInfoData) {
   }
 
   // Update the profile
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from('profiles')
     .update({
       business_name: data.businessName.trim(),
@@ -77,7 +77,7 @@ export async function updateSmsTimingSettings(data: SmsTimingData) {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await (supabase as any).auth.getUser()
 
   if (authError || !user) {
     return { error: 'Not authenticated' }
@@ -89,7 +89,7 @@ export async function updateSmsTimingSettings(data: SmsTimingData) {
   }
 
   // Update the profile
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from('profiles')
     .update({
       sms_delay_hours: data.smsDelayHours,
@@ -112,7 +112,7 @@ export async function updateNudgeSettings(data: NudgeSettingsData) {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await (supabase as any).auth.getUser()
 
   if (authError || !user) {
     return { error: 'Not authenticated' }
@@ -124,7 +124,7 @@ export async function updateNudgeSettings(data: NudgeSettingsData) {
   }
 
   // Update the profile
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from('profiles')
     .update({
       nudge_enabled: data.nudge_enabled,
@@ -148,7 +148,7 @@ export async function updateAccountInfo(data: AccountInfoData) {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await (supabase as any).auth.getUser()
 
   if (authError || !user) {
     return { error: 'Not authenticated' }
@@ -165,7 +165,7 @@ export async function updateAccountInfo(data: AccountInfoData) {
   }
 
   // Update the user's email (this will send a confirmation email)
-  const { error: updateError } = await supabase.auth.updateUser({
+  const { error: updateError } = await (supabase as any).auth.updateUser({
     email: data.email.trim(),
   })
 
@@ -181,7 +181,7 @@ export async function updateAccountInfo(data: AccountInfoData) {
   }
 
   // Also update the profile email for consistency
-  const { error: profileUpdateError } = await supabase
+  const { error: profileUpdateError } = await (supabase as any)
     .from('profiles')
     .update({
       email: data.email.trim(),
