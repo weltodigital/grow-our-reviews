@@ -51,14 +51,12 @@ export default function SignUpPage() {
         // Create profile
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              email: data.user.email!,
-              subscription_status: 'trialing',
-              trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
-            }
-          ])
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            subscription_status: 'trialing',
+            trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
+          })
 
         if (profileError) {
           console.error('Profile creation error:', profileError)
