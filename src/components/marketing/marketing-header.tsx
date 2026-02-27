@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Star, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { getAppUrl } from '@/lib/utils'
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -37,10 +38,10 @@ export function MarketingHeader() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link href="/login">Log In</Link>
+            <a href={getAppUrl('/login')}>Log In</a>
           </Button>
           <Button asChild>
-            <Link href="/signup">Start Free Trial</Link>
+            <a href={getAppUrl('/signup')}>Start Free Trial</a>
           </Button>
         </div>
 
@@ -95,10 +96,10 @@ export function MarketingHeader() {
 
             <div className="flex flex-col space-y-2 pt-4 border-t">
               <Button variant="ghost" asChild className="justify-start">
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Log In</Link>
+                <a href={getAppUrl('/login')} onClick={() => setMobileMenuOpen(false)}>Log In</a>
               </Button>
               <Button asChild className="justify-start">
-                <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>Start Free Trial</Link>
+                <a href={getAppUrl('/signup')} onClick={() => setMobileMenuOpen(false)}>Start Free Trial</a>
               </Button>
             </div>
           </div>

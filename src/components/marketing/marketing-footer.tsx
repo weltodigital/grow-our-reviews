@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Star, Mail, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { getAppUrl } from '@/lib/utils'
 
 export function MarketingFooter() {
   return (
@@ -17,10 +18,10 @@ export function MarketingFooter() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700">
-                <Link href="/signup">Start Your Free Trial</Link>
+                <a href={getAppUrl('/signup')}>Start Your Free Trial</a>
               </Button>
               <Button size="lg" variant="outline" asChild className="border-gray-600 text-gray-300 hover:bg-gray-800">
-                <Link href="/login">Sign In</Link>
+                <a href={getAppUrl('/login')}>Sign In</a>
               </Button>
             </div>
             <p className="text-sm text-gray-400 mt-4">
@@ -76,7 +77,7 @@ export function MarketingFooter() {
                 <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
               </li>
               <li>
-                <Link href="/signup" className="hover:text-white transition-colors">Free Trial</Link>
+                <a href={getAppUrl('/signup')} className="hover:text-white transition-colors">Free Trial</a>
               </li>
             </ul>
           </div>

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Star, ArrowLeft } from 'lucide-react'
+import { getAppUrl } from '@/lib/utils'
 
 export function PricingHeader() {
   return (
@@ -23,10 +24,10 @@ export function PricingHeader() {
             </Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="/login">Log In</Link>
+            <a href={getAppUrl('/login')}>Log In</a>
           </Button>
           <Button asChild>
-            <Link href="/signup">Start Free Trial</Link>
+            <a href={getAppUrl('/signup')}>Start Free Trial</a>
           </Button>
         </div>
       </div>

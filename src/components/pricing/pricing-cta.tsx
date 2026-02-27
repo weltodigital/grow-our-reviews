@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Star, Shield, Zap, CheckCircle } from 'lucide-react'
+import { getAppUrl } from '@/lib/utils'
 
 export function PricingCta() {
   return (
@@ -33,10 +34,10 @@ export function PricingCta() {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button size="lg" asChild className="bg-white text-blue-600 hover:bg-gray-100">
-              <Link href="/signup">
+              <a href={getAppUrl('/signup')}>
                 <Star className="h-5 w-5 mr-2 fill-current" />
                 Start Your Free Trial
-              </Link>
+              </a>
             </Button>
             <Button size="lg" variant="outline" asChild className="border-blue-300 text-white hover:bg-blue-700">
               <Link href="/">

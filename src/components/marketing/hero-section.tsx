@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowDown, Star, MessageSquare, Shield } from 'lucide-react'
+import { getAppUrl } from '@/lib/utils'
 
 export function HeroSection() {
   const scrollToHowItWorks = () => {
@@ -24,7 +25,7 @@ export function HeroSection() {
 
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button size="lg" asChild>
-              <Link href="/signup">Start Your Free Trial</Link>
+              <a href={getAppUrl('/signup')}>Start Your Free Trial</a>
             </Button>
             <Button
               variant="outline"

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { CheckCircle } from 'lucide-react'
 import { formatPrice } from '@/lib/pricing'
+import { getAppUrl } from '@/lib/utils'
 
 export function PricingSection() {
   const plans = [
@@ -96,7 +97,7 @@ export function PricingSection() {
                   }`}
                   asChild
                 >
-                  <Link href="/signup">Start 7-Day Free Trial</Link>
+                  <a href={getAppUrl('/signup')}>Start 7-Day Free Trial</a>
                 </Button>
               </div>
             </div>
