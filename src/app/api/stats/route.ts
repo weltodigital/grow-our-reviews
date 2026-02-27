@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 
 export async function GET(request: NextRequest) {
-  let response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  let response: NextResponse
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return response
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     const clicks = clicksThisMonth.count || 0
     const reviews = reviewsThisMonth.count || 0
     const feedback = feedbackThisMonth.count || 0
-    const monthlyLimit = profile?.monthly_request_limit || 50
+    const monthlyLimit = (profile as any)?.monthly_request_limit || 50
 
     // Calculate click through rate
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0

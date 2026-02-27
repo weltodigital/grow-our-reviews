@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 
 export async function GET(request: NextRequest) {
-  let response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  let response: NextResponse
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return response
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Format the data for the frontend
-    const formattedRequests = requests?.map(request => ({
+    const formattedRequests = requests?.map((request: any) => ({
       id: request.id,
       customer_name: request.customers?.name || 'Unknown Customer',
       customer_phone: request.customers?.phone || '',

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
 
 export async function GET(request: NextRequest) {
-  let response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  let response: NextResponse
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return response
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
@@ -124,15 +124,15 @@ export async function GET(request: NextRequest) {
     // Calculate analytics
     const totalFeedback = feedbackData?.length || 0
     const averageRating = totalFeedback > 0
-      ? feedbackData!.reduce((sum, item) => sum + item.rating, 0) / totalFeedback
+      ? feedbackData!.reduce((sum: number, item: any) => sum + item.rating, 0) / totalFeedback
       : 0
 
     const ratingDistribution = {
-      1: feedbackData?.filter(item => item.rating === 1).length || 0,
-      2: feedbackData?.filter(item => item.rating === 2).length || 0,
-      3: feedbackData?.filter(item => item.rating === 3).length || 0,
-      4: feedbackData?.filter(item => item.rating === 4).length || 0,
-      5: feedbackData?.filter(item => item.rating === 5).length || 0,
+      1: feedbackData?.filter((item: any) => item.rating === 1).length || 0,
+      2: feedbackData?.filter((item: any) => item.rating === 2).length || 0,
+      3: feedbackData?.filter((item: any) => item.rating === 3).length || 0,
+      4: feedbackData?.filter((item: any) => item.rating === 4).length || 0,
+      5: feedbackData?.filter((item: any) => item.rating === 5).length || 0,
     }
 
     response = NextResponse.json({
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
     const { data: existingFeedback } = await supabase
       .from('feedback')
       .select('id')
-      .eq('review_request_id', reviewRequest.id)
+      .eq('review_request_id', (reviewRequest as any).id)
       .single()
 
     if (existingFeedback) {
@@ -227,11 +227,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the feedback record
-    const { error: feedbackError } = await supabase
+    const { error: feedbackError } = await (supabase as any)
       .from('feedback')
       .insert({
-        review_request_id: reviewRequest.id,
-        user_id: reviewRequest.user_id,
+        review_request_id: (reviewRequest as any).id,
+        user_id: (reviewRequest as any).user_id,
         rating,
         comment: comment?.trim() || null,
       })
@@ -245,12 +245,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Update review request status
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('review_requests')
       .update({
         status: 'feedback_given'
       })
-      .eq('id', reviewRequest.id)
+      .eq('id', (reviewRequest as any).id)
 
     if (updateError) {
       console.error('Error updating review request status:', updateError)
