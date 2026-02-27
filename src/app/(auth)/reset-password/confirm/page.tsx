@@ -19,6 +19,11 @@ function ConfirmResetPasswordForm() {
   useEffect(() => {
     // Handle the auth callback from email link
     const handleAuthCallback = async () => {
+      if (!supabase) {
+        setError('Service temporarily unavailable')
+        return
+      }
+
       const { data, error } = await supabase.auth.getSession()
       if (error) {
         setError('Invalid reset link. Please request a new one.')
@@ -43,6 +48,12 @@ function ConfirmResetPasswordForm() {
     }
 
     setIsLoading(true)
+
+    if (!supabase) {
+      setError('Service temporarily unavailable')
+      setIsLoading(false)
+      return
+    }
 
     try {
       const { error } = await supabase.auth.updateUser({

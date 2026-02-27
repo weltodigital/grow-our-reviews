@@ -19,6 +19,12 @@ export default function ResetPasswordPage() {
     setError('')
     setIsLoading(true)
 
+    if (!supabase) {
+      setError('Service temporarily unavailable')
+      setIsLoading(false)
+      return
+    }
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password/confirm`,

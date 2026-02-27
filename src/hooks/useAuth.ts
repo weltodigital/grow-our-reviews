@@ -13,9 +13,14 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
+
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase!.auth.getSession()
       setUser(session?.user ?? null)
 
       if (session?.user) {
@@ -28,7 +33,7 @@ export function useAuth() {
     getInitialSession()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase!.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null)
 
@@ -46,6 +51,8 @@ export function useAuth() {
   }, [])
 
   const fetchProfile = async (userId: string) => {
+    if (!supabase) return
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -65,6 +72,7 @@ export function useAuth() {
   }
 
   const signOut = async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
   }
 

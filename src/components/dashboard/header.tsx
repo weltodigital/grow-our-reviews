@@ -21,6 +21,7 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
   const router = useRouter()
 
   const handleSignOut = async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
     router.push('/login')
   }
