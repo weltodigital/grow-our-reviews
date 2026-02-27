@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
+import type { Database } from '@/types/database'
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
@@ -49,14 +50,16 @@ export default function SignUpPage() {
 
       if (data.user) {
         // Create profile
-        const { error: profileError } = await supabase
+        const profileData = {
+          id: data.user.id,
+          email: data.user.email!,
+          subscription_status: 'trialing',
+          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
+        }
+
+        const { error: profileError } = await (supabase as any)
           .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            subscription_status: 'trialing',
-            trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
-          })
+          .insert(profileData)
 
         if (profileError) {
           console.error('Profile creation error:', profileError)

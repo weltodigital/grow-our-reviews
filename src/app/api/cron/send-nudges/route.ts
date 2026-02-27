@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 
     // Filter requests that are past their nudge delay time
     const now = new Date()
-    const eligibleRequests = nudgeRequests.filter(request => {
+    const eligibleRequests = nudgeRequests.filter((request: any) => {
       const sentAt = new Date(request.sent_at!)
       const nudgeDelayMs = request.profiles.nudge_delay_hours * 60 * 60 * 1000
       const nudgeTime = new Date(sentAt.getTime() + nudgeDelayMs)
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     for (const request of eligibleRequests) {
       try {
         // Create the sentiment gate URL
-        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${request.token}`
+        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 
         // Create the nudge SMS message
         const message = createNudgeMessage({
