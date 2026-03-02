@@ -3,24 +3,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendSMS, createNudgeMessage } from '@/lib/twilio'
 import type { Database } from '@/types/database'
 
-// Protect the cron endpoint with a secret
-function validateCronSecret(request: NextRequest): boolean {
+// Protect the cron endpoint - Vercel automatically handles cron authentication
+function validateCronRequest(request: NextRequest): boolean {
+  // Check for Vercel cron header
+  const cronHeader = request.headers.get('x-vercel-cron')
+
+  // Also check for custom secret as fallback
   const authHeader = request.headers.get('authorization')
   const expectedSecret = process.env.CRON_SECRET
 
-  if (!expectedSecret) {
-    console.error('CRON_SECRET environment variable not set')
-    return false
-  }
-
-  return authHeader === `Bearer ${expectedSecret}`
+  // Allow if either Vercel cron header is present OR custom secret matches
+  return !!(cronHeader || (expectedSecret && authHeader === `Bearer ${expectedSecret}`))
 }
 
 export async function GET(request: NextRequest) {
-  // Validate cron secret
-  if (!validateCronSecret(request)) {
+  // Validate cron request
+  if (!validateCronRequest(request)) {
     return NextResponse.json(
-      { error: 'Unauthorized' },
+      { error: 'Unauthorized - not a valid cron request' },
       { status: 401 }
     )
   }

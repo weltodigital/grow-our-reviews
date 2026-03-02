@@ -55,8 +55,30 @@ export function RequestsTable({
   }
 
   const handleRetryFailed = async (request: ReviewRequest) => {
-    // TODO: Implement retry logic
-    console.log('Retry failed request:', request.id)
+    try {
+      const response = await fetch('/api/retry-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestId: request.id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Success - refresh the page to show updated status
+        window.location.reload()
+      } else {
+        // Show error message
+        alert(`Failed to retry request: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error retrying request:', error)
+      alert('Failed to retry request. Please try again.')
+    }
   }
 
   const getActionButton = (request: ReviewRequest) => {
