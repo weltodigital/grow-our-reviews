@@ -42,10 +42,10 @@ export async function GET(request: NextRequest) {
         .from('profiles')
         .select('business_name')
         .eq('id', data.user.id)
-        .single()
+        .single() as { data: { business_name: string | null } | null }
 
       // Redirect to onboarding if profile incomplete, otherwise to requested destination
-      if (!profile?.business_name) {
+      if (!profile || !profile.business_name) {
         response = NextResponse.redirect(requestUrl.origin + '/onboarding')
       }
     }
