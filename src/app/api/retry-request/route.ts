@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the failed request with customer and profile data
-    const { data: reviewRequest, error: fetchError } = await supabase
+    const { data: reviewRequest, error: fetchError } = await (supabase as any)
       .from('review_requests')
       .select(`
         *,
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     if (smsResult.success) {
       // Update request status to 'sent'
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('review_requests')
         .update({
           status: 'sent',
