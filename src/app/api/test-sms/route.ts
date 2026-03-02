@@ -1,0 +1,189 @@
+import { createServerClient } from '@supabase/ssr'
+import { NextRequest, NextResponse } from 'next/server'
+import { sendSMS, createInitialReviewMessage } from '@/lib/twilio'
+import type { Database } from '@/types/database'
+
+// Test endpoint to manually trigger SMS sending (remove after testing)
+export async function GET(request: NextRequest) {
+  // For testing only - remove auth check temporarily
+  console.log('Starting test SMS send...')
+
+  let response = NextResponse.json({
+    message: 'Testing SMS sending'
+  })
+
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return (request as any).cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            (request as any).cookies.set({ name, value, ...options })
+            response.cookies.set({ name, value, ...options })
+          })
+        },
+      },
+    }
+  )
+
+  try {
+    // Find all review requests that should be sent now
+    const now = new Date().toISOString()
+
+    const { data: pendingRequests, error: fetchError } = await (supabase as any)
+      .from('review_requests')
+      .select(`
+        *,
+        profiles!inner(business_name, google_review_url),
+        customers!inner(name, phone)
+      `)
+      .eq('status', 'scheduled')
+      .lte('scheduled_for', now)
+      .limit(10) // Process in batches to avoid timeouts
+
+    if (fetchError) {
+      console.error('Error fetching pending requests:', fetchError)
+      return NextResponse.json(
+        { error: 'Failed to fetch pending requests', details: fetchError },
+        { status: 500 }
+      )
+    }
+
+    if (!pendingRequests || pendingRequests.length === 0) {
+      return NextResponse.json({
+        message: 'No messages to send',
+        processed: 0,
+        now,
+        query_time: now
+      })
+    }
+
+    const results = []
+    const sentCount = { success: 0, failed: 0 }
+
+    console.log(`Found ${pendingRequests.length} pending requests`)
+
+    // Process each request
+    for (const request of pendingRequests) {
+      try {
+        console.log(`Processing request ${(request as any).id} for ${(request as any).customers.name}`)
+
+        // Create the sentiment gate URL
+        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
+
+        // Create the SMS message
+        const message = createInitialReviewMessage({
+          customerName: (request as any).customers.name,
+          businessName: (request as any).profiles.business_name,
+          sentimentGateUrl,
+        })
+
+        console.log(`Sending SMS to ${(request as any).customers.phone}:`, message)
+
+        // Send SMS
+        const smsResult = await sendSMS((request as any).customers.phone, message)
+
+        console.log('SMS result:', smsResult)
+
+        if (smsResult.success) {
+          // Update request status to 'sent'
+          const { error: updateError } = await (supabase as any)
+            .from('review_requests')
+            .update({
+              status: 'sent',
+              sent_at: new Date().toISOString(),
+              sms_message_sid: smsResult.messageSid,
+            })
+            .eq('id', (request as any).id)
+
+          if (updateError) {
+            console.error(`Error updating request ${(request as any).id}:`, updateError)
+            results.push({
+              id: (request as any).id,
+              customer: (request as any).customers.name,
+              status: 'sms_sent_but_db_update_failed',
+              error: updateError.message,
+            })
+          } else {
+            sentCount.success++
+            results.push({
+              id: (request as any).id,
+              customer: (request as any).customers.name,
+              status: 'success',
+              messageSid: smsResult.messageSid,
+            })
+          }
+        } else {
+          // Mark as failed
+          const { error: updateError } = await (supabase as any)
+            .from('review_requests')
+            .update({
+              status: 'failed',
+            })
+            .eq('id', (request as any).id)
+
+          sentCount.failed++
+          results.push({
+            id: (request as any).id,
+            customer: (request as any).customers.name,
+            status: 'failed',
+            error: smsResult.error,
+          })
+
+          if (updateError) {
+            console.error(`Error updating failed request ${(request as any).id}:`, updateError)
+          }
+        }
+
+        // Add a small delay between SMS sends to respect rate limits
+        await new Promise(resolve => setTimeout(resolve, 100))
+
+      } catch (error) {
+        console.error(`Unexpected error processing request ${(request as any).id}:`, error)
+        sentCount.failed++
+        results.push({
+          id: (request as any).id,
+          customer: (request as any).customers?.name || 'Unknown',
+          status: 'error',
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })
+      }
+    }
+
+    // Log summary
+    console.log(`Test SMS Summary: ${sentCount.success} sent, ${sentCount.failed} failed`)
+
+    response = NextResponse.json({
+      message: 'Test SMS sending completed',
+      processed: pendingRequests.length,
+      success: sentCount.success,
+      failed: sentCount.failed,
+      results,
+      environment: {
+        twilioConfigured: !!process.env.TWILIO_ACCOUNT_SID && !!process.env.TWILIO_AUTH_TOKEN,
+        phoneNumber: process.env.TWILIO_PHONE_NUMBER,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL,
+      }
+    })
+    return response
+
+  } catch (error) {
+    console.error('Unexpected error in test SMS:', error)
+    return NextResponse.json(
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
+// Only allow GET requests
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  )
+}
