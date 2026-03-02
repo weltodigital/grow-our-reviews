@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Send, MousePointer, Star, MessageSquare } from 'lucide-react'
+import Link from 'next/link'
 
 interface StatsOverviewProps {
   stats: {
@@ -95,9 +96,12 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
               <div className="text-sm text-gray-500">
                 Need more requests?
               </div>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              <Link
+                href="/dashboard/billing"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
+              >
                 Upgrade plan →
-              </button>
+              </Link>
             </div>
           </div>
         </CardContent>

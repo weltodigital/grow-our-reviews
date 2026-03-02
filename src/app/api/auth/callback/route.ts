@@ -6,8 +6,9 @@ import type { Database } from '@/types/database'
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/dashboard'
 
-  let response = NextResponse.redirect(requestUrl.origin + '/dashboard')
+  let response = NextResponse.redirect(requestUrl.origin + next)
 
   if (code) {
     const supabase = createServerClient<Database>(
@@ -28,7 +29,26 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (error) {
+      console.error('Auth callback error:', error)
+      return NextResponse.redirect(requestUrl.origin + '/login?error=auth_callback_error')
+    }
+
+    if (data.user) {
+      // Check if user has completed onboarding
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('business_name')
+        .eq('id', data.user.id)
+        .single()
+
+      // Redirect to onboarding if profile incomplete, otherwise to requested destination
+      if (!profile?.business_name) {
+        response = NextResponse.redirect(requestUrl.origin + '/onboarding')
+      }
+    }
   }
 
   return response

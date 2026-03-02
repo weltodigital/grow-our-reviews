@@ -30,7 +30,7 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
     <>
       {/* Mobile header */}
       <div className="sticky top-0 z-40 lg:hidden">
-        <div className="flex h-16 items-center justify-between bg-white px-4 shadow-sm">
+        <div className="flex h-16 items-center justify-between bg-white px-4 shadow-sm border-b border-gray-200">
           <Link href="/dashboard" className="flex items-center">
             <div className="text-lg font-bold text-blue-600">
               Grow Our Reviews
@@ -45,7 +45,6 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
               variant="outline"
               size="sm"
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="lg:hidden"
             >
               {mobileNavOpen ? (
                 <X className="h-4 w-4" />
@@ -54,33 +53,6 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
               )}
             </Button>
           </div>
-        </div>
-      </div>
-
-      {/* Desktop header - user info */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:right-0 lg:z-50 lg:flex lg:w-96 lg:flex-col">
-        <div className="flex h-16 items-center justify-between bg-white px-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-600">
-              {profile.business_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">
-                {profile.business_name}
-              </span>
-              <span className="text-xs text-gray-500">
-                {user.email}
-              </span>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
         </div>
       </div>
 

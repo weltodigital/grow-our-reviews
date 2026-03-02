@@ -12,7 +12,7 @@ export async function sendWelcomeEmail(to: string, businessName: string) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Grow Our Reviews <ed@weltodigital.com>',
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
       to: [to],
       subject: 'Welcome to Grow Our Reviews! 🌟',
       html: `
@@ -64,7 +64,7 @@ export async function sendTrialEndingEmail(to: string, businessName: string, tri
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Grow Our Reviews <ed@weltodigital.com>',
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
       to: [to],
       subject: `Your free trial ends on ${trialEndDate}`,
       html: `
@@ -110,7 +110,7 @@ export async function sendSubscriptionConfirmationEmail(to: string, businessName
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Grow Our Reviews <ed@weltodigital.com>',
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
       to: [to],
       subject: `Welcome to the ${planName} plan! 🎉`,
       html: `
