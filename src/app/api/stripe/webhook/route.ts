@@ -73,21 +73,28 @@ export async function POST(request: NextRequest) {
             ? new Date(subscription.trial_end * 1000)
             : calculateTrialEndDate()
 
-          // Update profile with subscription info
-          const { error: updateError } = await (supabase as any)
+          // Create or update profile with subscription info
+          const { error: upsertError } = await (supabase as any)
             .from('profiles')
-            .update({
-              stripe_customer_id: session.customer as string,
-              stripe_subscription_id: subscription.id,
-              subscription_status: subscription.status,
-              monthly_request_limit: priceInfo.monthlyRequestLimit,
-              trial_ends_at: trialEnd.toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', userId)
+            .upsert(
+              {
+                id: userId,
+                email: session.customer_details?.email || '',
+                stripe_customer_id: session.customer as string,
+                stripe_subscription_id: subscription.id,
+                subscription_status: subscription.status,
+                monthly_request_limit: priceInfo.monthlyRequestLimit,
+                trial_ends_at: trialEnd.toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+              {
+                onConflict: 'id',
+              }
+            )
 
-          if (updateError) {
-            console.error('Error updating profile after checkout:', updateError)
+          if (upsertError) {
+            console.error('Error upserting profile after checkout:', upsertError)
           } else {
             console.log(`Subscription created for user ${userId}:`, {
               subscriptionId: subscription.id,

@@ -39,7 +39,7 @@ export type Plan = typeof PRICING_PLANS[PlanKey]
 // Trial configuration
 export const TRIAL_CONFIG = {
   durationDays: 14,
-  requiresCard: false,
+  requiresCard: true,
   defaultPlan: 'starter' as PlanKey,
 } as const
 
