@@ -21,9 +21,12 @@ import type { Database } from '@/types/database'
 interface BillingDashboardProps {
   user: User
   profile: Database['public']['Tables']['profiles']['Row']
+  billingStats: {
+    requestsSentThisMonth: number
+  }
 }
 
-export function BillingDashboard({ user, profile }: BillingDashboardProps) {
+export function BillingDashboard({ user, profile, billingStats }: BillingDashboardProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -77,15 +80,12 @@ export function BillingDashboard({ user, profile }: BillingDashboardProps) {
   const trialDaysRemaining = trialEndsAt
     ? Math.max(0, Math.ceil((trialEndsAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
     : 0
+  const trialHasEnded = trialEndsAt && trialEndsAt < new Date()
 
-  // Calculate usage this month
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-  // This would normally be fetched from the API
-  const mockUsage = {
-    requestsSent: 8,
-    requestsRemaining: profile.monthly_request_limit - 8,
+  // Calculate usage this month using real data
+  const usage = {
+    requestsSent: billingStats.requestsSentThisMonth,
+    requestsRemaining: profile.monthly_request_limit - billingStats.requestsSentThisMonth,
   }
 
   return (
@@ -108,26 +108,43 @@ export function BillingDashboard({ user, profile }: BillingDashboardProps) {
 
       {/* Trial Banner */}
       {isTrialing && (
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className={`border-2 ${trialHasEnded ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}`}>
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
-              <div className="rounded-full bg-blue-100 p-2">
-                <Zap className="h-5 w-5 text-blue-600" />
+              <div className={`rounded-full p-2 ${trialHasEnded ? 'bg-red-100' : 'bg-blue-100'}`}>
+                {trialHasEnded ? (
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                ) : (
+                  <Zap className="h-5 w-5 text-blue-600" />
+                )}
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900">
-                  Free Trial Active
+                <h3 className={`font-semibold ${trialHasEnded ? 'text-red-900' : 'text-blue-900'}`}>
+                  {trialHasEnded ? 'Free Trial Ended' : 'Free Trial Active'}
                 </h3>
-                <p className="text-blue-700 text-sm mt-1">
-                  {trialDaysRemaining > 0
-                    ? `${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining in your free trial.`
-                    : 'Your trial has ended.'
-                  } {trialEndsAt && `Trial ends ${trialEndsAt.toLocaleDateString('en-GB')}.`}
+                <p className={`text-sm mt-1 ${trialHasEnded ? 'text-red-700' : 'text-blue-700'}`}>
+                  {trialHasEnded ? (
+                    <>Your free trial ended on {trialEndsAt?.toLocaleDateString('en-GB')}. Please upgrade to continue using the service.</>
+                  ) : (
+                    <>
+                      {trialDaysRemaining > 0
+                        ? `${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining in your free trial.`
+                        : 'Your trial ends today.'
+                      } {trialEndsAt && `Trial ends ${trialEndsAt.toLocaleDateString('en-GB')}.`}
+                    </>
+                  )}
                 </p>
-                {trialDaysRemaining <= 3 && (
+                {!trialHasEnded && trialDaysRemaining <= 3 && (
                   <p className="text-blue-800 text-sm mt-2 font-medium">
-                    Your subscription will start automatically when the trial ends.
+                    Remember to upgrade before your trial ends to continue using the service.
                   </p>
+                )}
+                {trialHasEnded && (
+                  <Button asChild className="mt-3 bg-red-600 hover:bg-red-700">
+                    <Link href="/pricing">
+                      Upgrade Now
+                    </Link>
+                  </Button>
                 )}
               </div>
             </div>
@@ -163,18 +180,18 @@ export function BillingDashboard({ user, profile }: BillingDashboardProps) {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Requests this month</span>
-              <span>{mockUsage.requestsSent} of {profile.monthly_request_limit}</span>
+              <span>{usage.requestsSent} of {profile.monthly_request_limit}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{
-                  width: `${Math.min(100, (mockUsage.requestsSent / profile.monthly_request_limit) * 100)}%`
+                  width: `${Math.min(100, (usage.requestsSent / profile.monthly_request_limit) * 100)}%`
                 }}
               />
             </div>
             <div className="text-xs text-gray-500">
-              {mockUsage.requestsRemaining} requests remaining
+              {usage.requestsRemaining} requests remaining
             </div>
           </div>
 
