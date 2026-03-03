@@ -16,11 +16,13 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccessMessage('')
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
@@ -62,7 +64,7 @@ export default function SignUpPage() {
           router.push('/billing/setup')
         } else {
           // User needs to confirm email first
-          setError('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup.')
+          setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup.')
         }
       }
     } catch (err) {
@@ -119,8 +121,13 @@ export default function SignUpPage() {
             />
           </div>
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded">
               {error}
+            </div>
+          )}
+          {successMessage && (
+            <div className="text-sm text-green-600 bg-green-50 border border-green-200 p-3 rounded">
+              {successMessage}
             </div>
           )}
           <Button type="submit" className="w-full" disabled={isLoading}>
