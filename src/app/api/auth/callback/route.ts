@@ -44,12 +44,19 @@ export async function GET(request: NextRequest) {
         .eq('id', data.user.id)
         .single() as { data: { business_name: string | null; stripe_customer_id: string | null; created_at: string } | null }
 
-      // Only redirect new users (created in the last 5 minutes) to billing setup
-      // This allows existing users to continue using the system while new signups get the proper flow
-      const isNewUser = profile && new Date(profile.created_at).getTime() > (Date.now() - 5 * 60 * 1000)
+      // Check if the redirect is explicitly requesting billing setup (from signup flow)
+      const isBillingSetupRequest = next.includes('/billing/setup')
+
+      // Consider a user "new" if:
+      // 1. No profile exists yet, OR
+      // 2. Profile was created recently (within last hour) AND has no stripe customer ID, OR
+      // 3. The redirect explicitly requests billing setup
+      const isNewUser = !profile ||
+        (profile && new Date(profile.created_at).getTime() > (Date.now() - 60 * 60 * 1000) && !profile.stripe_customer_id) ||
+        isBillingSetupRequest
 
       if (!profile) {
-        // No profile at all - this is a new user, start with billing
+        // No profile at all - this is definitely a new user, start with billing
         response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
       } else if (isNewUser && !profile.stripe_customer_id) {
         // New user without billing setup - redirect to billing
