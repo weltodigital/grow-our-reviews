@@ -34,7 +34,7 @@ export default function BillingSetupPage() {
         .eq('id', session.user.id)
         .single()
 
-      if (profile && (profile.subscription_status === 'active' || profile.subscription_status === 'trialing')) {
+      if (profile && ((profile as any).subscription_status === 'active' || (profile as any).subscription_status === 'trialing')) {
         router.push('/onboarding')
       }
     }
