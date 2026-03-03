@@ -44,25 +44,32 @@ export async function GET(request: NextRequest) {
         .eq('id', data.user.id)
         .single() as { data: { business_name: string | null; stripe_customer_id: string | null; created_at: string } | null }
 
+      // Log for debugging
+      console.log('Auth callback debug:', {
+        userId: data.user.id,
+        next,
+        profile: profile ? {
+          hasBusinessName: !!profile.business_name,
+          hasStripeId: !!profile.stripe_customer_id,
+          createdAt: profile.created_at,
+        } : null
+      })
+
       // Check if the redirect is explicitly requesting billing setup (from signup flow)
       const isBillingSetupRequest = next.includes('/billing/setup')
 
-      // Consider a user "new" if:
-      // 1. No profile exists yet, OR
-      // 2. Profile was created recently (within last hour) AND has no stripe customer ID, OR
-      // 3. The redirect explicitly requests billing setup
-      const isNewUser = !profile ||
-        (profile && new Date(profile.created_at).getTime() > (Date.now() - 60 * 60 * 1000) && !profile.stripe_customer_id) ||
-        isBillingSetupRequest
-
+      // For all new signups (no existing profile OR no stripe customer ID), redirect to billing
       if (!profile) {
         // No profile at all - this is definitely a new user, start with billing
+        console.log('No profile found - redirecting to billing setup')
         response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
-      } else if (isNewUser && !profile.stripe_customer_id) {
-        // New user without billing setup - redirect to billing
+      } else if (!profile.stripe_customer_id) {
+        // Any user without stripe customer ID should go to billing setup
+        console.log('No stripe customer ID - redirecting to billing setup')
         response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
       } else if (!profile.business_name) {
-        // Existing user or new user with billing - check for business info
+        // Has billing but no business info - go to onboarding
+        console.log('Has billing but no business name - redirecting to onboarding')
         response = NextResponse.redirect(requestUrl.origin + '/onboarding')
       }
       // Otherwise go to the requested destination (default is /dashboard)
