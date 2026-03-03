@@ -37,17 +37,28 @@ export async function GET(request: NextRequest) {
     }
 
     if (data.user) {
-      // Check if user has completed onboarding
+      // Check if user has completed onboarding and billing setup
       const { data: profile } = await supabase
         .from('profiles')
-        .select('business_name')
+        .select('business_name, stripe_customer_id, created_at')
         .eq('id', data.user.id)
-        .single() as { data: { business_name: string | null } | null }
+        .single() as { data: { business_name: string | null; stripe_customer_id: string | null; created_at: string } | null }
 
-      // Redirect to onboarding if profile incomplete, otherwise to requested destination
-      if (!profile || !profile.business_name) {
+      // Only redirect new users (created in the last 5 minutes) to billing setup
+      // This allows existing users to continue using the system while new signups get the proper flow
+      const isNewUser = profile && new Date(profile.created_at).getTime() > (Date.now() - 5 * 60 * 1000)
+
+      if (!profile) {
+        // No profile at all - this is a new user, start with billing
+        response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
+      } else if (isNewUser && !profile.stripe_customer_id) {
+        // New user without billing setup - redirect to billing
+        response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
+      } else if (!profile.business_name) {
+        // Existing user or new user with billing - check for business info
         response = NextResponse.redirect(requestUrl.origin + '/onboarding')
       }
+      // Otherwise go to the requested destination (default is /dashboard)
     }
   }
 

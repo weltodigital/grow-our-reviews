@@ -208,6 +208,38 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
         </CardContent>
       </Card>
 
+      {/* Legacy Trial Notice for users without Stripe billing */}
+      {!profile.stripe_customer_id && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="rounded-full p-2 bg-amber-100">
+                <AlertTriangle className="h-5 w-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-900">
+                  Legacy Free Trial Account
+                </h3>
+                <p className="text-sm text-amber-700 mt-1">
+                  You're currently on our legacy free trial. To continue using the service long-term and access new features, you can upgrade to a modern subscription with Stripe billing.
+                </p>
+                <div className="mt-3">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                  >
+                    <Link href="/billing/setup">
+                      Set Up Billing
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Billing Information */}
       {profile.stripe_customer_id && (
         <Card>
