@@ -28,19 +28,21 @@ export const STRIPE_CONFIG = {
 
 export type StripePlanKey = keyof typeof STRIPE_CONFIG
 
-// Create checkout session with 7-day trial
+// Create checkout session with customizable trial
 export async function createCheckoutSession({
   priceId,
   successUrl,
   cancelUrl,
   customerEmail,
   userId,
+  trialDays = 7,
 }: {
   priceId: string
   successUrl: string
   cancelUrl: string
   customerEmail: string
   userId: string
+  trialDays?: number
 }) {
   if (!stripe) {
     throw new Error('Stripe is not configured')
@@ -57,7 +59,7 @@ export async function createCheckoutSession({
       },
     ],
     subscription_data: {
-      trial_period_days: 7, // 7-day trial
+      trial_period_days: trialDays,
       metadata: {
         userId,
       },

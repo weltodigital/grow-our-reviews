@@ -44,7 +44,7 @@ export function PricingSection() {
             Simple, transparent pricing
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Start with a 14-day free trial. No hidden fees, cancel anytime.
+            Start with a 14-day free trial. Credit card required, cancel anytime.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export function PricingSection() {
               <p>✓ Cancel anytime with one click</p>
             </div>
             <p className="text-xs text-gray-500 mt-3">
-              No credit card required to start your trial.
+              Credit card required. You'll only be charged after your 14-day trial ends.
             </p>
           </div>
         </div>

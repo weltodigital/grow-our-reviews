@@ -41,11 +41,12 @@ export default function SignUpPage() {
     }
 
     try {
+      // First create the user account
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/onboarding`,
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/billing/setup`,
         }
       })
 
@@ -55,27 +56,13 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
-        // Create profile
-        const profileData = {
-          id: data.user.id,
-          email: data.user.email!,
-          subscription_status: 'trialing',
-          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
-        }
-
-        const { error: profileError } = await (supabase as any)
-          .from('profiles')
-          .insert(profileData)
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-        }
-
         // Check if user needs to confirm email
         if (data.session) {
-          router.push('/onboarding')
+          // User is immediately logged in, redirect to billing setup
+          router.push('/billing/setup')
         } else {
-          setError('Please check your email to confirm your account')
+          // User needs to confirm email first
+          setError('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup.')
         }
       }
     } catch (err) {
@@ -91,7 +78,7 @@ export default function SignUpPage() {
       <CardHeader>
         <CardTitle>Create your account</CardTitle>
         <CardDescription>
-          Start your 14-day free trial. No credit card required.
+          Start your 14-day free trial. Credit card required - cancel anytime.
         </CardDescription>
       </CardHeader>
       <CardContent>

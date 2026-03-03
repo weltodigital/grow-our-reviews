@@ -124,7 +124,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                 </h3>
                 <p className={`text-sm mt-1 ${trialHasEnded ? 'text-red-700' : 'text-blue-700'}`}>
                   {trialHasEnded ? (
-                    <>Your free trial ended on {trialEndsAt?.toLocaleDateString('en-GB')}. Please upgrade to continue using the service.</>
+                    <>Your free trial ended on {trialEndsAt?.toLocaleDateString('en-GB')}. Billing has now started automatically.</>
                   ) : (
                     <>
                       {trialDaysRemaining > 0
@@ -136,15 +136,13 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                 </p>
                 {!trialHasEnded && trialDaysRemaining <= 3 && (
                   <p className="text-blue-800 text-sm mt-2 font-medium">
-                    Remember to upgrade before your trial ends to continue using the service.
+                    Your subscription will automatically start when your trial ends. You can cancel anytime through your billing portal.
                   </p>
                 )}
                 {trialHasEnded && (
-                  <Button asChild className="mt-3 bg-red-600 hover:bg-red-700">
-                    <Link href="/pricing">
-                      Upgrade Now
-                    </Link>
-                  </Button>
+                  <p className="text-blue-800 text-sm mt-2 font-medium">
+                    Your subscription is now active. Use the "Manage Billing" button below to modify your plan or payment method.
+                  </p>
                 )}
               </div>
             </div>

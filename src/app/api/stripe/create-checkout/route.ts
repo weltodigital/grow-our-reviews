@@ -6,10 +6,23 @@ import type { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
-    const { planKey } = await request.json() as { planKey: PlanKey }
+    const { planKey, priceId, successUrl, cancelUrl, trialDays } = await request.json() as {
+      planKey?: PlanKey
+      priceId?: string
+      successUrl?: string
+      cancelUrl?: string
+      trialDays?: number
+    }
 
-    // Validate plan
-    if (!planKey || !PRICING_PLANS[planKey]) {
+    // Validate input - either planKey or priceId is required
+    if (!planKey && !priceId) {
+      return NextResponse.json(
+        { error: 'Plan key or price ID is required' },
+        { status: 400 }
+      )
+    }
+
+    if (planKey && !PRICING_PLANS[planKey]) {
       return NextResponse.json(
         { error: 'Invalid plan selected' },
         { status: 400 }
@@ -65,23 +78,34 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already has an active subscription
-    if ((profile as any).stripe_subscription_id && (profile as any).subscription_status === 'active') {
+    if ((profile as any).stripe_subscription_id &&
+        ((profile as any).subscription_status === 'active' || (profile as any).subscription_status === 'trialing')) {
       return NextResponse.json(
         { error: 'You already have an active subscription' },
         { status: 400 }
       )
     }
 
-    const plan = PRICING_PLANS[planKey]
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    // Determine the price ID to use
+    const finalPriceId = priceId || (planKey ? PRICING_PLANS[planKey].stripeProductId : null)
+
+    if (!finalPriceId) {
+      return NextResponse.json(
+        { error: 'Unable to determine price ID' },
+        { status: 400 }
+      )
+    }
 
     // Create Stripe checkout session
     const session = await createCheckoutSession({
-      priceId: plan.stripeProductId!,
-      successUrl: `${baseUrl}/dashboard/billing?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${baseUrl}/pricing`,
+      priceId: finalPriceId,
+      successUrl: successUrl || `${baseUrl}/dashboard/billing?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: cancelUrl || `${baseUrl}/pricing`,
       customerEmail: user.email!,
       userId: user.id,
+      trialDays: trialDays,
     })
 
     response = NextResponse.json({
