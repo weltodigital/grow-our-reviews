@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Building, ExternalLink, Save } from 'lucide-react'
+import { Building, ExternalLink, Save, HelpCircle, X } from 'lucide-react'
 import { updateBusinessInfo } from './settings-actions'
+import GoogleReviewGuide from '@/components/GoogleReviewGuide'
 import type { Database } from '@/types/database'
 
 interface BusinessInfoSettingsProps {
@@ -26,6 +27,7 @@ export function BusinessInfoSettings({
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showGuide, setShowGuide] = useState(false)
 
   const hasChanges =
     businessName !== (profile.business_name || '') ||
@@ -59,17 +61,19 @@ export function BusinessInfoSettings({
       return
     }
 
-    if (!googleReviewUrl.trim()) {
-      setError('Google Review URL is required')
-      return
-    }
-
-    // Basic URL validation
-    try {
-      new URL(googleReviewUrl)
-    } catch {
-      setError('Please enter a valid Google Review URL')
-      return
+    // Basic URL validation (only if provided)
+    if (googleReviewUrl.trim()) {
+      try {
+        new URL(googleReviewUrl)
+        // Additional validation for Google URLs
+        if (!googleReviewUrl.includes('google')) {
+          setError('This doesn\'t look like a Google Review link. Check the guide below for help finding the right one.')
+          return
+        }
+      } catch {
+        setError('Please enter a valid Google Review URL')
+        return
+      }
     }
 
     setIsSaving(true)
@@ -78,7 +82,7 @@ export function BusinessInfoSettings({
     try {
       const result = await updateBusinessInfo({
         businessName: businessName.trim(),
-        googleReviewUrl: googleReviewUrl.trim(),
+        googleReviewUrl: googleReviewUrl.trim() || null,
         phone: phone.trim() || null,
       })
 
@@ -159,18 +163,28 @@ export function BusinessInfoSettings({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="googleReviewUrl">Google Review URL *</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="googleReviewUrl">Google Review URL</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowGuide(true)}
+              className="text-blue-600 hover:text-blue-700 p-1"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </Button>
+          </div>
           <Input
             id="googleReviewUrl"
             type="url"
             value={googleReviewUrl}
             onChange={(e) => handleInputChange('googleReviewUrl', e.target.value)}
             placeholder="https://search.google.com/local/writereview?placeid=..."
-            required
           />
           <div className="flex items-center justify-between">
             <p className="text-xs text-gray-500">
-              Where customers go to leave public reviews
+              Where customers go to leave public reviews. {!googleReviewUrl && <span className="text-orange-600">Required before sending review requests.</span>}
             </p>
             {googleReviewUrl && (
               <Button
@@ -190,6 +204,18 @@ export function BusinessInfoSettings({
               </Button>
             )}
           </div>
+          {!googleReviewUrl && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowGuide(true)}
+              className="w-full sm:w-auto"
+            >
+              <HelpCircle className="h-4 w-4 mr-2" />
+              How do I find this?
+            </Button>
+          )}
         </div>
 
         {error && (
@@ -223,6 +249,31 @@ export function BusinessInfoSettings({
                 </>
               )}
             </Button>
+          </div>
+        )}
+
+        {/* Guide Modal */}
+        {showGuide && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">How to Find Your Google Review Link</h2>
+                <button
+                  onClick={() => setShowGuide(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="px-6 py-4">
+                <GoogleReviewGuide showTitle={false} />
+              </div>
+              <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
+                <Button onClick={() => setShowGuide(false)} className="w-full sm:w-auto">
+                  Got it, thanks!
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>

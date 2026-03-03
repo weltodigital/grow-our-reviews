@@ -12,6 +12,20 @@ export interface SMSTemplate {
   sentimentGateUrl: string
 }
 
+export interface CustomSMSTemplate {
+  greeting: string
+  opening_line: string
+  request_line: string
+  sign_off: string | null
+}
+
+export interface MessageData {
+  customerName: string
+  businessName: string
+  sentimentGateUrl: string
+  template?: CustomSMSTemplate
+}
+
 export function createInitialReviewMessage({ customerName, businessName, sentimentGateUrl }: SMSTemplate): string {
   return `Hi ${customerName}, thanks for choosing ${businessName}! If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds 👇
 
@@ -24,6 +38,57 @@ export function createNudgeMessage({ customerName, businessName, sentimentGateUr
 ${sentimentGateUrl}
 
 No pressure at all — thanks!`
+}
+
+export function createCustomInitialMessage({ customerName, businessName, sentimentGateUrl, template }: MessageData): string {
+  // Use custom template if provided, otherwise fall back to default
+  if (!template) {
+    return createInitialReviewMessage({ customerName, businessName, sentimentGateUrl })
+  }
+
+  // Replace {business_name} placeholder in opening line
+  const processedOpeningLine = template.opening_line.replace(/\{business_name\}/g, businessName)
+
+  // Build message components
+  const messageParts = []
+
+  // Format: {greeting} {customer_name}, {opening_line}
+  messageParts.push(`${template.greeting} ${customerName}, ${processedOpeningLine}`)
+  messageParts.push('')
+  messageParts.push(`${template.request_line} 👇`)
+  messageParts.push('')
+  messageParts.push(sentimentGateUrl)
+
+  // Add sign-off if provided
+  if (template.sign_off && template.sign_off.trim()) {
+    messageParts.push('')
+    messageParts.push(template.sign_off)
+  }
+
+  return messageParts.join('\n')
+}
+
+export function createCustomNudgeMessage({ customerName, businessName, sentimentGateUrl, template }: MessageData): string {
+  // Use custom template if provided, otherwise fall back to default
+  if (!template) {
+    return createNudgeMessage({ customerName, businessName, sentimentGateUrl })
+  }
+
+  // Build nudge message
+  const messageParts = []
+
+  // Format: {greeting} {customer_name}, just a gentle reminder — {request_line}:
+  messageParts.push(`${template.greeting} ${customerName}, just a gentle reminder — ${template.request_line}:`)
+  messageParts.push('')
+  messageParts.push(sentimentGateUrl)
+
+  // Add sign-off if provided
+  if (template.sign_off && template.sign_off.trim()) {
+    messageParts.push('')
+    messageParts.push(template.sign_off)
+  }
+
+  return messageParts.join('\n')
 }
 
 export async function sendSMS(to: string, message: string): Promise<{

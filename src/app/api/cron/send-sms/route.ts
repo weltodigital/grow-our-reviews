@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { sendSMS, createInitialReviewMessage } from '@/lib/twilio'
+import { sendSMS, createInitialReviewMessage, createCustomInitialMessage } from '@/lib/twilio'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       .from('review_requests')
       .select(`
         *,
-        profiles!inner(business_name, google_review_url),
+        profiles!inner(business_name, google_review_url, id),
         customers!inner(name, phone)
       `)
       .eq('status', 'scheduled')
@@ -77,6 +77,25 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    // Get all unique user IDs to fetch their SMS templates
+    const userIds = [...new Set(pendingRequests.map((req: any) => req.profiles.id))]
+
+    // Fetch SMS templates for all users
+    const { data: smsTemplates } = await (supabase as any)
+      .from('sms_templates')
+      .select('*')
+      .in('user_id', userIds)
+      .eq('type', 'initial')
+      .eq('is_active', true)
+
+    // Create a map of user ID to template for quick lookup
+    const templateMap = new Map()
+    if (smsTemplates) {
+      smsTemplates.forEach((template: any) => {
+        templateMap.set(template.user_id, template)
+      })
+    }
+
     const results = []
     const sentCount = { success: 0, failed: 0 }
 
@@ -86,11 +105,20 @@ export async function GET(request: NextRequest) {
         // Create the sentiment gate URL
         const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 
-        // Create the SMS message
-        const message = createInitialReviewMessage({
+        // Get the user's custom template
+        const userTemplate = templateMap.get((request as any).profiles.id)
+
+        // Create the SMS message using custom template if available
+        const message = createCustomInitialMessage({
           customerName: (request as any).customers.name,
           businessName: (request as any).profiles.business_name,
           sentimentGateUrl,
+          template: userTemplate ? {
+            greeting: userTemplate.greeting,
+            opening_line: userTemplate.opening_line,
+            request_line: userTemplate.request_line,
+            sign_off: userTemplate.sign_off
+          } : undefined
         })
 
         // Send SMS

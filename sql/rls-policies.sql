@@ -65,3 +65,16 @@ CREATE POLICY "Public can insert feedback via token" ON feedback
       AND review_requests.token IS NOT NULL
     )
   );
+
+-- SMS templates policies (users can only access their own templates)
+CREATE POLICY "Users can view own sms templates" ON sms_templates
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own sms templates" ON sms_templates
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own sms templates" ON sms_templates
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own sms templates" ON sms_templates
+  FOR DELETE USING (auth.uid() = user_id);

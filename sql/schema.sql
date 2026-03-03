@@ -53,11 +53,27 @@ CREATE TABLE feedback (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Create sms_templates table
+CREATE TABLE sms_templates (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('initial', 'nudge')),
+  greeting TEXT DEFAULT 'Hi',
+  opening_line TEXT DEFAULT 'thanks for choosing {business_name}!',
+  request_line TEXT DEFAULT 'If you were happy with our work, we''d really appreciate a quick review — it only takes 30 seconds',
+  sign_off TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, type)
+);
+
 -- Enable RLS on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE review_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sms_templates ENABLE ROW LEVEL SECURITY;
 
 -- Create indexes for performance
 CREATE INDEX idx_customers_user_id ON customers(user_id);
@@ -68,6 +84,8 @@ CREATE INDEX idx_review_requests_scheduled_for ON review_requests(scheduled_for)
 CREATE INDEX idx_review_requests_token ON review_requests(token);
 CREATE INDEX idx_feedback_user_id ON feedback(user_id);
 CREATE INDEX idx_feedback_review_request_id ON feedback(review_request_id);
+CREATE INDEX idx_sms_templates_user_id ON sms_templates(user_id);
+CREATE INDEX idx_sms_templates_type ON sms_templates(type);
 
 -- Create function to generate unique tokens
 CREATE OR REPLACE FUNCTION generate_review_token() RETURNS TEXT AS $$
@@ -109,5 +127,10 @@ $$ LANGUAGE plpgsql;
 -- Trigger to automatically update updated_at
 CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_sms_templates_updated_at
+  BEFORE UPDATE ON sms_templates
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();

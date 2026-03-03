@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import GoogleReviewGuide from '@/components/GoogleReviewGuide'
 import { completeOnboarding } from './actions'
 
 export default function OnboardingPage() {
@@ -13,6 +15,7 @@ export default function OnboardingPage() {
   const [googleReviewUrl, setGoogleReviewUrl] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showGuide, setShowGuide] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +26,29 @@ export default function OnboardingPage() {
     try {
       const result = await completeOnboarding({
         businessName: businessName.trim(),
-        googleReviewUrl: googleReviewUrl.trim(),
+        googleReviewUrl: googleReviewUrl.trim() || null,
+      })
+
+      if (result.error) {
+        setError(result.error)
+      } else {
+        router.push('/dashboard')
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSkip = async () => {
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const result = await completeOnboarding({
+        businessName: businessName.trim(),
+        googleReviewUrl: null,
       })
 
       if (result.error) {
@@ -74,19 +99,45 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <Label htmlFor="googleReviewUrl">Google Reviews URL *</Label>
+                <Label htmlFor="googleReviewUrl">Google Reviews URL</Label>
                 <Input
                   id="googleReviewUrl"
                   type="url"
                   value={googleReviewUrl}
                   onChange={(e) => setGoogleReviewUrl(e.target.value)}
                   placeholder="https://search.google.com/local/writereview?placeid=..."
-                  required
                   className="mt-1"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Where customers will be sent to leave a review. Find this by searching for your business on Google, clicking "Write a review", and copying the URL.
+                  Where customers will be sent to leave a review. You can add this later if you don't have it ready.
                 </p>
+
+                {/* Collapsible Guide */}
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowGuide(!showGuide)}
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    {showGuide ? (
+                      <>
+                        <ChevronUp className="h-4 w-4" />
+                        Hide guide
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        How do I find this?
+                      </>
+                    )}
+                  </button>
+
+                  {showGuide && (
+                    <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <GoogleReviewGuide showTitle={false} className="text-sm" />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {error && (
@@ -95,13 +146,31 @@ export default function OnboardingPage() {
                 </div>
               )}
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading || !businessName.trim() || !googleReviewUrl.trim()}
-              >
-                {isLoading ? 'Setting up...' : 'Complete Setup'}
-              </Button>
+              <div className="space-y-3">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading || !businessName.trim()}
+                >
+                  {isLoading ? 'Setting up...' : 'Complete Setup'}
+                </Button>
+
+                {!googleReviewUrl.trim() && businessName.trim() && (
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={handleSkip}
+                      disabled={isLoading}
+                      className="text-sm text-blue-600 hover:text-blue-500 underline"
+                    >
+                      Skip for now - I'll add this later
+                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      No problem — you can add this anytime from Settings. You'll need it before you can send your first review request.
+                    </p>
+                  </div>
+                )}
+              </div>
             </form>
           </CardContent>
         </Card>

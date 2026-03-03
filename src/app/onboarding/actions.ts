@@ -6,7 +6,7 @@ import type { Database } from '@/types/database'
 
 interface OnboardingData {
   businessName: string
-  googleReviewUrl: string
+  googleReviewUrl: string | null
 }
 
 export async function completeOnboarding(data: OnboardingData) {
@@ -27,15 +27,13 @@ export async function completeOnboarding(data: OnboardingData) {
     return { error: 'Business name is required' }
   }
 
-  if (!data.googleReviewUrl.trim()) {
-    return { error: 'Google Reviews URL is required' }
-  }
-
-  // Basic URL validation
-  try {
-    new URL(data.googleReviewUrl)
-  } catch {
-    return { error: 'Please enter a valid URL for your Google Reviews page' }
+  // Basic URL validation (only if provided)
+  if (data.googleReviewUrl) {
+    try {
+      new URL(data.googleReviewUrl)
+    } catch {
+      return { error: 'Please enter a valid URL for your Google Reviews page' }
+    }
   }
 
   // Create or update the profile
@@ -46,7 +44,7 @@ export async function completeOnboarding(data: OnboardingData) {
         id: user.id,
         email: user.email!,
         business_name: data.businessName.trim(),
-        google_review_url: data.googleReviewUrl.trim(),
+        google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
         updated_at: new Date().toISOString(),
       },
       {
@@ -57,6 +55,37 @@ export async function completeOnboarding(data: OnboardingData) {
   if (upsertError) {
     console.error('Error updating profile:', upsertError)
     return { error: 'Failed to save your business information. Please try again.' }
+  }
+
+  // Create default SMS templates for the user
+  const defaultTemplates = [
+    {
+      user_id: user.id,
+      type: 'initial',
+      greeting: 'Hi',
+      opening_line: 'thanks for choosing {business_name}!',
+      request_line: 'If you were happy with our work, we\'d really appreciate a quick review — it only takes 30 seconds',
+      sign_off: null
+    },
+    {
+      user_id: user.id,
+      type: 'nudge',
+      greeting: 'Hi',
+      opening_line: 'thanks for choosing {business_name}!',
+      request_line: 'If you were happy with our work, we\'d really appreciate a quick review — it only takes 30 seconds',
+      sign_off: null
+    }
+  ]
+
+  const { error: templatesError } = await (supabase as any)
+    .from('sms_templates')
+    .upsert(defaultTemplates, {
+      onConflict: 'user_id,type',
+    })
+
+  if (templatesError) {
+    console.error('Error creating default SMS templates:', templatesError)
+    // Don't fail onboarding if templates fail - they can be created later
   }
 
   // Send welcome email

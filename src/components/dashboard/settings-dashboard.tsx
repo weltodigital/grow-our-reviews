@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Save, Settings } from 'lucide-react'
@@ -9,17 +10,23 @@ import { BusinessInfoSettings } from './business-info-settings'
 import { SmsTimingSettings } from './sms-timing-settings'
 import { NudgeSettings } from './nudge-settings'
 import { AccountSettings } from './account-settings'
+import SmsTemplateEditor from './SmsTemplateEditor'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
 interface SettingsDashboardProps {
   user: User
   profile: Database['public']['Tables']['profiles']['Row']
+  smsTemplates?: {
+    initial: Database['public']['Tables']['sms_templates']['Row'] | null
+    nudge: Database['public']['Tables']['sms_templates']['Row'] | null
+  }
 }
 
-export function SettingsDashboard({ user, profile }: SettingsDashboardProps) {
+export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashboardProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const router = useRouter()
 
   const handleSettingsChange = () => {
     setHasUnsavedChanges(true)
@@ -27,6 +34,10 @@ export function SettingsDashboard({ user, profile }: SettingsDashboardProps) {
 
   const handleSettingsSaved = () => {
     setHasUnsavedChanges(false)
+  }
+
+  const handleTemplateUpdated = () => {
+    router.refresh()
   }
 
   return (
@@ -72,6 +83,14 @@ export function SettingsDashboard({ user, profile }: SettingsDashboardProps) {
           onSettingsSaved={handleSettingsSaved}
         />
 
+        {/* SMS Template Editor */}
+        <SmsTemplateEditor
+          profile={profile}
+          initialTemplate={smsTemplates?.initial || undefined}
+          nudgeTemplate={smsTemplates?.nudge || undefined}
+          onTemplateUpdated={handleTemplateUpdated}
+        />
+
         {/* SMS Timing Settings */}
         <SmsTimingSettings
           profile={profile}
@@ -107,16 +126,19 @@ export function SettingsDashboard({ user, profile }: SettingsDashboardProps) {
               Need Help?
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-4 text-sm">
             <div>
               <strong>Finding your Google Reviews URL:</strong>
-              <ol className="list-decimal list-inside mt-1 text-gray-600 space-y-1">
-                <li>Search for your business on Google</li>
-                <li>Click "Write a review" on your business listing</li>
-                <li>Copy the URL from your browser's address bar</li>
-                <li>Paste it in the "Google Review URL" field above</li>
-              </ol>
+              <p className="text-gray-600 mt-1 mb-2">
+                Need help finding your Google Review link? We've created a step-by-step guide with pictures.
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/help/google-review-link">
+                  View Complete Guide
+                </Link>
+              </Button>
             </div>
+
             <div>
               <strong>SMS Timing Tips:</strong>
               <ul className="list-disc list-inside mt-1 text-gray-600 space-y-1">
@@ -125,6 +147,7 @@ export function SettingsDashboard({ user, profile }: SettingsDashboardProps) {
                 <li>SMS won't be sent between 9pm-8am regardless of settings</li>
               </ul>
             </div>
+
             <div>
               <strong>Questions?</strong> Contact us at{' '}
               <a

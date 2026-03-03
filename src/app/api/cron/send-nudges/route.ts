@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { sendSMS, createNudgeMessage } from '@/lib/twilio'
+import { sendSMS, createNudgeMessage, createCustomNudgeMessage } from '@/lib/twilio'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
       .select(`
         *,
         profiles!inner(
+          id,
           business_name,
           google_review_url,
           nudge_enabled,
@@ -102,6 +103,25 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    // Get all unique user IDs to fetch their nudge SMS templates
+    const userIds = [...new Set(eligibleRequests.map((req: any) => req.profiles.id))]
+
+    // Fetch nudge SMS templates for all users
+    const { data: smsTemplates } = await (supabase as any)
+      .from('sms_templates')
+      .select('*')
+      .in('user_id', userIds)
+      .eq('type', 'nudge')
+      .eq('is_active', true)
+
+    // Create a map of user ID to template for quick lookup
+    const templateMap = new Map()
+    if (smsTemplates) {
+      smsTemplates.forEach((template: any) => {
+        templateMap.set(template.user_id, template)
+      })
+    }
+
     const results = []
     const sentCount = { success: 0, failed: 0 }
 
@@ -111,11 +131,20 @@ export async function GET(request: NextRequest) {
         // Create the sentiment gate URL
         const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 
-        // Create the nudge SMS message
-        const message = createNudgeMessage({
+        // Get the user's custom nudge template
+        const userTemplate = templateMap.get((request as any).profiles.id)
+
+        // Create the nudge SMS message using custom template if available
+        const message = createCustomNudgeMessage({
           customerName: (request as any).customers.name,
           businessName: (request as any).profiles.business_name,
           sentimentGateUrl,
+          template: userTemplate ? {
+            greeting: userTemplate.greeting,
+            opening_line: userTemplate.opening_line,
+            request_line: userTemplate.request_line,
+            sign_off: userTemplate.sign_off
+          } : undefined
         })
 
         // Send nudge SMS

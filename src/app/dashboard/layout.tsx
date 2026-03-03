@@ -2,6 +2,7 @@ import { requireUserWithProfile } from '@/lib/auth'
 import { DashboardNav } from '@/components/dashboard/nav'
 import { DashboardHeader } from '@/components/dashboard/header'
 import { LogoutButton } from '@/components/dashboard/logout-button'
+import GoogleReviewUrlBanner from '@/components/dashboard/GoogleReviewUrlBanner'
 
 export default async function DashboardLayout({
   children,
@@ -45,6 +46,9 @@ export default async function DashboardLayout({
 
           {/* Mobile header */}
           <DashboardHeader user={user} profile={profile} />
+
+          {/* Google Review URL Banner */}
+          <GoogleReviewUrlBanner profile={profile} />
 
           {/* Page content */}
           <main>

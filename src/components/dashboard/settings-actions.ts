@@ -5,7 +5,7 @@ import type { Database } from '@/types/database'
 
 interface BusinessInfoData {
   businessName: string
-  googleReviewUrl: string
+  googleReviewUrl: string | null
   phone: string | null
 }
 
@@ -20,6 +20,14 @@ interface AccountInfoData {
 interface NudgeSettingsData {
   nudge_enabled: boolean
   nudge_delay_hours: number
+}
+
+interface SmsTemplateData {
+  type: 'initial' | 'nudge'
+  greeting: string
+  opening_line: string
+  request_line: string
+  sign_off: string | null
 }
 
 export async function updateBusinessInfo(data: BusinessInfoData) {
@@ -40,15 +48,13 @@ export async function updateBusinessInfo(data: BusinessInfoData) {
     return { error: 'Business name is required' }
   }
 
-  if (!data.googleReviewUrl.trim()) {
-    return { error: 'Google Reviews URL is required' }
-  }
-
-  // Basic URL validation
-  try {
-    new URL(data.googleReviewUrl)
-  } catch {
-    return { error: 'Please enter a valid URL for your Google Reviews page' }
+  // Basic URL validation (only if provided)
+  if (data.googleReviewUrl) {
+    try {
+      new URL(data.googleReviewUrl)
+    } catch {
+      return { error: 'Please enter a valid URL for your Google Reviews page' }
+    }
   }
 
   // Update the profile
@@ -56,7 +62,7 @@ export async function updateBusinessInfo(data: BusinessInfoData) {
     .from('profiles')
     .update({
       business_name: data.businessName.trim(),
-      google_review_url: data.googleReviewUrl.trim(),
+      google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
       phone: data.phone?.trim() || null,
       updated_at: new Date().toISOString(),
     })
@@ -192,6 +198,80 @@ export async function updateAccountInfo(data: AccountInfoData) {
   if (profileUpdateError) {
     console.error('Error updating profile email:', profileUpdateError)
     // Don't return error here since the auth update succeeded
+  }
+
+  return { success: true }
+}
+
+export async function updateSmsTemplate(data: SmsTemplateData) {
+  const supabase = await createServerSupabase()
+
+  // Get the current user
+  const {
+    data: { user },
+    error: authError,
+  } = await (supabase as any).auth.getUser()
+
+  if (authError || !user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Validate the data
+  if (!data.greeting.trim()) {
+    return { error: 'Greeting is required' }
+  }
+
+  if (data.greeting.length > 20) {
+    return { error: 'Greeting must be 20 characters or less' }
+  }
+
+  if (!data.opening_line.trim()) {
+    return { error: 'Opening line is required' }
+  }
+
+  if (data.opening_line.length > 150) {
+    return { error: 'Opening line must be 150 characters or less' }
+  }
+
+  if (!data.request_line.trim()) {
+    return { error: 'Request line is required' }
+  }
+
+  if (data.request_line.length > 200) {
+    return { error: 'Request line must be 200 characters or less' }
+  }
+
+  if (data.sign_off && data.sign_off.length > 50) {
+    return { error: 'Sign-off must be 50 characters or less' }
+  }
+
+  // Strip any URLs from user input
+  const stripUrls = (text: string) => {
+    return text.replace(/https?:\/\/[^\s]+/gi, '')
+  }
+
+  const cleanedData = {
+    greeting: stripUrls(data.greeting.trim()),
+    opening_line: stripUrls(data.opening_line.trim()),
+    request_line: stripUrls(data.request_line.trim()),
+    sign_off: data.sign_off ? stripUrls(data.sign_off.trim()) || null : null
+  }
+
+  // Update the template
+  const { error: updateError } = await (supabase as any)
+    .from('sms_templates')
+    .upsert({
+      user_id: user.id,
+      type: data.type,
+      ...cleanedData,
+      updated_at: new Date().toISOString(),
+    }, {
+      onConflict: 'user_id,type',
+    })
+
+  if (updateError) {
+    console.error('Error updating SMS template:', updateError)
+    return { error: 'Failed to save your SMS template. Please try again.' }
   }
 
   return { success: true }
