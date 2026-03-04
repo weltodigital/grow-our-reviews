@@ -122,18 +122,38 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                 <h3 className={`font-semibold ${trialHasEnded ? 'text-red-900' : 'text-blue-900'}`}>
                   {trialHasEnded ? 'Free Trial Ended' : 'Free Trial Active'}
                 </h3>
-                <p className={`text-sm mt-1 ${trialHasEnded ? 'text-red-700' : 'text-blue-700'}`}>
-                  {trialHasEnded ? (
-                    <>Your free trial ended on {trialEndsAt?.toLocaleDateString('en-GB')}. Billing has now started automatically.</>
-                  ) : (
-                    <>
-                      {trialDaysRemaining > 0
-                        ? `${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining in your free trial.`
-                        : 'Your trial ends today.'
-                      } {trialEndsAt && `Trial ends ${trialEndsAt.toLocaleDateString('en-GB')}.`}
-                    </>
+                <div className="space-y-2">
+                  <p className={`text-sm ${trialHasEnded ? 'text-red-700' : 'text-blue-700'}`}>
+                    {trialHasEnded ? (
+                      <>Your free trial ended on {trialEndsAt?.toLocaleDateString('en-GB')}. Billing has now started automatically.</>
+                    ) : (
+                      <>
+                        {trialDaysRemaining > 0
+                          ? `${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining in your free trial.`
+                          : 'Your trial ends today.'
+                        } {trialEndsAt && `Trial ends ${trialEndsAt.toLocaleDateString('en-GB')}.`}
+                      </>
+                    )}
+                  </p>
+
+                  {/* Trial Progress Bar */}
+                  {!trialHasEnded && trialEndsAt && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs text-blue-600">
+                        <span>Trial progress</span>
+                        <span>{14 - trialDaysRemaining} of 14 days used</span>
+                      </div>
+                      <div className="w-full bg-blue-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${Math.min(100, ((14 - trialDaysRemaining) / 14) * 100)}%`
+                          }}
+                        />
+                      </div>
+                    </div>
                   )}
-                </p>
+                </div>
                 {!trialHasEnded && trialDaysRemaining <= 3 && (
                   <p className="text-blue-800 text-sm mt-2 font-medium">
                     Your subscription will automatically start when your trial ends. You can cancel anytime through your billing portal.
@@ -210,7 +230,6 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
 
       {/* Billing Information */}
-      {profile.stripe_customer_id && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -235,10 +254,21 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Customer ID</p>
-                <p className="text-sm text-gray-600 font-mono">
-                  {profile.stripe_customer_id.substring(0, 20)}...
-                </p>
+                {profile.stripe_customer_id ? (
+                  <>
+                    <p className="font-medium">Customer ID</p>
+                    <p className="text-sm text-gray-600 font-mono">
+                      {profile.stripe_customer_id.substring(0, 20)}...
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium">Billing Management</p>
+                    <p className="text-sm text-gray-600">
+                      Manage your subscription and payment methods
+                    </p>
+                  </>
+                )}
               </div>
               <Button
                 onClick={handleManageSubscription}
@@ -267,7 +297,6 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
             </div>
           </CardContent>
         </Card>
-      )}
 
       {/* Upgrade Options */}
       {currentPlan === 'starter' && (
@@ -285,10 +314,15 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                   Just {formatPrice(getCostPerRequest('growth'))} per credit vs {formatPrice(getCostPerRequest('starter'))} on Starter
                 </p>
               </div>
-              <Button asChild className="bg-green-600 hover:bg-green-700">
-                <Link href="/pricing">
-                  Upgrade Now
-                </Link>
+              <Button
+                onClick={handleManageSubscription}
+                disabled={isLoading}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                ) : null}
+                Upgrade Now
               </Button>
             </div>
           </CardContent>
