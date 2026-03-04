@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { createCustomerPortalSession } from '@/lib/stripe'
 import type { Database } from '@/types/database'
+import Stripe from 'stripe'
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,7 +54,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!(profile as any).stripe_customer_id) {
+    let customerId = (profile as any).stripe_customer_id
+
+    // If no customer ID in profile, try to find customer by email
+    if (!customerId) {
+      try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+          apiVersion: '2023-10-16'
+        })
+        const customers = await stripe.customers.list({
+          email: user.email,
+          limit: 1
+        })
+
+        if (customers.data.length > 0) {
+          customerId = customers.data[0].id
+
+          // Update profile with the found customer ID
+          await supabase
+            .from('profiles')
+            .update({ stripe_customer_id: customerId })
+            .eq('id', user.id)
+        }
+      } catch (stripeError) {
+        console.error('Error looking up Stripe customer:', stripeError)
+      }
+    }
+
+    if (!customerId) {
       return NextResponse.json(
         { error: 'No Stripe customer found. Please subscribe to a plan first.' },
         { status: 400 }
@@ -64,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Create customer portal session
     const session = await createCustomerPortalSession({
-      customerId: (profile as any).stripe_customer_id,
+      customerId: customerId,
       returnUrl: `${baseUrl}/dashboard/billing`,
     })
 
