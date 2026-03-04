@@ -255,13 +255,13 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
   // Calculate message length based on type
   let testMessage = ''
   if (data.type === 'nudge') {
-    // Nudge format: {greeting} {customer_name}, just a gentle reminder — {request_line}:
-    testMessage = `${data.greeting} ${testCustomerName}, just a gentle reminder — ${data.request_line}:\n\n${testUrl}`
+    // Nudge format: {greeting} {customer_name}, just a quick reminder — would you mind leaving us a review:
+    testMessage = `${data.greeting} ${testCustomerName}, just a quick reminder — would you mind leaving us a review:\n\n${testUrl}`
     if (data.sign_off?.trim()) {
       testMessage += `\n\n${data.sign_off}`
     }
   } else {
-    // Initial format: {greeting} {customer_name}, {opening_line}
+    // Initial format: {greeting} {customer_name}, {opening_line}\n\n{request_line} 👇
     testMessage = `${data.greeting} ${testCustomerName}, ${processedOpeningLine}\n\n${data.request_line} 👇\n\n${testUrl}`
     if (data.sign_off?.trim()) {
       testMessage += `\n\n${data.sign_off}`

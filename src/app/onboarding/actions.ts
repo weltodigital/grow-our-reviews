@@ -63,16 +63,16 @@ export async function completeOnboarding(data: OnboardingData) {
       user_id: user.id,
       type: 'initial',
       greeting: 'Hi',
-      opening_line: 'thx for {business_name}!',
-      request_line: 'Review please',
+      opening_line: 'thanks for choosing {business_name}!',
+      request_line: 'We\'d love your feedback',
       sign_off: null
     },
     {
       user_id: user.id,
       type: 'nudge',
       greeting: 'Hi',
-      opening_line: 'thx for {business_name}!',
-      request_line: 'Review please',
+      opening_line: 'thanks for choosing {business_name}!',
+      request_line: 'We\'d love your feedback',
       sign_off: null
     }
   ]

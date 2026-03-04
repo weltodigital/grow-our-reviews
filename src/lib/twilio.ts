@@ -33,11 +33,9 @@ ${sentimentGateUrl}`
 }
 
 export function createNudgeMessage({ customerName, businessName, sentimentGateUrl }: SMSTemplate): string {
-  return `Hi ${customerName}, just a gentle reminder — if you have 30 seconds, ${businessName} would love a quick review:
+  return `Hi ${customerName}, just a quick reminder — would you mind leaving us a review:
 
-${sentimentGateUrl}
-
-No pressure at all — thanks!`
+${sentimentGateUrl}`
 }
 
 export function createCustomInitialMessage({ customerName, businessName, sentimentGateUrl, template }: MessageData): string {
@@ -77,8 +75,8 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
   // Build nudge message
   const messageParts = []
 
-  // Format: {greeting} {customer_name}, just a gentle reminder — {request_line}:
-  messageParts.push(`${template.greeting} ${customerName}, just a gentle reminder — ${template.request_line}:`)
+  // Format: {greeting} {customer_name}, just a quick reminder — would you mind leaving us a review:
+  messageParts.push(`${template.greeting} ${customerName}, just a quick reminder — would you mind leaving us a review:`)
   messageParts.push('')
   messageParts.push(sentimentGateUrl)
 

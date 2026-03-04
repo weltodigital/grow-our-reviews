@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS sms_templates (
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('initial', 'nudge')),
   greeting TEXT DEFAULT 'Hi',
-  opening_line TEXT DEFAULT 'thx for {business_name}!',
-  request_line TEXT DEFAULT 'Review please',
+  opening_line TEXT DEFAULT 'thanks for choosing {business_name}!',
+  request_line TEXT DEFAULT 'We\'d love to hear your feedback',
   sign_off TEXT,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -50,8 +50,8 @@ SELECT
   id as user_id,
   'initial' as type,
   'Hi' as greeting,
-  'thx for {business_name}!' as opening_line,
-  'Review please' as request_line,
+  'thanks for choosing {business_name}!' as opening_line,
+  'We\'d love your feedback' as request_line,
   NULL as sign_off,
   true as is_active,
   NOW() as created_at,
@@ -72,8 +72,8 @@ SELECT
   id as user_id,
   'nudge' as type,
   'Hi' as greeting,
-  'thx for {business_name}!' as opening_line,
-  'Review please' as request_line,
+  'thanks for choosing {business_name}!' as opening_line,
+  'We\'d love your feedback' as request_line,
   NULL as sign_off,
   true as is_active,
   NOW() as created_at,
@@ -91,14 +91,15 @@ ON CONFLICT (user_id, type) DO UPDATE SET
 -- Update any existing templates that still have the old long defaults
 UPDATE sms_templates
 SET
-  opening_line = 'thx for {business_name}!',
-  request_line = 'Review please',
+  opening_line = 'thanks for choosing {business_name}!',
+  request_line = 'We\'d love your feedback',
   updated_at = NOW()
 WHERE
   request_line LIKE '%30 seconds%'
   OR request_line LIKE '%quick review%'
-  OR opening_line = 'thanks for choosing {business_name}!'
+  OR request_line = 'Review please'
   OR opening_line = 'thanks for using {business_name}!'
+  OR opening_line = 'thx for {business_name}!'
   OR opening_line = 'thanks for {business_name}!';
 
 -- Verify the setup
@@ -118,7 +119,7 @@ SELECT
       WHEN st.type = 'initial' THEN
         'Hi Christopher, ' || REPLACE(st.opening_line, '{business_name}', COALESCE(p.business_name, 'Your Business')) || '\n\n' || st.request_line || ' 👇\n\nhttps://growourreviews.com/review/a1b2c3d4e5f6'
       ELSE
-        'Hi Christopher, reminder — ' || st.request_line || ':\n\nhttps://growourreviews.com/review/a1b2c3d4e5f6'
+        'Hi Christopher, just a quick reminder — would you mind leaving us a review:\n\nhttps://growourreviews.com/review/a1b2c3d4e5f6'
     END
   ) as estimated_sms_length
 FROM profiles p

@@ -25,9 +25,9 @@ export default function SmsPreview({
   // Assemble the message based on template type
   const assembleMessage = () => {
     if (templateType === 'nudge') {
-      // Nudge format: {greeting} {customer_name}, just a gentle reminder — {request_line}:
+      // Nudge format: {greeting} {customer_name}, just a quick reminder — would you mind leaving us a review:
       const messageLines = []
-      messageLines.push(`${greeting} ${customerName}, just a gentle reminder — ${requestLine}:`)
+      messageLines.push(`${greeting} ${customerName}, just a quick reminder — would you mind leaving us a review:`)
       messageLines.push('')
       messageLines.push('https://growourreviews.com/review/a1b2c3d4e5f6')
 
