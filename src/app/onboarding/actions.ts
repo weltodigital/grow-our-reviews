@@ -57,22 +57,22 @@ export async function completeOnboarding(data: OnboardingData) {
     return { error: 'Failed to save your business information. Please try again.' }
   }
 
-  // Create default SMS templates for the user (optimized for 160 character limit)
+  // Create default SMS templates for the user (optimized for 160 character limit with shorter tokens)
   const defaultTemplates = [
     {
       user_id: user.id,
       type: 'initial',
       greeting: 'Hi',
-      opening_line: 'thanks for using {business_name}!',
-      request_line: 'Quick review please',
+      opening_line: 'thx for {business_name}!',
+      request_line: 'Review please',
       sign_off: null
     },
     {
       user_id: user.id,
       type: 'nudge',
       greeting: 'Hi',
-      opening_line: 'thanks for using {business_name}!',
-      request_line: 'Quick review please',
+      opening_line: 'thx for {business_name}!',
+      request_line: 'Review please',
       sign_off: null
     }
   ]

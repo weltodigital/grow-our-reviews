@@ -94,7 +94,9 @@ DECLARE
   exists BOOLEAN DEFAULT TRUE;
 BEGIN
   WHILE exists LOOP
-    token := encode(gen_random_bytes(16), 'hex');
+    -- Generate 6 bytes (12 hex chars) instead of 16 bytes (32 hex chars)
+    -- This saves 20 characters in SMS messages while maintaining security
+    token := encode(gen_random_bytes(6), 'hex');
     SELECT EXISTS(SELECT 1 FROM review_requests WHERE review_requests.token = token) INTO exists;
   END LOOP;
   RETURN token;

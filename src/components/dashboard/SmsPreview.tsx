@@ -29,7 +29,7 @@ export default function SmsPreview({
       const messageLines = []
       messageLines.push(`${greeting} ${customerName}, just a gentle reminder — ${requestLine}:`)
       messageLines.push('')
-      messageLines.push('https://growourreviews.com/review/abc123')
+      messageLines.push('https://growourreviews.com/review/a1b2c3d4e5f6')
 
       if (signOff && signOff.trim()) {
         messageLines.push('')
@@ -44,7 +44,7 @@ export default function SmsPreview({
       messageLines.push('')
       messageLines.push(`${requestLine} 👇`)
       messageLines.push('')
-      messageLines.push('https://growourreviews.com/review/abc123')
+      messageLines.push('https://growourreviews.com/review/a1b2c3d4e5f6')
 
       if (signOff && signOff.trim()) {
         messageLines.push('')

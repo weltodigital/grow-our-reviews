@@ -245,10 +245,10 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
     return { error: 'Sign-off must be 50 characters or less' }
   }
 
-  // Validate total message length (simulate with common values)
+  // Validate total message length (simulate with common values and shorter tokens)
   const testCustomerName = 'Christopher'
   const testBusinessName = 'Professional Services Ltd'
-  const testUrl = 'https://growourreviews.com/review/abc123'
+  const testUrl = 'https://growourreviews.com/review/a1b2c3d4e5f6'  // 12-char token (shorter)
 
   const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, testBusinessName)
 
