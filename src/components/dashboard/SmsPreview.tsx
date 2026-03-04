@@ -98,8 +98,14 @@ export default function SmsPreview({
             <div className="flex items-start gap-2">
               <div className="text-orange-600 text-sm font-medium">⚠️</div>
               <div className="text-sm text-orange-700">
-                This message is over 160 characters and will be sent as {segments} SMS segments, which costs more.
-                Try shortening your message.
+                <div className="font-medium">This message will use {segments} credits instead of 1</div>
+                <div className="mt-1">
+                  Messages over 160 characters are split into {segments} SMS segments, with each segment using 1 credit from your monthly allowance.
+                  This will reduce your available requests faster.
+                </div>
+                <div className="mt-2 font-medium text-orange-800">
+                  💡 Try shortening your message to save credits
+                </div>
               </div>
             </div>
           </div>
@@ -110,8 +116,13 @@ export default function SmsPreview({
             <div className="flex items-start gap-2">
               <div className="text-red-600 text-sm font-medium">🚫</div>
               <div className="text-sm text-red-700">
-                Message is too long (over 300 characters). This would be very expensive to send.
-                Please shorten your message significantly.
+                <div className="font-medium">This message would use {segments} credits - that's extremely expensive!</div>
+                <div className="mt-1">
+                  A message this long could quickly exhaust your monthly credit allowance. Each of the {segments} segments counts as a separate request against your plan limit.
+                </div>
+                <div className="mt-2 font-medium text-red-800">
+                  🔴 Please shorten your message significantly to avoid wasting credits
+                </div>
               </div>
             </div>
           </div>
