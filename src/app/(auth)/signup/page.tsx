@@ -48,7 +48,7 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/billing/setup`,
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/onboarding`,
         }
       })
 
@@ -60,8 +60,8 @@ export default function SignUpPage() {
       if (data.user) {
         // Check if user needs to confirm email
         if (data.session) {
-          // User is immediately logged in, redirect to billing setup
-          router.push('/billing/setup')
+          // User is immediately logged in, redirect to onboarding
+          router.push('/onboarding')
         } else {
           // User needs to confirm email first
           setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup.')

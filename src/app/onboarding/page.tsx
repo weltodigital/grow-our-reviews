@@ -32,7 +32,7 @@ export default function OnboardingPage() {
       if (result.error) {
         setError(result.error)
       } else {
-        router.push('/dashboard')
+        router.push('/billing/setup')
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')
@@ -54,7 +54,7 @@ export default function OnboardingPage() {
       if (result.error) {
         setError(result.error)
       } else {
-        router.push('/dashboard')
+        router.push('/billing/setup')
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')

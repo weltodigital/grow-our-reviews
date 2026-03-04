@@ -58,19 +58,19 @@ export async function GET(request: NextRequest) {
       // Check if the redirect is explicitly requesting billing setup (from signup flow)
       const isBillingSetupRequest = next.includes('/billing/setup')
 
-      // For all new signups (no existing profile OR no stripe customer ID), redirect to billing
+      // New flow: Onboarding first, then billing
       if (!profile) {
-        // No profile at all - this is definitely a new user, start with billing
-        console.log('No profile found - redirecting to billing setup')
-        response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
+        // No profile at all - this is definitely a new user, start with onboarding
+        console.log('No profile found - redirecting to onboarding')
+        response = NextResponse.redirect(requestUrl.origin + '/onboarding')
+      } else if (!profile.business_name) {
+        // No business info - go to onboarding first
+        console.log('No business name - redirecting to onboarding')
+        response = NextResponse.redirect(requestUrl.origin + '/onboarding')
       } else if (!profile.stripe_customer_id) {
-        // Any user without stripe customer ID should go to billing setup
+        // Has business info but no billing - go to billing setup
         console.log('No stripe customer ID - redirecting to billing setup')
         response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
-      } else if (!profile.business_name) {
-        // Has billing but no business info - go to onboarding
-        console.log('Has billing but no business name - redirecting to onboarding')
-        response = NextResponse.redirect(requestUrl.origin + '/onboarding')
       }
       // Otherwise go to the requested destination (default is /dashboard)
     }

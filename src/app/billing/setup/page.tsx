@@ -70,7 +70,7 @@ export default function BillingSetupPage() {
         },
         body: JSON.stringify({
           priceId: plan === 'starter' ? process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_GROWTH_PRICE_ID,
-          successUrl: `${window.location.origin}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
+          successUrl: `${window.location.origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/billing/setup`,
           trialDays: 14,
         }),
