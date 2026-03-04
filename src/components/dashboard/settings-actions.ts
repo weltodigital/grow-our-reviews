@@ -245,6 +245,35 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
     return { error: 'Sign-off must be 50 characters or less' }
   }
 
+  // Validate total message length (simulate with common values)
+  const testCustomerName = 'Christopher'
+  const testBusinessName = 'Professional Services Ltd'
+  const testUrl = 'https://growourreviews.com/review/abc123'
+
+  const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, testBusinessName)
+
+  // Calculate message length based on type
+  let testMessage = ''
+  if (data.type === 'nudge') {
+    // Nudge format: {greeting} {customer_name}, just a gentle reminder — {request_line}:
+    testMessage = `${data.greeting} ${testCustomerName}, just a gentle reminder — ${data.request_line}:\n\n${testUrl}`
+    if (data.sign_off?.trim()) {
+      testMessage += `\n\n${data.sign_off}`
+    }
+  } else {
+    // Initial format: {greeting} {customer_name}, {opening_line}
+    testMessage = `${data.greeting} ${testCustomerName}, ${processedOpeningLine}\n\n${data.request_line} 👇\n\n${testUrl}`
+    if (data.sign_off?.trim()) {
+      testMessage += `\n\n${data.sign_off}`
+    }
+  }
+
+  if (testMessage.length > 160) {
+    return {
+      error: `Message too long (${testMessage.length} chars). Must be under 160 characters to avoid SMS splitting. Try shortening your text.`
+    }
+  }
+
   // Strip any URLs from user input
   const stripUrls = (text: string) => {
     return text.replace(/https?:\/\/[^\s]+/gi, '')
@@ -271,7 +300,8 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
 
   if (updateError) {
     console.error('Error updating SMS template:', updateError)
-    return { error: 'Failed to save your SMS template. Please try again.' }
+    console.error('Template data:', { user_id: user.id, type: data.type, ...cleanedData })
+    return { error: `Failed to save your SMS template: ${updateError.message || updateError}` }
   }
 
   return { success: true }

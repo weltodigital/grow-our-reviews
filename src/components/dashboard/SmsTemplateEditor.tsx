@@ -22,14 +22,14 @@ interface SmsTemplateEditorProps {
 const DEFAULT_TEMPLATES = {
   initial: {
     greeting: 'Hi',
-    opening_line: 'thanks for choosing {business_name}!',
-    request_line: 'If you were happy with our work, we\'d really appreciate a quick review — it only takes 30 seconds',
+    opening_line: 'thanks for using {business_name}!',
+    request_line: 'Quick review please',
     sign_off: null
   },
   nudge: {
     greeting: 'Hi',
-    opening_line: 'thanks for choosing {business_name}!',
-    request_line: 'If you were happy with our work, we\'d really appreciate a quick review — it only takes 30 seconds',
+    opening_line: 'thanks for using {business_name}!',
+    request_line: 'Quick review please',
     sign_off: null
   }
 }

@@ -65,13 +65,8 @@ export function BusinessInfoSettings({
     if (googleReviewUrl.trim()) {
       try {
         new URL(googleReviewUrl)
-        // Additional validation for Google URLs
-        if (!googleReviewUrl.includes('google')) {
-          setError('This doesn\'t look like a Google Review link. Check the guide below for help finding the right one.')
-          return
-        }
       } catch {
-        setError('Please enter a valid Google Review URL')
+        setError('Please enter a valid URL for your Google Reviews page')
         return
       }
     }
