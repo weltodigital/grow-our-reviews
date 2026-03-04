@@ -134,7 +134,7 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h4 className="font-medium text-blue-900 mb-2">Nudge Message Preview:</h4>
               <p className="text-sm text-blue-700 italic">
-                "Hi [Customer], just a gentle reminder — if you have 30 seconds, [Your Business] would love a quick review: [link]. No pressure at all — thanks!"
+                "Hi [Customer], just a quick reminder — would you mind leaving us a review: [link]"
               </p>
             </div>
           </div>
