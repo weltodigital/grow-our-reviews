@@ -5,10 +5,11 @@ export const PRICING_PLANS = {
     price: 49,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 50,
+    monthlyRequestLimit: 150,
     features: [
-      'Up to 50 review requests per month',
+      'Up to 150 message credits per month',
       'SMS review requests',
+      'Automatic follow-up nudges (can enable/disable)',
       'Sentiment gate (review filtering)',
       'Simple dashboard',
       'Email support'
@@ -21,11 +22,11 @@ export const PRICING_PLANS = {
     price: 79,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 150,
+    monthlyRequestLimit: 300,
     features: [
-      'Up to 150 review requests per month',
+      'Up to 300 message credits per month',
       'Everything in Starter',
-      'Automatic 48-hour nudge follow-ups',
+      'Advanced analytics',
       'Priority support'
     ],
     stripeProductId: process.env.STRIPE_GROWTH_PRICE_ID,

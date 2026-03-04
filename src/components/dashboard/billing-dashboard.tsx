@@ -163,7 +163,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
             <div>
               <h3 className="text-lg font-semibold">{planConfig.name}</h3>
               <p className="text-gray-600">
-                {formatPrice(planConfig.price)}/month • Up to {profile.monthly_request_limit} requests
+                {formatPrice(planConfig.price)}/month • Up to {profile.monthly_request_limit} message credits
               </p>
             </div>
             <div className="text-right">
@@ -177,7 +177,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
           {/* Usage Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Requests this month</span>
+              <span>Message credits used this month</span>
               <span>{usage.requestsSent} of {profile.monthly_request_limit}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -189,7 +189,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               />
             </div>
             <div className="text-xs text-gray-500">
-              {usage.requestsRemaining} requests remaining
+              {usage.requestsRemaining} message credits remaining
             </div>
           </div>
 
@@ -273,16 +273,16 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
       {currentPlan === 'starter' && (
         <Card className="border-green-200 bg-green-50">
           <CardHeader>
-            <CardTitle className="text-green-900">Need More Requests?</CardTitle>
+            <CardTitle className="text-green-900">Need More Message Credits?</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-green-800 mb-2">
-                  Upgrade to Growth plan for {PRICING_PLANS.growth.monthlyRequestLimit} monthly requests
+                  Upgrade to Growth plan for {PRICING_PLANS.growth.monthlyRequestLimit} monthly message credits
                 </p>
                 <p className="text-sm text-green-700">
-                  Just {formatPrice(getCostPerRequest('growth'))} per request vs {formatPrice(getCostPerRequest('starter'))} on Starter
+                  Just {formatPrice(getCostPerRequest('growth'))} per credit vs {formatPrice(getCostPerRequest('starter'))} on Starter
                 </p>
               </div>
               <Button asChild className="bg-green-600 hover:bg-green-700">

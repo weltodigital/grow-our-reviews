@@ -95,16 +95,16 @@ export default function BillingSetupPage() {
 
   const planFeatures = {
     starter: [
-      'Up to 50 review requests per month',
+      'Up to 150 message credits per month',
       'SMS review requests',
+      'Automatic follow-up nudges (enable/disable)',
       'Sentiment-based routing',
       'Simple dashboard',
       'Email support',
     ],
     growth: [
-      'Up to 150 review requests per month',
+      'Up to 300 message credits per month',
       'Everything in Starter',
-      'Automatic follow-up nudges',
       'Advanced analytics',
       'Priority support',
     ],

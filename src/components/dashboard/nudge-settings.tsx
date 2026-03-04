@@ -177,6 +177,7 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
 
         {/* Information */}
         <div className="text-xs text-gray-500 space-y-1">
+          <p>• <strong>Each nudge uses 1 message credit</strong> from your monthly allowance</p>
           <p>• Nudges are only sent once per review request</p>
           <p>• No nudges sent if customer already clicked or responded</p>
           <p>• Nudges respect the same time restrictions (no SMS 9pm-8am)</p>

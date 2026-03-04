@@ -11,10 +11,11 @@ export function PricingSection() {
     {
       name: 'Starter',
       price: 49,
-      requests: 50,
+      requests: 150,
       features: [
-        'Up to 50 review requests per month',
+        'Up to 150 message credits per month',
         'SMS review requests',
+        'Automatic follow-up nudges (enable/disable)',
         'Sentiment gate (review filtering)',
         'Simple dashboard',
         'Email support'
@@ -24,13 +25,12 @@ export function PricingSection() {
     {
       name: 'Growth',
       price: 79,
-      requests: 150,
+      requests: 300,
       features: [
-        'Up to 150 review requests per month',
+        'Up to 300 message credits per month',
         'Everything in Starter',
-        'Automatic 48-hour nudge follow-ups',
-        'Priority support',
-        'Advanced analytics'
+        'Advanced analytics',
+        'Priority support'
       ],
       recommended: true
     }
@@ -75,7 +75,7 @@ export function PricingSection() {
                   <span className="text-gray-600">/month</span>
                 </div>
                 <p className="mt-2 text-sm text-gray-600">
-                  {plan.requests} requests per month
+                  {plan.requests} message credits per month
                 </p>
               </div>
 
@@ -104,14 +104,27 @@ export function PricingSection() {
           ))}
         </div>
 
-        {/* Trial details */}
+        {/* Message credits explanation */}
         <div className="mt-12 text-center">
+          <div className="bg-blue-50 rounded-lg p-6 max-w-2xl mx-auto">
+            <h4 className="font-semibold text-blue-900 mb-2">
+              What are message credits?
+            </h4>
+            <div className="text-sm text-blue-700 space-y-1">
+              <p>• <strong>Each SMS message = 1 credit</strong> (initial request + optional nudge)</p>
+              <p>• If you send a nudge reminder, that's an additional credit</p>
+              <p>• Maximum 2 credits per customer (initial + nudge)</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Trial details */}
+        <div className="mt-8 text-center">
           <div className="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto">
             <h4 className="font-semibold text-gray-900 mb-2">
               14-Day Free Trial Includes:
             </h4>
             <div className="text-sm text-gray-600 space-y-1">
-              <p>✓ Full access to all features</p>
               <p>✓ Full access to all features for 14 days</p>
               <p>✓ No setup fees or hidden costs</p>
               <p>✓ Cancel anytime with one click</p>
