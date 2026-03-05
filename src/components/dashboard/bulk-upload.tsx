@@ -48,8 +48,7 @@ interface UploadBatch {
 
 const EXAMPLE_DATA: CsvRow[] = [
   { name: 'Sarah Johnson', phone: "'07712345678" },
-  { name: 'Mike Williams', phone: "'07798765432" },
-  { name: 'Example Customer', phone: "'07824534293" }
+  { name: 'Mike Williams', phone: "'07798765432" }
 ]
 
 export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
@@ -400,7 +399,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <ul className="text-sm text-blue-800 space-y-2">
                     <li><strong>✅ How to enter in Excel/Google Sheets:</strong></li>
                     <li className="ml-4">1. Type an apostrophe <code>'</code> before the number</li>
-                    <li className="ml-4">2. Then type the full UK mobile: <code>'07824534293</code></li>
+                    <li className="ml-4">2. Then type the full UK mobile: <code>'07712345678</code></li>
                     <li className="ml-4">3. The apostrophe keeps the leading zero</li>
                     <li><strong>❌ Don't use:</strong></li>
                     <li className="ml-4">• <code>07712345678</code> (Excel removes the zero)</li>
