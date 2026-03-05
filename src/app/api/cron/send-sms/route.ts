@@ -55,8 +55,8 @@ export async function GET(request: NextRequest) {
       .from('review_requests')
       .select(`
         *,
-        profiles!inner(business_name, google_review_url, id),
-        customers!inner(name, phone)
+        profiles!review_requests_user_id_fkey(business_name, google_review_url, id),
+        customers!review_requests_customer_id_fkey(name, phone)
       `)
       .eq('status', 'scheduled')
       .lte('scheduled_for', now)
