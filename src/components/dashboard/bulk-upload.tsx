@@ -180,15 +180,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
   // Download CSV template
   const downloadTemplate = () => {
-    // Add header comment rows for Excel/Google Sheets users
-    const csvContent = [
-      '# Customer Upload Template for Grow Our Reviews',
-      '# REQUIRED: Use apostrophe before phone numbers like this: \'07712345678',
-      '# This keeps the leading zero when you open in Excel/Google Sheets',
-      '# Delete these comment lines before uploading',
-      '',
-      Papa.unparse(EXAMPLE_DATA, { header: true })
-    ].join('\n')
+    const csvContent = Papa.unparse(EXAMPLE_DATA, {
+      header: true
+    })
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
     const url = window.URL.createObjectURL(blob)
