@@ -47,9 +47,9 @@ interface UploadBatch {
 }
 
 const EXAMPLE_DATA: CsvRow[] = [
-  { name: 'Sarah Johnson', phone: '+447712345678' },
-  { name: 'Mike Williams', phone: '+447798765432' },
-  { name: 'Example Customer', phone: '07712345678' }
+  { name: 'Sarah Johnson', phone: "'07712345678" },
+  { name: 'Mike Williams', phone: "'07798765432" },
+  { name: 'Example Customer', phone: "'07824534293" }
 ]
 
 export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
@@ -84,24 +84,18 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
   // Normalize UK phone numbers to E.164 format
   const normalizePhoneNumber = (phone: string): { normalized: string; isValid: boolean } => {
+    // Remove apostrophe prefix if present (Excel text format indicator)
+    let cleanPhone = phone.replace(/^'/, '')
+
     // Remove all non-digits
-    const digits = phone.replace(/\D/g, '')
+    const digits = cleanPhone.replace(/\D/g, '')
 
     let normalized = ''
     let isValid = false
 
-    // Check different UK mobile formats
+    // Only accept UK mobile format: 07xxxxxxxxx (11 digits)
     if (digits.startsWith('07') && digits.length === 11) {
-      // UK mobile: 07xxxxxxxxx (11 digits) -> +447xxxxxxxxx
       normalized = `+44${digits.slice(1)}`
-      isValid = true
-    } else if (digits.startsWith('447') && digits.length === 12) {
-      // International format: 447xxxxxxxx (12 digits) -> +447xxxxxxxxx
-      normalized = `+${digits}`
-      isValid = true
-    } else if (digits.startsWith('00447') && digits.length === 14) {
-      // International with 00 prefix: 00447xxxxxxxx (14 digits) -> +447xxxxxxxxx
-      normalized = `+${digits.slice(3)}`
       isValid = true
     }
 
@@ -190,8 +184,8 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
     // Add header comment rows for Excel/Google Sheets users
     const csvContent = [
       '# Customer Upload Template for Grow Our Reviews',
-      '# IMPORTANT: Format the phone column as TEXT to keep leading zeros',
-      '# Or use international format: +44 instead of 07',
+      '# REQUIRED: Use apostrophe before phone numbers like this: \'07712345678',
+      '# This keeps the leading zero when you open in Excel/Google Sheets',
       '# Delete these comment lines before uploading',
       '',
       Papa.unparse(EXAMPLE_DATA, { header: true })
@@ -395,15 +389,23 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-3">📱 Phone Number Format (Important!):</h4>
+                  <h4 className="font-medium text-blue-900 mb-3">📱 Phone Number Format (REQUIRED):</h4>
+                  <div className="bg-white border border-blue-300 rounded p-3 mb-3">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-blue-900 mb-1">Use this format ONLY:</p>
+                      <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded">'07712345678</code>
+                      <p className="text-sm text-blue-700 mt-1">(Apostrophe + UK mobile number)</p>
+                    </div>
+                  </div>
                   <ul className="text-sm text-blue-800 space-y-2">
-                    <li><strong>✅ Accepted formats:</strong></li>
-                    <li className="ml-4">• <code>07712345678</code> (UK mobile starting with 07)</li>
-                    <li className="ml-4">• <code>+447712345678</code> (International format - recommended)</li>
-                    <li><strong>⚠️ Excel/Google Sheets users:</strong></li>
-                    <li className="ml-4">• Format the phone column as <strong>"Text"</strong> to keep leading zeros</li>
-                    <li className="ml-4">• Or use the international format (+44...) to avoid the issue</li>
-                    <li className="ml-4">• Or prefix with an apostrophe: <code>'07712345678</code></li>
+                    <li><strong>✅ How to enter in Excel/Google Sheets:</strong></li>
+                    <li className="ml-4">1. Type an apostrophe <code>'</code> before the number</li>
+                    <li className="ml-4">2. Then type the full UK mobile: <code>'07824534293</code></li>
+                    <li className="ml-4">3. The apostrophe keeps the leading zero</li>
+                    <li><strong>❌ Don't use:</strong></li>
+                    <li className="ml-4">• <code>07712345678</code> (Excel removes the zero)</li>
+                    <li className="ml-4">• <code>+447712345678</code> (International format)</li>
+                    <li className="ml-4">• Any other format</li>
                   </ul>
                 </div>
 
