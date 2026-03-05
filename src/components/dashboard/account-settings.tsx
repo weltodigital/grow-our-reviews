@@ -203,7 +203,7 @@ export function AccountSettings({
               </Button>
               {currentPlan === 'starter' && (
                 <Button asChild>
-                  <Link href="/pricing">
+                  <Link href="/dashboard/billing">
                     Upgrade Plan
                   </Link>
                 </Button>
