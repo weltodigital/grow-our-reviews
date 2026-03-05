@@ -114,10 +114,21 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
   const isTrialing = profile.subscription_status === 'trialing'
   const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null
+  const trialStartsAt = profile.created_at ? new Date(profile.created_at) : null
+
+  // Calculate trial progress based on actual dates
+  const now = new Date()
   const trialDaysRemaining = trialEndsAt
-    ? Math.max(0, Math.ceil((trialEndsAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
     : 0
-  const trialHasEnded = trialEndsAt && trialEndsAt < new Date()
+
+  // Calculate total trial length and days used
+  const totalTrialDays = (trialStartsAt && trialEndsAt)
+    ? Math.ceil((trialEndsAt.getTime() - trialStartsAt.getTime()) / (1000 * 60 * 60 * 24))
+    : 14
+  const trialDaysUsed = Math.max(0, totalTrialDays - trialDaysRemaining)
+
+  const trialHasEnded = trialEndsAt && trialEndsAt < now
 
   // Calculate usage this month using real data
   const usage = {
@@ -178,15 +189,18 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-blue-600">
                         <span>Trial progress</span>
-                        <span>{14 - trialDaysRemaining} of 14 days used</span>
+                        <span>{trialDaysUsed} of {totalTrialDays} days used</span>
                       </div>
                       <div className="w-full bg-blue-200 rounded-full h-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                           style={{
-                            width: `${Math.min(100, ((14 - trialDaysRemaining) / 14) * 100)}%`
+                            width: `${Math.min(100, (trialDaysUsed / totalTrialDays) * 100)}%`
                           }}
                         />
+                      </div>
+                      <div className="text-xs text-blue-500">
+                        {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} remaining
                       </div>
                     </div>
                   )}
