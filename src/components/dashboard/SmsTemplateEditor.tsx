@@ -52,6 +52,7 @@ export default function SmsTemplateEditor({
   const [nudgeRequestLine, setNudgeRequestLine] = useState(nudgeTemplate?.request_line || DEFAULT_TEMPLATES.nudge.request_line)
   const [nudgeSignOff, setNudgeSignOff] = useState(nudgeTemplate?.sign_off || DEFAULT_TEMPLATES.nudge.sign_off || '')
   const [nudgeRequestLineCounter, setNudgeRequestLineCounter] = useState((nudgeTemplate?.request_line || DEFAULT_TEMPLATES.nudge.request_line).length)
+  const [counterUpdateKey, setCounterUpdateKey] = useState(0)
 
   // Form state
   const [isInitialSaving, setIsInitialSaving] = useState(false)
@@ -63,10 +64,7 @@ export default function SmsTemplateEditor({
 
   const businessName = profile.business_name || 'Your Business'
 
-  // Sync counter with text length
-  useEffect(() => {
-    setNudgeRequestLineCounter(nudgeRequestLine?.length || 0)
-  }, [nudgeRequestLine])
+  // Counter is handled directly in onChange handler
 
   // Track changes
   const hasInitialChanges = initialTemplate ? (
@@ -320,9 +318,9 @@ export default function SmsTemplateEditor({
                     value={nudgeRequestLine || ''}
                     onChange={(e) => {
                       const newValue = e.target.value.slice(0, 200)
-                      console.log('Nudge request line changed:', newValue, 'length:', newValue.length)
                       setNudgeRequestLine(newValue)
                       setNudgeRequestLineCounter(newValue.length)
+                      setCounterUpdateKey(prev => prev + 1)
                     }}
                     placeholder="would you mind leaving us a review:"
                     maxLength={200}
@@ -331,7 +329,9 @@ export default function SmsTemplateEditor({
                   <p className="text-xs text-gray-500">
                     This is your gentle reminder message. Keep it polite and brief.
                   </p>
-                  <p className="text-xs text-gray-400">{nudgeRequestLineCounter}/200 characters</p>
+                  <p className="text-xs text-gray-400" key={`counter-${counterUpdateKey}-${nudgeRequestLineCounter}`}>
+                    {nudgeRequestLineCounter}/200 characters
+                  </p>
                 </div>
 
                 <div className="space-y-2">
