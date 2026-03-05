@@ -62,19 +62,63 @@ export async function POST(request: NextRequest) {
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
           apiVersion: '2026-01-28.clover'
         })
+
+        console.log('Looking up Stripe customer for email:', user.email)
+
         const customers = await stripe.customers.list({
           email: user.email,
-          limit: 1
+          limit: 10, // Check more customers in case of multiple
         })
 
+        console.log('Found customers:', customers.data.length)
+
         if (customers.data.length > 0) {
+          // Use the most recent customer (first in list)
           customerId = customers.data[0].id
+          console.log('Using customer ID:', customerId)
 
           // Update profile with the found customer ID
-          await supabase
+          const { error: updateError } = await supabase
             .from('profiles')
             .update({ stripe_customer_id: customerId })
             .eq('id', user.id)
+
+          if (updateError) {
+            console.error('Error updating profile with customer ID:', updateError)
+          } else {
+            console.log('Successfully linked customer ID to profile')
+          }
+        } else {
+          console.log('No Stripe customers found for email:', user.email)
+
+          // Also try searching without case sensitivity or with common variations
+          const emailVariations = [
+            user.email?.toLowerCase(),
+            user.email?.replace('@weltodigital.com', '@weltoleads.com'),
+            user.email?.replace('@weltoleads.com', '@weltodigital.com')
+          ].filter(Boolean)
+
+          for (const email of emailVariations) {
+            if (email === user.email) continue // Skip the one we already tried
+
+            console.log('Trying email variation:', email)
+            const altCustomers = await stripe.customers.list({
+              email: email,
+              limit: 5,
+            })
+
+            if (altCustomers.data.length > 0) {
+              customerId = altCustomers.data[0].id
+              console.log('Found customer with variation:', email, 'ID:', customerId)
+
+              // Update profile with the found customer ID
+              await supabase
+                .from('profiles')
+                .update({ stripe_customer_id: customerId })
+                .eq('id', user.id)
+              break
+            }
+          }
         }
       } catch (stripeError) {
         console.error('Error looking up Stripe customer:', stripeError)
