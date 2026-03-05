@@ -99,13 +99,12 @@ export default function BillingSetupPage() {
       'SMS review requests',
       'Automatic follow-up nudges (enable/disable)',
       'Sentiment-based routing',
-      'Simple dashboard',
+      'Analytics dashboard',
       'Email support',
     ],
     growth: [
       'Up to 300 message credits per month',
       'Everything in Starter',
-      'Advanced analytics',
       'Priority support',
     ],
   }
@@ -167,6 +166,9 @@ export default function BillingSetupPage() {
               <div className="mt-4">
                 <span className="text-3xl font-bold">£{PRICING_PLANS.starter.price}</span>
                 <span className="text-gray-500">/month</span>
+                <p className="text-xs text-gray-500 mt-1">
+                  £{(PRICING_PLANS.starter.price / PRICING_PLANS.starter.monthlyRequestLimit).toFixed(2)} per credit
+                </p>
               </div>
             </CardHeader>
             <CardContent>
@@ -201,6 +203,9 @@ export default function BillingSetupPage() {
               <div className="mt-4">
                 <span className="text-3xl font-bold">£{PRICING_PLANS.growth.price}</span>
                 <span className="text-gray-500">/month</span>
+                <p className="text-xs text-gray-500 mt-1">
+                  £{(PRICING_PLANS.growth.price / PRICING_PLANS.growth.monthlyRequestLimit).toFixed(2)} per credit
+                </p>
               </div>
             </CardHeader>
             <CardContent>

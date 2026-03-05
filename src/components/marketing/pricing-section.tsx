@@ -74,9 +74,14 @@ export function PricingSection() {
                   </span>
                   <span className="text-gray-600">/month</span>
                 </div>
-                <p className="mt-2 text-sm text-gray-600">
-                  {plan.requests} message credits per month
-                </p>
+                <div className="mt-2 text-center">
+                  <p className="text-sm text-gray-600">
+                    {plan.requests} message credits per month
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formatPrice(plan.price / plan.requests)} per credit
+                  </p>
+                </div>
               </div>
 
               <ul className="mt-8 space-y-4">

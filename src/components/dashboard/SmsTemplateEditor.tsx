@@ -28,8 +28,8 @@ const DEFAULT_TEMPLATES = {
   },
   nudge: {
     greeting: 'Hi',
-    opening_line: 'thanks for choosing {business_name}!',
-    request_line: 'We\'d love your feedback',
+    opening_line: 'just a quick reminder —',
+    request_line: 'would you mind leaving us a review:',
     sign_off: null
   }
 }

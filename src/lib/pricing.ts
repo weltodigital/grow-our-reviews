@@ -11,7 +11,7 @@ export const PRICING_PLANS = {
       'SMS review requests',
       'Automatic follow-up nudges (can enable/disable)',
       'Sentiment gate (review filtering)',
-      'Simple dashboard',
+      'Analytics dashboard',
       'Email support'
     ],
     stripeProductId: process.env.STRIPE_STARTER_PRICE_ID,
@@ -26,7 +26,6 @@ export const PRICING_PLANS = {
     features: [
       'Up to 300 message credits per month',
       'Everything in Starter',
-      'Advanced analytics',
       'Priority support'
     ],
     stripeProductId: process.env.STRIPE_GROWTH_PRICE_ID,
