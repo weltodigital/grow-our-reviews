@@ -28,6 +28,7 @@ export function AccountSettings({
 }: AccountSettingsProps) {
   const [email, setEmail] = useState(user.email || '')
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false)
+  const [isUpgrading, setIsUpgrading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -75,6 +76,41 @@ export function AccountSettings({
       setError('Something went wrong. Please try again.')
     } finally {
       setIsUpdatingEmail(false)
+    }
+  }
+
+  const handleUpgrade = async () => {
+    setIsUpgrading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/stripe/upgrade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetPlan: 'growth'
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to start upgrade process')
+      }
+
+      const data = await response.json()
+      if (data.redirect) {
+        // Direct subscription update succeeded
+        window.location.href = data.redirect
+      } else if (data.url) {
+        // Redirect to Stripe Checkout for payment
+        window.location.href = data.url
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to upgrade plan')
+    } finally {
+      setIsUpgrading(false)
     }
   }
 
@@ -202,10 +238,19 @@ export function AccountSettings({
                 </Link>
               </Button>
               {currentPlan === 'starter' && (
-                <Button asChild>
-                  <Link href="/dashboard/billing">
-                    Upgrade Plan
-                  </Link>
+                <Button
+                  onClick={handleUpgrade}
+                  disabled={isUpgrading}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isUpgrading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                      Upgrading...
+                    </>
+                  ) : (
+                    'Upgrade Plan'
+                  )}
                 </Button>
               )}
             </div>
