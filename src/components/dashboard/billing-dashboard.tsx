@@ -75,6 +75,43 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
     }
   }
 
+  const handleUpgrade = async () => {
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/stripe/upgrade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetPlan: 'growth'
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to start upgrade process')
+      }
+
+      const data = await response.json()
+
+      if (data.redirect) {
+        // Direct subscription update succeeded
+        window.location.href = data.redirect
+      } else if (data.url) {
+        // Checkout session created
+        window.location.href = data.url
+      }
+
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const isTrialing = profile.subscription_status === 'trialing'
   const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null
   const trialDaysRemaining = trialEndsAt
@@ -315,7 +352,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                 </p>
               </div>
               <Button
-                onClick={handleManageSubscription}
+                onClick={handleUpgrade}
                 disabled={isLoading}
                 className="bg-green-600 hover:bg-green-700"
               >
