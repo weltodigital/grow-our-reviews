@@ -385,18 +385,18 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <div className="bg-white border border-blue-300 rounded p-3 mb-3">
                     <div className="text-center">
                       <p className="text-lg font-bold text-blue-900 mb-1">Use this format ONLY:</p>
-                      <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded">'07712345678</code>
+                      <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded">'07868287177</code>
                       <p className="text-sm text-blue-700 mt-1">(Apostrophe + UK mobile number)</p>
                     </div>
                   </div>
                   <ul className="text-sm text-blue-800 space-y-2">
                     <li><strong>✅ How to enter in Excel/Google Sheets:</strong></li>
                     <li className="ml-4">1. Type an apostrophe <code>'</code> before the number</li>
-                    <li className="ml-4">2. Then type the full UK mobile: <code>'07712345678</code></li>
+                    <li className="ml-4">2. Then type the full UK mobile: <code>'07868287177</code></li>
                     <li className="ml-4">3. The apostrophe keeps the leading zero</li>
                     <li><strong>❌ Don't use:</strong></li>
-                    <li className="ml-4">• <code>07712345678</code> (Excel removes the zero)</li>
-                    <li className="ml-4">• <code>+447712345678</code> (International format)</li>
+                    <li className="ml-4">• <code>07868287177</code> (Excel removes the zero)</li>
+                    <li className="ml-4">• <code>+447868287177</code> (International format)</li>
                     <li className="ml-4">• Any other format</li>
                   </ul>
                 </div>
