@@ -51,13 +51,10 @@ export async function GET(request: NextRequest) {
     // Find all review requests that should be sent now
     const now = new Date().toISOString()
 
-    const { data: pendingRequests, error: fetchError } = await (supabase as any)
+    // First, get the review requests without JOINs
+    const { data: reviewRequests, error: fetchError } = await (supabase as any)
       .from('review_requests')
-      .select(`
-        *,
-        profiles!review_requests_user_id_fkey(business_name, google_review_url, id),
-        customers!review_requests_customer_id_fkey(name, phone)
-      `)
+      .select('*')
       .eq('status', 'scheduled')
       .lte('scheduled_for', now)
       .limit(50) // Process in batches to avoid timeouts
@@ -70,15 +67,56 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    if (!pendingRequests || pendingRequests.length === 0) {
+    if (!reviewRequests || reviewRequests.length === 0) {
       return NextResponse.json({
         message: 'No messages to send',
         processed: 0
       })
     }
 
-    // Get all unique user IDs to fetch their SMS templates
-    const userIds = [...new Set(pendingRequests.map((req: any) => req.profiles.id))]
+    // Get unique user IDs and customer IDs
+    const userIds = [...new Set(reviewRequests.map((req: any) => req.user_id))]
+    const customerIds = [...new Set(reviewRequests.map((req: any) => req.customer_id))]
+
+    // Fetch profiles and customers separately
+    const { data: profiles, error: profilesError } = await (supabase as any)
+      .from('profiles')
+      .select('id, business_name, google_review_url')
+      .in('id', userIds)
+
+    const { data: customers, error: customersError } = await (supabase as any)
+      .from('customers')
+      .select('id, name, phone')
+      .in('id', customerIds)
+
+    if (profilesError || customersError) {
+      console.error('Error fetching profiles or customers:', { profilesError, customersError })
+      return NextResponse.json(
+        { error: 'Failed to fetch related data' },
+        { status: 500 }
+      )
+    }
+
+    // Create lookup maps
+    const profileMap = new Map()
+    const customerMap = new Map()
+
+    profiles?.forEach((profile: any) => profileMap.set(profile.id, profile))
+    customers?.forEach((customer: any) => customerMap.set(customer.id, customer))
+
+    // Combine data manually
+    const pendingRequests = reviewRequests.map((request: any) => ({
+      ...request,
+      profiles: profileMap.get(request.user_id),
+      customers: customerMap.get(request.customer_id)
+    })).filter((request: any) => request.profiles && request.customers)
+
+    if (!pendingRequests || pendingRequests.length === 0) {
+      return NextResponse.json({
+        message: 'No messages to send after filtering',
+        processed: 0
+      })
+    }
 
     // Fetch SMS templates for all users
     const { data: smsTemplates } = await (supabase as any)
