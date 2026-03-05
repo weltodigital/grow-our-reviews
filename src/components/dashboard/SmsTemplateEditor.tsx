@@ -310,8 +310,11 @@ export default function SmsTemplateEditor({
                   <Label htmlFor="nudge-request">Follow-up request line</Label>
                   <Textarea
                     id="nudge-request"
-                    value={nudgeRequestLine}
-                    onChange={(e) => setNudgeRequestLine(e.target.value.slice(0, 200))}
+                    value={nudgeRequestLine || ''}
+                    onChange={(e) => {
+                      const newValue = e.target.value.slice(0, 200)
+                      setNudgeRequestLine(newValue)
+                    }}
                     placeholder="If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds"
                     maxLength={200}
                     rows={3}
@@ -319,7 +322,7 @@ export default function SmsTemplateEditor({
                   <p className="text-xs text-gray-500">
                     This is your gentle reminder message. Keep it polite and brief.
                   </p>
-                  <p className="text-xs text-gray-400">{nudgeRequestLine.length}/200 characters</p>
+                  <p className="text-xs text-gray-400" key={`nudge-counter-${nudgeRequestLine?.length || 0}`}>{nudgeRequestLine?.length || 0}/200 characters</p>
                 </div>
 
                 <div className="space-y-2">
