@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
           console.log('Using customer ID:', customerId)
 
           // Update profile with the found customer ID
-          const { error: updateError } = await supabase
+          const { error: updateError } = await (supabase as any)
             .from('profiles')
             .update({ stripe_customer_id: customerId })
             .eq('id', user.id)
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
               console.log('Found customer with variation:', email, 'ID:', customerId)
 
               // Update profile with the found customer ID
-              await supabase
+              await (supabase as any)
                 .from('profiles')
                 .update({ stripe_customer_id: customerId })
                 .eq('id', user.id)
