@@ -51,7 +51,6 @@ export default function SmsTemplateEditor({
   const [nudgeOpeningLine, setNudgeOpeningLine] = useState(nudgeTemplate?.opening_line || DEFAULT_TEMPLATES.nudge.opening_line)
   const [nudgeRequestLine, setNudgeRequestLine] = useState(nudgeTemplate?.request_line || DEFAULT_TEMPLATES.nudge.request_line)
   const [nudgeSignOff, setNudgeSignOff] = useState(nudgeTemplate?.sign_off || DEFAULT_TEMPLATES.nudge.sign_off || '')
-  const [forceRender, setForceRender] = useState(0)
 
   // Form state
   const [isInitialSaving, setIsInitialSaving] = useState(false)
@@ -299,11 +298,7 @@ export default function SmsTemplateEditor({
                   <Input
                     id="nudge-greeting"
                     value={nudgeGreeting}
-                    onChange={(e) => {
-                      const newValue = e.target.value.slice(0, 20)
-                      console.log('GREETING onChange:', newValue.length, 'chars')
-                      setNudgeGreeting(newValue)
-                    }}
+                    onChange={(e) => setNudgeGreeting(e.target.value.slice(0, 20))}
                     placeholder="Hi"
                     maxLength={20}
                   />
@@ -318,12 +313,7 @@ export default function SmsTemplateEditor({
                   <Textarea
                     id="nudge-request"
                     value={nudgeRequestLine}
-                    onChange={(e) => {
-                      const newValue = e.target.value.slice(0, 200)
-                      console.log('NUDGE onChange:', newValue.length, 'chars')
-                      setNudgeRequestLine(newValue)
-                      setForceRender(Date.now())
-                    }}
+                    onChange={(e) => setNudgeRequestLine(e.target.value.slice(0, 200))}
                     placeholder="would you mind leaving us a review:"
                     maxLength={200}
                     rows={3}
@@ -331,9 +321,7 @@ export default function SmsTemplateEditor({
                   <p className="text-xs text-gray-500">
                     This is your gentle reminder message. Keep it polite and brief.
                   </p>
-                  <p className="text-xs text-gray-400" key={forceRender}>
-                    {nudgeRequestLine.length}/200 characters
-                  </p>
+                  <p className="text-xs text-gray-400">{nudgeRequestLine.length}/200 characters</p>
                 </div>
 
                 <div className="space-y-2">
