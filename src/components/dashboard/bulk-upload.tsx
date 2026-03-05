@@ -47,8 +47,7 @@ interface UploadBatch {
 }
 
 const EXAMPLE_DATA: CsvRow[] = [
-  { name: 'Sarah Johnson', phone: "'07712345678" },
-  { name: 'Mike Williams', phone: "'07798765432" }
+  { name: 'Example Customer', phone: "'07868287177" }
 ]
 
 export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
