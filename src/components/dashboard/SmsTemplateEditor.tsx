@@ -298,14 +298,26 @@ export default function SmsTemplateEditor({
                   <Input
                     id="nudge-greeting"
                     value={nudgeGreeting}
-                    onChange={(e) => setNudgeGreeting(e.target.value.slice(0, 20))}
+                    onChange={(e) => {
+                      const newValue = e.target.value.slice(0, 20)
+                      console.log('GREETING onChange:', {
+                        oldValue: nudgeGreeting,
+                        newValue,
+                        oldLength: nudgeGreeting?.length,
+                        newLength: newValue.length
+                      })
+                      setNudgeGreeting(newValue)
+                    }}
                     placeholder="Hi"
                     maxLength={20}
                   />
                   <p className="text-xs text-gray-500">
                     This appears before the customer's name. Preview shows: "{nudgeGreeting} Sarah,"
                   </p>
-                  <p className="text-xs text-gray-400">{nudgeGreeting.length}/20 characters</p>
+                  <p className="text-xs text-gray-400">
+                    {nudgeGreeting.length}/20 characters
+                    {console.log('GREETING RENDER:', nudgeGreeting?.length)}
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -313,7 +325,16 @@ export default function SmsTemplateEditor({
                   <Textarea
                     id="nudge-request"
                     value={nudgeRequestLine}
-                    onChange={(e) => setNudgeRequestLine(e.target.value.slice(0, 200))}
+                    onChange={(e) => {
+                      const newValue = e.target.value.slice(0, 200)
+                      console.log('NUDGE onChange:', {
+                        oldValue: nudgeRequestLine,
+                        newValue,
+                        oldLength: nudgeRequestLine?.length,
+                        newLength: newValue.length
+                      })
+                      setNudgeRequestLine(newValue)
+                    }}
                     placeholder="would you mind leaving us a review:"
                     maxLength={200}
                     rows={3}
@@ -323,6 +344,7 @@ export default function SmsTemplateEditor({
                   </p>
                   <p className="text-xs text-gray-400" key={nudgeRequestLine.length}>
                     {nudgeRequestLine.length}/200 characters
+                    {console.log('NUDGE RENDER:', nudgeRequestLine?.length)}
                   </p>
                 </div>
 
