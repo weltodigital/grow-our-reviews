@@ -30,9 +30,9 @@ function normalizePhoneNumber(phone: string): string {
   return phone.startsWith('+') ? phone : '+' + digits
 }
 
-// Generate a secure random token
+// Generate a secure random token (shorter to save SMS characters)
 function generateToken(): string {
-  return randomBytes(32).toString('hex')
+  return randomBytes(16).toString('hex') // Reduced from 32 to 16 bytes for shorter URLs
 }
 
 // Calculate scheduled time based on user's delay settings
