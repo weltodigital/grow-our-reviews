@@ -92,12 +92,15 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
     // Check different UK mobile formats
     if (digits.startsWith('07') && digits.length === 11) {
+      // UK mobile: 07xxxxxxxxx (11 digits) -> +447xxxxxxxxx
       normalized = `+44${digits.slice(1)}`
       isValid = true
-    } else if (digits.startsWith('447') && digits.length === 13) {
+    } else if (digits.startsWith('447') && digits.length === 12) {
+      // International format: 447xxxxxxxx (12 digits) -> +447xxxxxxxxx
       normalized = `+${digits}`
       isValid = true
-    } else if (digits.startsWith('00447') && digits.length === 15) {
+    } else if (digits.startsWith('00447') && digits.length === 14) {
+      // International with 00 prefix: 00447xxxxxxxx (14 digits) -> +447xxxxxxxxx
       normalized = `+${digits.slice(3)}`
       isValid = true
     }
