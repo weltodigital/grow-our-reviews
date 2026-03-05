@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // Manual trigger for SMS sending - for debugging purposes
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     // Check if user is authenticated and is admin
     // For now, require a simple secret to prevent abuse
