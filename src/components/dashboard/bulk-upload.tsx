@@ -47,8 +47,9 @@ interface UploadBatch {
 }
 
 const EXAMPLE_DATA: CsvRow[] = [
-  { name: 'Sarah Johnson', phone: '07712345678' },
-  { name: 'Mike Williams', phone: '07798765432' }
+  { name: 'Sarah Johnson', phone: '+447712345678' },
+  { name: 'Mike Williams', phone: '+447798765432' },
+  { name: 'Example Customer', phone: '07712345678' }
 ]
 
 export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
@@ -183,11 +184,17 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
   // Download CSV template
   const downloadTemplate = () => {
-    const csvContent = Papa.unparse(EXAMPLE_DATA, {
-      header: true
-    })
+    // Add header comment rows for Excel/Google Sheets users
+    const csvContent = [
+      '# Customer Upload Template for Grow Our Reviews',
+      '# IMPORTANT: Format the phone column as TEXT to keep leading zeros',
+      '# Or use international format: +44 instead of 07',
+      '# Delete these comment lines before uploading',
+      '',
+      Papa.unparse(EXAMPLE_DATA, { header: true })
+    ].join('\n')
 
-    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -377,11 +384,23 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-medium mb-3">Format Requirements:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
+                  <ul className="text-sm text-gray-600 space-y-2">
                     <li>• Your file should have two columns: <strong>name</strong> and <strong>phone</strong></li>
-                    <li>• Phone numbers should be UK mobile numbers (starting with 07)</li>
                     <li>• Save as .csv (comma separated values)</li>
                     <li>• Maximum 200 rows per upload</li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-3">📱 Phone Number Format (Important!):</h4>
+                  <ul className="text-sm text-blue-800 space-y-2">
+                    <li><strong>✅ Accepted formats:</strong></li>
+                    <li className="ml-4">• <code>07712345678</code> (UK mobile starting with 07)</li>
+                    <li className="ml-4">• <code>+447712345678</code> (International format - recommended)</li>
+                    <li><strong>⚠️ Excel/Google Sheets users:</strong></li>
+                    <li className="ml-4">• Format the phone column as <strong>"Text"</strong> to keep leading zeros</li>
+                    <li className="ml-4">• Or use the international format (+44...) to avoid the issue</li>
+                    <li className="ml-4">• Or prefix with an apostrophe: <code>'07712345678</code></li>
                   </ul>
                 </div>
 
