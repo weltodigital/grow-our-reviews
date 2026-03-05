@@ -8,11 +8,11 @@ CREATE TABLE profiles (
   sms_delay_hours INTEGER DEFAULT 2,
   nudge_enabled BOOLEAN DEFAULT true,
   nudge_delay_hours INTEGER DEFAULT 48,
-  monthly_request_limit INTEGER DEFAULT 50,
+  monthly_request_limit INTEGER DEFAULT 150,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
   subscription_status TEXT DEFAULT 'trialing',
-  trial_ends_at TIMESTAMPTZ,
+  trial_ends_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '14 days'),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

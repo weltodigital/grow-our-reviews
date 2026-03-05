@@ -73,11 +73,25 @@ export async function POST(request: NextRequest) {
             ? new Date(subscription.trial_end * 1000)
             : calculateTrialEndDate()
 
-          // Create or update profile with subscription info
-          const { error: upsertError } = await (supabase as any)
+          // Update existing profile with subscription info (don't overwrite created_at)
+          const { error: updateError } = await (supabase as any)
             .from('profiles')
-            .upsert(
-              {
+            .update({
+              email: session.customer_details?.email || '',
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: subscription.id,
+              subscription_status: subscription.status,
+              monthly_request_limit: priceInfo.monthlyRequestLimit,
+              trial_ends_at: trialEnd.toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', userId)
+
+          // If update failed because profile doesn't exist, create it
+          if (updateError && updateError.code === 'PGRST116') {
+            const { error: insertError } = await (supabase as any)
+              .from('profiles')
+              .insert({
                 id: userId,
                 email: session.customer_details?.email || '',
                 stripe_customer_id: session.customer as string,
@@ -87,24 +101,24 @@ export async function POST(request: NextRequest) {
                 trial_ends_at: trialEnd.toISOString(),
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-              },
-              {
-                onConflict: 'id',
-              }
-            )
+              })
 
-          if (upsertError) {
-            console.error('Error upserting profile after checkout:', upsertError)
-          } else {
-            console.log(`Subscription created for user ${userId}:`, {
-              subscriptionId: subscription.id,
-              status: subscription.status,
-              limit: priceInfo.monthlyRequestLimit,
-              trialEnd: trialEnd.toISOString(),
-            })
+            if (insertError) {
+              console.error('Error creating profile after checkout:', insertError)
+            }
+          } else if (updateError) {
+            console.error('Error updating profile after checkout:', updateError)
+          }
 
-            // Send subscription confirmation email
-            try {
+          console.log(`Subscription created for user ${userId}:`, {
+            subscriptionId: subscription.id,
+            status: subscription.status,
+            limit: priceInfo.monthlyRequestLimit,
+            trialEnd: trialEnd.toISOString(),
+          })
+
+          // Send subscription confirmation email
+          try {
               const { data: profile } = await (supabase as any)
                 .from('profiles')
                 .select('email, business_name')
@@ -127,7 +141,6 @@ export async function POST(request: NextRequest) {
             } catch (error) {
               console.error('Failed to send subscription confirmation email:', error)
             }
-          }
         }
         break
       }
