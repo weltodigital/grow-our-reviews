@@ -63,6 +63,11 @@ export default function SmsTemplateEditor({
 
   const businessName = profile.business_name || 'Your Business'
 
+  // Sync counter with text length
+  useEffect(() => {
+    setNudgeRequestLineCounter(nudgeRequestLine?.length || 0)
+  }, [nudgeRequestLine])
+
   // Track changes
   const hasInitialChanges = initialTemplate ? (
     initialGreeting !== initialTemplate.greeting ||
@@ -315,10 +320,11 @@ export default function SmsTemplateEditor({
                     value={nudgeRequestLine || ''}
                     onChange={(e) => {
                       const newValue = e.target.value.slice(0, 200)
+                      console.log('Nudge request line changed:', newValue, 'length:', newValue.length)
                       setNudgeRequestLine(newValue)
                       setNudgeRequestLineCounter(newValue.length)
                     }}
-                    placeholder="If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds"
+                    placeholder="would you mind leaving us a review:"
                     maxLength={200}
                     rows={3}
                   />
