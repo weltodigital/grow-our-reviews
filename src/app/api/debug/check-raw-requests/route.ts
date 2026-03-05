@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       rawScheduledCount: rawScheduled?.length || 0,
       readyRawCount: readyRaw?.length || 0,
       cronQueryCount: cronQuery?.length || 0,
-      rawScheduled: rawScheduled?.map(req => ({
+      rawScheduled: rawScheduled?.map((req: any) => ({
         id: req.id,
         status: req.status,
         customer_id: req.customer_id,
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         scheduled_for: req.scheduled_for,
         created_at: req.created_at
       })) || [],
-      readyRaw: readyRaw?.map(req => ({
+      readyRaw: readyRaw?.map((req: any) => ({
         id: req.id,
         scheduled_for: req.scheduled_for,
         isPastDue: new Date(req.scheduled_for) <= new Date(now)
