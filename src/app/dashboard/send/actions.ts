@@ -32,7 +32,7 @@ function normalizePhoneNumber(phone: string): string {
 
 // Generate a secure random token (shorter to save SMS characters)
 function generateToken(): string {
-  return randomBytes(16).toString('hex') // Reduced from 32 to 16 bytes for shorter URLs
+  return randomBytes(8).toString('hex') // 8 bytes = 16 character hex string for shorter URLs
 }
 
 // Calculate scheduled time based on user's delay settings
