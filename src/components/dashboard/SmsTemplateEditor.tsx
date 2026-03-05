@@ -51,6 +51,7 @@ export default function SmsTemplateEditor({
   const [nudgeOpeningLine, setNudgeOpeningLine] = useState(nudgeTemplate?.opening_line || DEFAULT_TEMPLATES.nudge.opening_line)
   const [nudgeRequestLine, setNudgeRequestLine] = useState(nudgeTemplate?.request_line || DEFAULT_TEMPLATES.nudge.request_line)
   const [nudgeSignOff, setNudgeSignOff] = useState(nudgeTemplate?.sign_off || DEFAULT_TEMPLATES.nudge.sign_off || '')
+  const [nudgeRequestLineCounter, setNudgeRequestLineCounter] = useState((nudgeTemplate?.request_line || DEFAULT_TEMPLATES.nudge.request_line).length)
 
   // Form state
   const [isInitialSaving, setIsInitialSaving] = useState(false)
@@ -88,6 +89,7 @@ export default function SmsTemplateEditor({
     setNudgeGreeting(DEFAULT_TEMPLATES.nudge.greeting)
     setNudgeOpeningLine(DEFAULT_TEMPLATES.nudge.opening_line)
     setNudgeRequestLine(DEFAULT_TEMPLATES.nudge.request_line)
+    setNudgeRequestLineCounter(DEFAULT_TEMPLATES.nudge.request_line.length)
     setNudgeSignOff('')
   }
 
@@ -314,6 +316,7 @@ export default function SmsTemplateEditor({
                     onChange={(e) => {
                       const newValue = e.target.value.slice(0, 200)
                       setNudgeRequestLine(newValue)
+                      setNudgeRequestLineCounter(newValue.length)
                     }}
                     placeholder="If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds"
                     maxLength={200}
@@ -322,7 +325,7 @@ export default function SmsTemplateEditor({
                   <p className="text-xs text-gray-500">
                     This is your gentle reminder message. Keep it polite and brief.
                   </p>
-                  <p className="text-xs text-gray-400" key={`nudge-counter-${nudgeRequestLine?.length || 0}`}>{nudgeRequestLine?.length || 0}/200 characters</p>
+                  <p className="text-xs text-gray-400">{nudgeRequestLineCounter}/200 characters</p>
                 </div>
 
                 <div className="space-y-2">
