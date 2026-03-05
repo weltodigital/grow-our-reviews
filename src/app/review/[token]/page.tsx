@@ -10,13 +10,10 @@ interface PageProps {
 async function getReviewRequest(token: string) {
   const supabase = await createServerSupabase()
 
+  // First get the review request
   const { data: reviewRequest, error } = await (supabase as any)
     .from('review_requests')
-    .select(`
-      *,
-      profiles!inner(business_name, google_review_url),
-      customers!inner(name)
-    `)
+    .select('*')
     .eq('token', token)
     .single()
 
@@ -24,7 +21,28 @@ async function getReviewRequest(token: string) {
     return null
   }
 
-  return reviewRequest
+  // Get the profile and customer separately
+  const { data: profile } = await (supabase as any)
+    .from('profiles')
+    .select('business_name, google_review_url')
+    .eq('id', reviewRequest.user_id)
+    .single()
+
+  const { data: customer } = await (supabase as any)
+    .from('customers')
+    .select('name')
+    .eq('id', reviewRequest.customer_id)
+    .single()
+
+  if (!profile || !customer) {
+    return null
+  }
+
+  return {
+    ...reviewRequest,
+    profiles: profile,
+    customers: customer
+  }
 }
 
 async function trackClick(token: string) {
