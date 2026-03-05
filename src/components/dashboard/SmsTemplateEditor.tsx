@@ -321,7 +321,9 @@ export default function SmsTemplateEditor({
                   <p className="text-xs text-gray-500">
                     This is your gentle reminder message. Keep it polite and brief.
                   </p>
-                  <p className="text-xs text-gray-400">{nudgeRequestLine.length}/200 characters</p>
+                  <p className="text-xs text-gray-400" key={nudgeRequestLine.length}>
+                    {nudgeRequestLine.length}/200 characters
+                  </p>
                 </div>
 
                 <div className="space-y-2">
