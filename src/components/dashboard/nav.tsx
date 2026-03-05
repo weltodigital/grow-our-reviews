@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import {
   Home,
   Plus,
+  Upload,
   List,
   MessageSquare,
   Settings,
@@ -15,6 +16,7 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Send Request', href: '/dashboard/send', icon: Plus },
+  { name: 'Upload Customers', href: '/dashboard/upload', icon: Upload },
   { name: 'All Requests', href: '/dashboard/requests', icon: List },
   { name: 'Feedback', href: '/dashboard/feedback', icon: MessageSquare },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
