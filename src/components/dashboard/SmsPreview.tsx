@@ -42,7 +42,7 @@ export default function SmsPreview({
       const messageLines = []
       messageLines.push(`${greeting} ${customerName}, ${processedOpeningLine}`)
       messageLines.push('')
-      messageLines.push(`${requestLine} 👇`)
+      messageLines.push(`${requestLine}:`)
       messageLines.push('')
       messageLines.push('https://growourreviews.com/review/a1b2c3d4e5f6')
 

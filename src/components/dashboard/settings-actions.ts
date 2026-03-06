@@ -261,8 +261,8 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
       testMessage += `\n\n${data.sign_off}`
     }
   } else {
-    // Initial format: {greeting} {customer_name}, {opening_line}\n\n{request_line} 👇
-    testMessage = `${data.greeting} ${testCustomerName}, ${processedOpeningLine}\n\n${data.request_line} 👇\n\n${testUrl}`
+    // Initial format: {greeting} {customer_name}, {opening_line}\n\n{request_line}:
+    testMessage = `${data.greeting} ${testCustomerName}, ${processedOpeningLine}\n\n${data.request_line}:\n\n${testUrl}`
     if (data.sign_off?.trim()) {
       testMessage += `\n\n${data.sign_off}`
     }
