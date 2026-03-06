@@ -34,24 +34,34 @@ export function FeedbackForm({
       const userAgent = navigator.userAgent
       const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent)
 
+      const cleanComment = comment || ''
+
       console.log('Submitting feedback:', {
         token: token.substring(0, 8) + '...',
         rating,
-        commentLength: comment.trim().length,
+        commentLength: cleanComment.length,
         isMobile,
         userAgent: userAgent.substring(0, 50)
       })
+
+      // Try to create the request body step by step for debugging
+      const requestBody = {
+        token: token,
+        rating: rating,
+        comment: cleanComment
+      }
+
+      console.log('Request body created:', requestBody)
+
+      const requestBodyString = JSON.stringify(requestBody)
+      console.log('JSON stringified successfully, length:', requestBodyString.length)
 
       const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          token,
-          rating,
-          comment: comment.trim(),
-        }),
+        body: requestBodyString,
       })
 
       console.log('Response status:', response.status, response.statusText)
@@ -65,8 +75,21 @@ export function FeedbackForm({
       setIsSubmitted(true)
     } catch (err) {
       console.error('Feedback submission error:', err)
-      const errorMessage = err instanceof Error ? err.message : 'Something went wrong'
-      setError(`Error: ${errorMessage}`)
+      console.error('Error type:', typeof err)
+      console.error('Error constructor:', err?.constructor?.name)
+
+      let errorMessage = 'Something went wrong'
+
+      if (err instanceof Error) {
+        errorMessage = err.message
+        console.error('Error stack:', err.stack)
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      } else {
+        errorMessage = `Unknown error: ${JSON.stringify(err)}`
+      }
+
+      setError(`Mobile Error: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }
