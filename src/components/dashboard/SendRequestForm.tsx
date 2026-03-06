@@ -287,6 +287,7 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
               signOff={smsTemplate?.sign_off || null}
               businessName={profile.business_name || 'Your Business'}
               templateType="initial"
+              customerName={customerName.trim() || 'Sarah'}
             />
           </CardContent>
         </Card>
