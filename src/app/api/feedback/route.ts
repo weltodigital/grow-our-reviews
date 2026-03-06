@@ -231,9 +231,20 @@ export async function POST(request: NextRequest) {
       })
 
     if (feedbackError) {
-      console.error('Error creating feedback:', feedbackError)
+      console.error('Error creating feedback:', {
+        error: feedbackError,
+        token,
+        rating,
+        comment: comment?.trim(),
+        review_request_id: (reviewRequest as any).id,
+        user_id: (reviewRequest as any).user_id
+      })
       return NextResponse.json(
-        { error: 'Failed to save feedback' },
+        {
+          error: 'Failed to save feedback',
+          details: feedbackError.message,
+          hint: feedbackError.hint
+        },
         { status: 500 }
       )
     }
