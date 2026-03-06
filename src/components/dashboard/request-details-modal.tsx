@@ -17,9 +17,17 @@ import {
   UserIcon,
   ExternalLinkIcon,
   CopyIcon,
-  MessageSquareIcon
+  MessageSquareIcon,
+  MessageCircleIcon
 } from 'lucide-react'
 import type { ReviewRequest } from '@/app/dashboard/requests/page'
+
+interface SmsTemplate {
+  greeting: string
+  opening_line: string
+  request_line: string
+  sign_off: string | null
+}
 
 interface RequestDetailsModalProps {
   request: ReviewRequest | null
@@ -33,6 +41,8 @@ export function RequestDetailsModal({
   onClose
 }: RequestDetailsModalProps) {
   const [copied, setCopied] = useState(false)
+  const [smsMessage, setSmsMessage] = useState<string | null>(null)
+  const [isLoadingMessage, setIsLoadingMessage] = useState(false)
 
   useEffect(() => {
     if (copied) {
@@ -40,6 +50,52 @@ export function RequestDetailsModal({
       return () => clearTimeout(timer)
     }
   }, [copied])
+
+  // Fetch SMS message when modal opens
+  useEffect(() => {
+    if (isOpen && request && !smsMessage) {
+      fetchSmsMessage()
+    }
+  }, [isOpen, request])
+
+  const fetchSmsMessage = async () => {
+    if (!request) return
+
+    setIsLoadingMessage(true)
+    try {
+      // Fetch the user's SMS templates
+      const response = await fetch('/api/requests/sms-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestId: request.id,
+          customerName: request.customer_name,
+          token: request.token
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSmsMessage(data.message)
+      } else {
+        setSmsMessage('Unable to load SMS message')
+      }
+    } catch (error) {
+      console.error('Error fetching SMS message:', error)
+      setSmsMessage('Error loading SMS message')
+    } finally {
+      setIsLoadingMessage(false)
+    }
+  }
+
+  // Reset message when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSmsMessage(null)
+    }
+  }, [isOpen])
 
   if (!request) return null
 
@@ -195,6 +251,40 @@ export function RequestDetailsModal({
                 </div>
               )}
             </div>
+          </div>
+
+          {/* SMS Message */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <MessageCircleIcon className="h-4 w-4" />
+              SMS Message Sent
+            </div>
+            <div className="border rounded-lg p-4 bg-blue-50">
+              {isLoadingMessage ? (
+                <div className="flex items-center gap-2 text-gray-500">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+                  Loading message...
+                </div>
+              ) : smsMessage ? (
+                <div className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
+                  {smsMessage}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">Message not available</div>
+              )}
+            </div>
+            {smsMessage && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(smsMessage)}
+                >
+                  <CopyIcon className="h-3 w-3 mr-1" />
+                  Copy Message
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Review Link */}
