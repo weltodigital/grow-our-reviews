@@ -174,37 +174,6 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
       </div>
 
       <div className="max-w-2xl">
-        {/* SMS Message Preview */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-blue-600" />
-                SMS Message Preview
-              </CardTitle>
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard/settings">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Message
-                </Link>
-              </Button>
-            </div>
-            <CardDescription>
-              This is how your review request SMS will appear to customers
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SmsPreview
-              greeting={smsTemplate?.greeting || 'Hi'}
-              openingLine={smsTemplate?.opening_line || 'thanks for choosing {business_name}!'}
-              requestLine={smsTemplate?.request_line || 'We\'d love your feedback'}
-              signOff={smsTemplate?.sign_off || null}
-              businessName={profile.business_name || 'Your Business'}
-              templateType="initial"
-            />
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Customer Information</CardTitle>
@@ -288,6 +257,37 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
                 )}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* SMS Message Preview */}
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-blue-600" />
+                SMS Message Preview
+              </CardTitle>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/dashboard/settings">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Message
+                </Link>
+              </Button>
+            </div>
+            <CardDescription>
+              This is how your review request SMS will appear to customers
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SmsPreview
+              greeting={smsTemplate?.greeting || 'Hi'}
+              openingLine={smsTemplate?.opening_line || 'thanks for choosing {business_name}!'}
+              requestLine={smsTemplate?.request_line || 'We\'d love your feedback'}
+              signOff={smsTemplate?.sign_off || null}
+              businessName={profile.business_name || 'Your Business'}
+              templateType="initial"
+            />
           </CardContent>
         </Card>
       </div>
