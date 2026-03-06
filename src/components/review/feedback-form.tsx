@@ -30,6 +30,18 @@ export function FeedbackForm({
     setError('')
 
     try {
+      // Add debugging info for mobile issues
+      const userAgent = navigator.userAgent
+      const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent)
+
+      console.log('Submitting feedback:', {
+        token: token.substring(0, 8) + '...',
+        rating,
+        commentLength: comment.trim().length,
+        isMobile,
+        userAgent: userAgent.substring(0, 50)
+      })
+
       const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: {
@@ -42,14 +54,19 @@ export function FeedbackForm({
         }),
       })
 
+      console.log('Response status:', response.status, response.statusText)
+
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('API error:', errorData)
         throw new Error(errorData.error || 'Failed to submit feedback')
       }
 
       setIsSubmitted(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      console.error('Feedback submission error:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong'
+      setError(`Error: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }
@@ -112,7 +129,7 @@ export function FeedbackForm({
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
