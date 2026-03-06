@@ -26,11 +26,14 @@ async function getReviewRequest(token: string) {
     return null
   }
 
-  // Only allow review page for requests that have been sent or clicked
-  if (!['sent', 'clicked'].includes(reviewRequest.status)) {
-    console.log(`Review request ${token} has status: ${reviewRequest.status} - not showing review page`)
-    return null
-  }
+  // Log status for debugging but don't block access
+  console.log(`Review request ${token} has status: ${reviewRequest.status}`)
+
+  // Temporarily disabled status check for debugging
+  // if (!['sent', 'clicked'].includes(reviewRequest.status)) {
+  //   console.log(`Review request ${token} has status: ${reviewRequest.status} - not showing review page`)
+  //   return null
+  // }
 
   // Get the profile and customer with proper error handling
   const [profileResult, customerResult] = await Promise.all([
