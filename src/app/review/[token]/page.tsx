@@ -8,7 +8,18 @@ interface PageProps {
 }
 
 async function getReviewRequest(token: string) {
-  const supabase = await createServerSupabase()
+  // Use service role key to bypass RLS for public review pages
+  const { createServerClient } = await import('@supabase/ssr')
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() { return [] },
+        setAll() {},
+      },
+    }
+  )
 
   // First get the review request
   const { data: reviewRequest, error: reviewError } = await (supabase as any)
@@ -77,7 +88,18 @@ async function getReviewRequest(token: string) {
 }
 
 async function trackClick(token: string) {
-  const supabase = await createServerSupabase()
+  // Use service role key to update review request status
+  const { createServerClient } = await import('@supabase/ssr')
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() { return [] },
+        setAll() {},
+      },
+    }
+  )
 
   // Only update if this is the first click
   await (supabase as any)
