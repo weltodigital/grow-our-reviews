@@ -44,15 +44,28 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
     setSuccess('')
 
     try {
+      // Use the actual updateNudgeSettings function instead of the no-op onSave callback
+      const result = await updateNudgeSettings({
+        nudge_enabled: nudgeEnabled,
+        nudge_delay_hours: nudgeDelayHours,
+      })
+
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+
+      setSuccess('Nudge settings updated successfully!')
+      setHasChanges(false)
+      setTimeout(() => setSuccess(''), 3000)
+
+      // Also call the onSave callback in case parent needs to know
       await onSave({
         nudge_enabled: nudgeEnabled,
         nudge_delay_hours: nudgeDelayHours,
       })
-      setSuccess('Nudge settings updated successfully!')
-      setHasChanges(false)
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.')
     } finally {
       setIsSaving(false)
     }

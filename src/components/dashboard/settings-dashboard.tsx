@@ -105,8 +105,8 @@ export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashb
             nudge_delay_hours: profile.nudge_delay_hours,
           }}
           onSave={async (settings) => {
-            // This will be handled by the NudgeSettings component
-            return Promise.resolve()
+            // Refresh the page to get the updated profile data
+            router.refresh()
           }}
         />
 
