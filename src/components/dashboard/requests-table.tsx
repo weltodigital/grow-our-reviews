@@ -19,13 +19,15 @@ interface RequestsTableProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  onRequestsChange?: () => void
 }
 
 export function RequestsTable({
   requests,
   currentPage,
   totalPages,
-  onPageChange
+  onPageChange,
+  onRequestsChange
 }: RequestsTableProps) {
   const [selectedRequest, setSelectedRequest] = useState<ReviewRequest | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -305,6 +307,12 @@ export function RequestsTable({
         request={selectedRequest}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onRequestDeleted={() => {
+          setIsModalOpen(false)
+          if (onRequestsChange) {
+            onRequestsChange()
+          }
+        }}
       />
     </>
   )

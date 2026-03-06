@@ -293,6 +293,40 @@ export default function RequestsPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+          onRequestsChange={() => {
+            // Refresh the requests by re-fetching
+            const fetchRequests = async () => {
+              try {
+                setIsLoading(true)
+                setError('')
+
+                const params = new URLSearchParams({
+                  page: currentPage.toString(),
+                  limit: requestsPerPage.toString(),
+                })
+
+                if (statusFilter && statusFilter !== 'all') {
+                  params.append('status', statusFilter)
+                }
+
+                if (searchTerm.trim()) {
+                  params.append('search', searchTerm.trim())
+                }
+
+                const response = await fetch(`/api/requests?${params}`)
+                if (!response.ok) throw new Error('Failed to fetch requests')
+
+                const data = await response.json()
+                setRequests(data.requests || [])
+                setFilteredRequests(data.requests || [])
+              } catch (err: any) {
+                setError(err.message || 'Failed to load requests')
+              } finally {
+                setIsLoading(false)
+              }
+            }
+            fetchRequests()
+          }}
         />
       )}
     </div>

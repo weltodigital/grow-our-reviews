@@ -18,7 +18,8 @@ import {
   ExternalLinkIcon,
   CopyIcon,
   MessageSquareIcon,
-  MessageCircleIcon
+  MessageCircleIcon,
+  Trash2Icon
 } from 'lucide-react'
 import type { ReviewRequest } from '@/app/dashboard/requests/page'
 
@@ -33,16 +34,19 @@ interface RequestDetailsModalProps {
   request: ReviewRequest | null
   isOpen: boolean
   onClose: () => void
+  onRequestDeleted?: () => void
 }
 
 export function RequestDetailsModal({
   request,
   isOpen,
-  onClose
+  onClose,
+  onRequestDeleted
 }: RequestDetailsModalProps) {
   const [copied, setCopied] = useState(false)
   const [smsMessage, setSmsMessage] = useState<string | null>(null)
   const [isLoadingMessage, setIsLoadingMessage] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     if (copied) {
@@ -96,6 +100,37 @@ export function RequestDetailsModal({
       setSmsMessage(null)
     }
   }, [isOpen])
+
+  const handleDeleteRequest = async () => {
+    if (!request || request.status !== 'scheduled') return
+
+    if (!confirm('Are you sure you want to delete this scheduled request? This action cannot be undone.')) {
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/requests/${request.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to delete request')
+      }
+
+      // Success - close modal and refresh the parent list
+      onClose()
+      if (onRequestDeleted) {
+        onRequestDeleted()
+      }
+    } catch (error: any) {
+      console.error('Error deleting request:', error)
+      alert(error.message || 'Failed to delete request. Please try again.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   if (!request) return null
 
@@ -340,15 +375,42 @@ export function RequestDetailsModal({
           </details>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
-          {request.status === 'failed' && (
-            <Button>
-              Retry SMS
+        <div className="flex justify-between gap-3 pt-4 border-t">
+          {/* Left side - Delete button for scheduled requests */}
+          <div>
+            {request.status === 'scheduled' && (
+              <Button
+                variant="outline"
+                onClick={handleDeleteRequest}
+                disabled={isDeleting}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent mr-2" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2Icon className="h-4 w-4 mr-2" />
+                    Delete Request
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+
+          {/* Right side - Close and action buttons */}
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={onClose}>
+              Close
             </Button>
-          )}
+            {request.status === 'failed' && (
+              <Button>
+                Retry SMS
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
