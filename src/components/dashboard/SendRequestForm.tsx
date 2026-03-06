@@ -6,11 +6,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft, Send, Clock } from 'lucide-react'
+import { ArrowLeft, Send, Clock, Settings, MessageCircle, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { createReviewRequest } from '@/app/dashboard/send/actions'
+import SmsPreview from './SmsPreview'
+import type { Database } from '@/types/database'
 
-export default function SendRequestForm() {
+interface SendRequestFormProps {
+  profile: Database['public']['Tables']['profiles']['Row']
+  smsTemplate: Database['public']['Tables']['sms_templates']['Row'] | null
+}
+
+export default function SendRequestForm({ profile, smsTemplate }: SendRequestFormProps) {
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -167,6 +174,37 @@ export default function SendRequestForm() {
       </div>
 
       <div className="max-w-2xl">
+        {/* SMS Message Preview */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-blue-600" />
+                SMS Message Preview
+              </CardTitle>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/dashboard/settings">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Message
+                </Link>
+              </Button>
+            </div>
+            <CardDescription>
+              This is how your review request SMS will appear to customers
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SmsPreview
+              greeting={smsTemplate?.greeting || 'Hi'}
+              openingLine={smsTemplate?.opening_line || 'thanks for choosing {business_name}!'}
+              requestLine={smsTemplate?.request_line || 'We\'d love your feedback'}
+              signOff={smsTemplate?.sign_off || null}
+              businessName={profile.business_name || 'Your Business'}
+              templateType="initial"
+            />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Customer Information</CardTitle>
@@ -219,10 +257,15 @@ export default function SendRequestForm() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
                 <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• The SMS will be scheduled based on your delay settings</li>
+                  <li>• The SMS will be scheduled based on your delay settings ({(profile as any).sms_delay_hours} hour{(profile as any).sms_delay_hours !== 1 ? 's' : ''} delay)</li>
+                  <li>• SMS won't send between 9pm-8am (moved to 8am if needed)</li>
                   <li>• If they rate 4-5 stars, they'll go to Google Reviews</li>
                   <li>• If they rate 1-3 stars, they'll give private feedback instead</li>
-                  <li>• A gentle nudge SMS is sent after 48 hours if no response</li>
+                  {(profile as any).nudge_enabled ? (
+                    <li>• A gentle nudge SMS is sent after {(profile as any).nudge_delay_hours} hours if no response</li>
+                  ) : (
+                    <li>• Follow-up nudges are disabled</li>
+                  )}
                 </ul>
               </div>
 
