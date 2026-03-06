@@ -75,7 +75,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/cron/') ||
     pathname.startsWith('/api/stripe/webhook') ||
     pathname.startsWith('/api/twilio/webhook') ||
-    pathname.startsWith('/api/debug/')
+    pathname.startsWith('/api/debug/') ||
+    pathname.startsWith('/api/feedback')
 
   // Review pages should NEVER require authentication - exit early for review routes
   if (pathname.startsWith('/review/')) {

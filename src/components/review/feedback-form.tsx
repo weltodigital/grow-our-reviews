@@ -60,13 +60,24 @@ export function FeedbackForm({
       addDebug(`✅ JSON stringified, length: ${requestBodyString.length}`)
 
       addDebug('🌐 Making fetch request...')
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
+      // Use absolute URL to avoid any mobile routing issues
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      const url = `${baseUrl}/api/feedback`
+      const method = 'POST'
+      addDebug(`📍 Base URL: ${baseUrl}`)
+      addDebug(`📍 Full URL: ${url}, Method: ${method}`)
+      addDebug(`🌍 Window location: ${typeof window !== 'undefined' ? window.location.href : 'server-side'}`)
+
+      const fetchOptions = {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
         },
         body: requestBodyString,
-      })
+      }
+      addDebug(`⚙️ Fetch options: ${JSON.stringify({...fetchOptions, body: 'BODY_CONTENT'}, null, 2)}`)
+
+      const response = await fetch(url, fetchOptions)
 
       addDebug(`📡 Response status: ${response.status} ${response.statusText}`)
 
