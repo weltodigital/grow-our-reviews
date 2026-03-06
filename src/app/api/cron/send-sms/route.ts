@@ -143,6 +143,9 @@ export async function GET(request: NextRequest) {
         // Create the sentiment gate URL
         const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 
+        // Log the URL being sent for debugging
+        console.log(`Sending SMS with URL: ${sentimentGateUrl} for customer: ${(request as any).customers.name}`)
+
         // Get the user's custom template
         const userTemplate = templateMap.get((request as any).profiles.id)
 

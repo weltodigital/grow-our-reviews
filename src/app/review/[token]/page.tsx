@@ -26,14 +26,14 @@ async function getReviewRequest(token: string) {
     return null
   }
 
-  // Log status for debugging but don't block access
-  console.log(`Review request ${token} has status: ${reviewRequest.status}`)
+  // Only block failed or expired requests
+  if (['failed', 'expired'].includes(reviewRequest.status)) {
+    console.log(`Review request ${token} has status: ${reviewRequest.status} - blocking access`)
+    return null
+  }
 
-  // Temporarily disabled status check for debugging
-  // if (!['sent', 'clicked'].includes(reviewRequest.status)) {
-  //   console.log(`Review request ${token} has status: ${reviewRequest.status} - not showing review page`)
-  //   return null
-  // }
+  // Log status for monitoring
+  console.log(`Review request ${token} has status: ${reviewRequest.status} - allowing access`)
 
   // Get the profile and customer with proper error handling
   const [profileResult, customerResult] = await Promise.all([
