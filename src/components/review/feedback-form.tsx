@@ -23,39 +23,43 @@ export function FeedbackForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const [debugInfo, setDebugInfo] = useState<string[]>([])
+
+  const addDebug = (message: string) => {
+    setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`])
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
+    setDebugInfo([])
 
     try {
+      addDebug('🚀 Starting submission')
+
       // Add debugging info for mobile issues
       const userAgent = navigator.userAgent
       const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent)
+      addDebug(`📱 Mobile: ${isMobile}, User Agent: ${userAgent.substring(0, 50)}...`)
 
       const cleanComment = comment || ''
-
-      console.log('Submitting feedback:', {
-        token: token.substring(0, 8) + '...',
-        rating,
-        commentLength: cleanComment.length,
-        isMobile,
-        userAgent: userAgent.substring(0, 50)
-      })
+      addDebug(`📝 Comment length: ${cleanComment.length}`)
 
       // Try to create the request body step by step for debugging
+      addDebug('📦 Creating request body...')
       const requestBody = {
         token: token,
         rating: rating,
         comment: cleanComment
       }
+      addDebug(`✅ Request body created with token: ${token.substring(0, 8)}...`)
 
-      console.log('Request body created:', requestBody)
-
+      addDebug('🔄 JSON stringifying...')
       const requestBodyString = JSON.stringify(requestBody)
-      console.log('JSON stringified successfully, length:', requestBodyString.length)
+      addDebug(`✅ JSON stringified, length: ${requestBodyString.length}`)
 
+      addDebug('🌐 Making fetch request...')
       const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: {
@@ -64,25 +68,30 @@ export function FeedbackForm({
         body: requestBodyString,
       })
 
-      console.log('Response status:', response.status, response.statusText)
+      addDebug(`📡 Response status: ${response.status} ${response.statusText}`)
 
       if (!response.ok) {
+        addDebug('❌ Response not OK, getting error data...')
         const errorData = await response.json()
-        console.error('API error:', errorData)
+        addDebug(`💥 API Error: ${JSON.stringify(errorData)}`)
         throw new Error(errorData.error || 'Failed to submit feedback')
       }
 
+      addDebug('🎉 Success! Setting submitted state...')
       setIsSubmitted(true)
     } catch (err) {
-      console.error('Feedback submission error:', err)
-      console.error('Error type:', typeof err)
-      console.error('Error constructor:', err?.constructor?.name)
+      addDebug(`💀 Caught error: ${err}`)
+      addDebug(`🔍 Error type: ${typeof err}`)
+      addDebug(`🏗️ Error constructor: ${err?.constructor?.name}`)
 
       let errorMessage = 'Something went wrong'
 
       if (err instanceof Error) {
         errorMessage = err.message
-        console.error('Error stack:', err.stack)
+        addDebug(`📚 Error message: ${err.message}`)
+        if (err.stack) {
+          addDebug(`📋 Error stack: ${err.stack.substring(0, 200)}...`)
+        }
       } else if (typeof err === 'string') {
         errorMessage = err
       } else {
@@ -92,6 +101,7 @@ export function FeedbackForm({
       setError(`Mobile Error: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
+      addDebug('🏁 Submission complete')
     }
   }
 
@@ -167,7 +177,20 @@ export function FeedbackForm({
 
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-sm text-red-600">{error}</p>
+                <p className="text-sm text-red-600 font-medium">{error}</p>
+              </div>
+            )}
+
+            {debugInfo.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                <p className="text-sm font-medium text-blue-800 mb-2">🔍 Debug Info:</p>
+                <div className="text-xs text-blue-700 space-y-1 max-h-40 overflow-y-auto">
+                  {debugInfo.map((info, index) => (
+                    <div key={index} className="font-mono bg-white bg-opacity-50 p-1 rounded">
+                      {info}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
