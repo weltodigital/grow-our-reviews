@@ -74,7 +74,13 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/auth/callback') ||
     pathname.startsWith('/api/cron/') ||
     pathname.startsWith('/api/stripe/webhook') ||
-    pathname.startsWith('/api/twilio/webhook')
+    pathname.startsWith('/api/twilio/webhook') ||
+    pathname.startsWith('/api/debug/')
+
+  // Review pages should NEVER require authentication - exit early for review routes
+  if (pathname.startsWith('/review/')) {
+    return response
+  }
 
   // Get the current user
   const { data: { user } } = await supabase.auth.getUser()
