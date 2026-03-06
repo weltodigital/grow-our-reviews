@@ -70,11 +70,52 @@ export function FeedbackForm({
 
       addDebug(`📡 Response status: ${response.status} ${response.statusText}`)
 
+      // Check what type of response we got
+      const contentType = response.headers.get('content-type')
+      addDebug(`📋 Content-Type: ${contentType}`)
+
       if (!response.ok) {
-        addDebug('❌ Response not OK, getting error data...')
-        const errorData = await response.json()
-        addDebug(`💥 API Error: ${JSON.stringify(errorData)}`)
-        throw new Error(errorData.error || 'Failed to submit feedback')
+        addDebug('❌ Response not OK, attempting to get error data...')
+
+        try {
+          // Try to get response as text first to see what we actually received
+          const responseText = await response.text()
+          addDebug(`📄 Response text (first 200 chars): ${responseText.substring(0, 200)}`)
+
+          // Try to parse as JSON if it looks like JSON
+          if (contentType?.includes('application/json')) {
+            try {
+              const errorData = JSON.parse(responseText)
+              addDebug(`💥 Parsed JSON Error: ${JSON.stringify(errorData)}`)
+              throw new Error(errorData.error || 'Failed to submit feedback')
+            } catch (parseError) {
+              addDebug(`🚫 JSON parse failed: ${parseError}`)
+              throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 100)}`)
+            }
+          } else {
+            addDebug('🚫 Response is not JSON, likely HTML error page')
+            throw new Error(`Server error (${response.status}): ${responseText.substring(0, 100)}`)
+          }
+        } catch (readError) {
+          addDebug(`💥 Failed to read response: ${readError}`)
+          throw new Error(`Cannot read server response: ${readError}`)
+        }
+      }
+
+      // For successful response, try to parse JSON safely
+      try {
+        const responseText = await response.text()
+        addDebug(`✅ Success response: ${responseText.substring(0, 100)}`)
+
+        if (contentType?.includes('application/json')) {
+          const successData = JSON.parse(responseText)
+          addDebug(`🎉 Parsed success data: ${JSON.stringify(successData)}`)
+        } else {
+          addDebug('⚠️ Success but no JSON content type')
+        }
+      } catch (successParseError) {
+        addDebug(`⚠️ Success but failed to parse response: ${successParseError}`)
+        // Don't throw error for success case, just log it
       }
 
       addDebug('🎉 Success! Setting submitted state...')
