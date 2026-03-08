@@ -108,12 +108,10 @@ export function RequestsTable({
             className="text-blue-600 hover:text-blue-700"
           >
             <a
-              href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${request.token}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/dashboard/feedback?search=${encodeURIComponent(request.customer_name)}`}
             >
               <ExternalLinkIcon className="h-3 w-3 mr-1" />
-              View
+              View Feedback
             </a>
           </Button>
         )

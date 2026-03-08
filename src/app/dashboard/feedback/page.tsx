@@ -38,6 +38,15 @@ export default function FeedbackPage() {
 
   const feedbackPerPage = 10
 
+  // Initialize search term from URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const searchParam = urlParams.get('search')
+    if (searchParam) {
+      setSearchTerm(searchParam)
+    }
+  }, [])
+
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
