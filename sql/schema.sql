@@ -13,6 +13,7 @@ CREATE TABLE profiles (
   stripe_subscription_id TEXT,
   subscription_status TEXT DEFAULT 'trialing',
   trial_ends_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '14 days'),
+  trial_reminder_sent TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
