@@ -66,6 +66,7 @@ export async function middleware(request: NextRequest) {
     '/pricing',
     '/reset-password',
     '/forgot-password',
+    '/test-emails',
   ]
 
   // Check if this is a public route, review route, or API route
