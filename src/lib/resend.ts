@@ -29,10 +29,10 @@ export async function sendWelcomeEmail(to: string, businessName: string) {
 
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Go to Dashboard →</a></p>
 
-        <p>Need help getting started? Just reply to this email - we're here to help!</p>
+        <p>Need help getting started? Just reply to this email - I'm here to help!</p>
 
         <p>Best regards,<br>
-        The Grow Our Reviews Team</p>
+        Ed at Grow Our Reviews</p>
 
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
@@ -78,10 +78,10 @@ export async function sendTrialEndingEmail(to: string, businessName: string, tri
 
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Choose Your Plan →</a></p>
 
-        <p>Questions? Just reply to this email and we'll help you out.</p>
+        <p>Questions? Just reply to this email and I'll help you out.</p>
 
         <p>Best regards,<br>
-        The Grow Our Reviews Team</p>
+        Ed at Grow Our Reviews</p>
 
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
@@ -131,10 +131,10 @@ export async function sendSubscriptionConfirmationEmail(to: string, businessName
 
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Go to Dashboard →</a></p>
 
-        <p>Need help? We're here for you - just reply to this email.</p>
+        <p>Need help? I'm here for you - just reply to this email.</p>
 
         <p>Best regards,<br>
-        The Grow Our Reviews Team</p>
+        Ed at Grow Our Reviews</p>
 
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
