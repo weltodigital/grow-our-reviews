@@ -1,0 +1,78 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { sendPlanLimitReachedEmail } from '@/lib/resend'
+
+export async function GET(request: NextRequest) {
+  try {
+    // Test data for Starter plan limit
+    const result = await sendPlanLimitReachedEmail(
+      'ed@weltodigital.com',
+      'Welto Digital',
+      50, // Starter plan limit
+      50  // Used all requests
+    )
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Plan limit email sent to ed@weltodigital.com',
+      data: result.data
+    })
+  } catch (error) {
+    console.error('Test plan limit email error:', error)
+    return NextResponse.json(
+      { error: 'Failed to send test email' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { planType = 'starter' } = await request.json()
+
+    // Different test data based on plan type
+    const testData = planType === 'growth'
+      ? {
+          limit: 200,
+          used: 200,
+          businessName: 'Welto Digital (Growth Plan)'
+        }
+      : {
+          limit: 50,
+          used: 50,
+          businessName: 'Welto Digital (Starter Plan)'
+        }
+
+    const result = await sendPlanLimitReachedEmail(
+      'ed@weltodigital.com',
+      testData.businessName,
+      testData.limit,
+      testData.used
+    )
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `${planType.charAt(0).toUpperCase() + planType.slice(1)} plan limit email sent to ed@weltodigital.com`,
+      data: result.data
+    })
+  } catch (error) {
+    console.error('Test plan limit email error:', error)
+    return NextResponse.json(
+      { error: 'Failed to send test email' },
+      { status: 500 }
+    )
+  }
+}
