@@ -115,6 +115,25 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
     .gte('created_at', startOfMonth.toISOString())
 
   if (requestsThisMonth && requestsThisMonth >= (profile as any).monthly_request_limit) {
+    // Send plan limit reached email (don't wait for it to complete)
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/plan-limit-reached`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: profile.email,
+          businessName: profile.business_name,
+          currentLimit: profile.monthly_request_limit,
+          requestsUsed: requestsThisMonth,
+        }),
+      })
+    } catch (error) {
+      console.error('Failed to send plan limit email:', error)
+      // Don't fail the request if email fails
+    }
+
     return { error: `You've reached your monthly limit of ${(profile as any).monthly_request_limit} requests. Upgrade your plan to send more.` }
   }
 

@@ -155,3 +155,127 @@ export async function sendSubscriptionConfirmationEmail(to: string, businessName
     return { success: false, error: 'Failed to send email' }
   }
 }
+
+export async function sendPlanLimitReachedEmail(to: string, businessName: string, currentLimit: number, requestsUsed: number) {
+  if (!resend) {
+    console.warn('Resend not configured - skipping plan limit email')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  const planName = currentLimit === 50 ? 'Starter' : 'Growth'
+  const nextPlanName = currentLimit === 50 ? 'Growth' : 'Enterprise'
+  const nextPlanLimit = currentLimit === 50 ? '200' : 'unlimited'
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
+      to: [to],
+      subject: `You've reached your ${planName} plan limit`,
+      html: `
+        <h1>You've reached your monthly limit</h1>
+
+        <p>Hi ${businessName},</p>
+
+        <p>You've used all <strong>${requestsUsed}/${currentLimit}</strong> review requests in your ${planName} plan for this month.</p>
+
+        <p>To continue sending review requests, you can upgrade to the <strong>${nextPlanName}</strong> plan and get ${nextPlanLimit} requests per month.</p>
+
+        <h2>Why upgrade?</h2>
+        <ul>
+          <li>Keep the momentum going with your reviews</li>
+          <li>Don't miss out on potential 5-star reviews</li>
+          <li>Higher limits = more reviews = more customers</li>
+          ${currentLimit === 50 ? '<li>Get automatic follow-up nudges</li><li>Priority support access</li>' : ''}
+        </ul>
+
+        <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Upgrade to ${nextPlanName} →</a></p>
+
+        <p>Your plan will reset next month, or you can upgrade anytime to continue sending requests immediately.</p>
+
+        <p>Questions about upgrading? Just reply to this email and I'll help you choose the right plan.</p>
+
+        <p>Best regards,<br>
+        Ed at Grow Our Reviews</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="color: #6b7280; font-size: 14px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing">Manage your subscription</a> |
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/settings">Email preferences</a>
+        </p>
+      `
+    })
+
+    if (error) {
+      console.error('Failed to send plan limit email:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error sending plan limit email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}
+
+export async function sendPaymentFailedEmail(to: string, businessName: string, planName: string, retryDate: string) {
+  if (!resend) {
+    console.warn('Resend not configured - skipping payment failed email')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
+      to: [to],
+      subject: 'Payment failed - Update your payment method',
+      html: `
+        <h1>Payment issue with your ${planName} plan</h1>
+
+        <p>Hi ${businessName},</p>
+
+        <p>We had trouble processing the payment for your ${planName} plan subscription.</p>
+
+        <p>To keep your account active and continue getting reviews, please update your payment method by <strong>${retryDate}</strong>.</p>
+
+        <h2>What happens next?</h2>
+        <ul>
+          <li>Your account remains active for a few more days</li>
+          <li>Please update your payment method to avoid service interruption</li>
+          <li>All your data and settings are safe</li>
+          <li>Once payment is fixed, everything continues as normal</li>
+        </ul>
+
+        <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing" style="background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Update Payment Method →</a></p>
+
+        <p><strong>Common causes:</strong></p>
+        <ul>
+          <li>Expired credit/debit card</li>
+          <li>Insufficient funds</li>
+          <li>Bank blocking the transaction</li>
+          <li>Changed billing address</li>
+        </ul>
+
+        <p>Having trouble updating your payment? Just reply to this email and I'll help you sort it out.</p>
+
+        <p>Best regards,<br>
+        Ed at Grow Our Reviews</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="color: #6b7280; font-size: 14px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing">Manage your subscription</a> |
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/settings">Email preferences</a>
+        </p>
+      `
+    })
+
+    if (error) {
+      console.error('Failed to send payment failed email:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error sending payment failed email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}

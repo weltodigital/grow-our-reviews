@@ -224,18 +224,43 @@ export async function POST(request: NextRequest) {
 
         if ((invoice as any).subscription) {
           // Update subscription status to past_due
-          const { error: updateError } = await (supabase as any)
+          const { data: profile, error: updateError } = await (supabase as any)
             .from('profiles')
             .update({
               subscription_status: 'past_due',
               updated_at: new Date().toISOString(),
             })
             .eq('stripe_subscription_id', (invoice as any).subscription as string)
+            .select('email, business_name, monthly_request_limit')
+            .single()
 
           if (updateError) {
             console.error('Error updating past_due subscription:', updateError)
           } else {
             console.log(`Payment failed for subscription: ${(invoice as any).subscription}`)
+
+            // Send payment failed email
+            if (profile) {
+              try {
+                const retryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')
+                const planName = profile.monthly_request_limit === 50 ? 'Starter' : 'Growth'
+
+                await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/payment-failed`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    email: profile.email,
+                    businessName: profile.business_name,
+                    planName: planName,
+                    retryDate: retryDate,
+                  }),
+                })
+              } catch (error) {
+                console.error('Failed to send payment failed email:', error)
+              }
+            }
           }
         }
         break
