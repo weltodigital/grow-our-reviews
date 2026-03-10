@@ -22,15 +22,42 @@ export default function TestEmailsPage() {
         body: body ? JSON.stringify(body) : undefined
       })
 
-      const data = await response.json()
+      // Check if response is OK before trying to parse JSON
+      if (!response.ok) {
+        // Try to get error text if JSON parsing fails
+        let errorText
+        try {
+          const errorData = await response.json()
+          errorText = errorData.error || `HTTP ${response.status} ${response.statusText}`
+        } catch {
+          errorText = `HTTP ${response.status} ${response.statusText}`
+        }
+        addResult(`❌ ${type} failed: ${errorText}`)
+        return
+      }
 
-      if (response.ok) {
-        addResult(`✅ ${data.message}`)
+      // Try to parse JSON response
+      let data
+      try {
+        const responseText = await response.text()
+        if (responseText.trim()) {
+          data = JSON.parse(responseText)
+        } else {
+          addResult(`⚠️ ${type}: Empty response (might have sent successfully)`)
+          return
+        }
+      } catch (parseError) {
+        addResult(`💥 ${type} JSON parse error: Response was not valid JSON`)
+        return
+      }
+
+      if (data.success !== false) {
+        addResult(`✅ ${data.message || `${type} sent successfully`}`)
       } else {
-        addResult(`❌ ${type} failed: ${data.error}`)
+        addResult(`❌ ${type} failed: ${data.error || 'Unknown error'}`)
       }
     } catch (error) {
-      addResult(`💥 ${type} error: ${error}`)
+      addResult(`💥 ${type} network error: ${error instanceof Error ? error.message : error}`)
     } finally {
       setLoading(null)
     }
@@ -149,6 +176,41 @@ export default function TestEmailsPage() {
                 variant="outline"
               >
                 {loading === 'Subscription Confirmation' ? 'Sending...' : 'Test Subscription Confirmation'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Configuration Test */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Configuration</CardTitle>
+              <CardDescription>
+                Check if email service is properly configured
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={async () => {
+                  setLoading('Config Check')
+                  try {
+                    const response = await fetch('/api/emails/test-config')
+                    const data = await response.json()
+                    if (response.ok) {
+                      addResult(`✅ Resend configured: ${data.configured}, API Key: ${data.hasApiKey ? 'Present' : 'Missing'} (${data.apiKeyPrefix}...)`)
+                    } else {
+                      addResult(`❌ Config check failed: ${data.error}`)
+                    }
+                  } catch (error) {
+                    addResult(`💥 Config check error: ${error}`)
+                  } finally {
+                    setLoading(null)
+                  }
+                }}
+                disabled={loading === 'Config Check'}
+                className="w-full"
+                variant="secondary"
+              >
+                {loading === 'Config Check' ? 'Checking...' : 'Check Email Configuration'}
               </Button>
             </CardContent>
           </Card>
