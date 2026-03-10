@@ -62,8 +62,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user is on starter plan
-    if ((profile as any).monthly_request_limit !== 150) {
+    // Check if user is on starter plan (50 or 150 requests)
+    const currentLimit = (profile as any).monthly_request_limit
+    if (currentLimit !== 50 && currentLimit !== 150) {
       return NextResponse.json(
         { error: 'Upgrade is only available for Starter plan users' },
         { status: 400 }
