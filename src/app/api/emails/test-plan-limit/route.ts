@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
     // Different test data based on plan type
     const testData = planType === 'growth'
       ? {
-          limit: 200,
-          used: 200,
+          limit: 150,
+          used: 150,
           businessName: 'Welto Digital (Growth Plan)'
         }
       : {

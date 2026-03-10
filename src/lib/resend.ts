@@ -72,7 +72,7 @@ export async function sendTrialEndingEmail(to: string, businessName: string, tri
 
         <p>Hi ${businessName},</p>
 
-        <p>Just a friendly reminder that your 7-day free trial ends on <strong>${trialEndDate}</strong>.</p>
+        <p>Just a friendly reminder that your 14-day free trial ends on <strong>${trialEndDate}</strong>.</p>
 
         <p>To continue getting more Google reviews after your trial ends, you'll need to choose a plan.</p>
 
@@ -163,8 +163,8 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
   }
 
   const planName = currentLimit === 50 ? 'Starter' : 'Growth'
-  const nextPlanName = currentLimit === 50 ? 'Growth' : 'Enterprise'
-  const nextPlanLimit = currentLimit === 50 ? '200' : 'unlimited'
+  const nextPlanName = currentLimit === 50 ? 'Growth' : null
+  const nextPlanLimit = currentLimit === 50 ? '150' : null
 
   try {
     const { data, error } = await resend.emails.send({
@@ -178,6 +178,7 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
 
         <p>You've used all <strong>${requestsUsed}/${currentLimit}</strong> review requests in your ${planName} plan for this month.</p>
 
+        ${currentLimit === 50 ? `
         <p>To continue sending review requests, you can upgrade to the <strong>${nextPlanName}</strong> plan and get ${nextPlanLimit} requests per month.</p>
 
         <h2>Why upgrade?</h2>
@@ -185,12 +186,25 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
           <li>Keep the momentum going with your reviews</li>
           <li>Don't miss out on potential 5-star reviews</li>
           <li>Higher limits = more reviews = more customers</li>
-          ${currentLimit === 50 ? '<li>Get automatic follow-up nudges</li><li>Priority support access</li>' : ''}
+          <li>Get automatic follow-up nudges</li>
+          <li>Priority support access</li>
         </ul>
 
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Upgrade to ${nextPlanName} →</a></p>
+        ` : `
+        <p>You're already on our highest plan! If you need more requests per month, please get in touch and we can discuss custom plan options.</p>
 
-        <p>Your plan will reset next month, or you can upgrade anytime to continue sending requests immediately.</p>
+        <h2>What you can do:</h2>
+        <ul>
+          <li>Your plan will reset next month with a fresh ${currentLimit} requests</li>
+          <li>Contact us about increasing your monthly limit</li>
+          <li>We can discuss custom pricing for higher volumes</li>
+        </ul>
+
+        <p><a href="mailto:ed@growourreviews.com" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Contact Support →</a></p>
+        `}
+
+        <p>Your plan will reset next month${currentLimit === 50 ? ', or you can upgrade anytime to continue sending requests immediately' : ' with a fresh allocation of requests'}.</p>
 
         <p>Questions about upgrading? Just reply to this email and I'll help you choose the right plan.</p>
 

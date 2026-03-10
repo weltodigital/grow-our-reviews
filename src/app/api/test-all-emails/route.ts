@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     switch (emailType) {
       case 'plan-limit':
-        const limit = planType === 'growth' ? 200 : 50
+        const limit = planType === 'growth' ? 150 : 50
         result = await sendPlanLimitReachedEmail(testEmail, `${testBusiness} (${planType.charAt(0).toUpperCase() + planType.slice(1)})`, limit, limit)
         emailDescription = `Plan Limit Reached (${planType.charAt(0).toUpperCase() + planType.slice(1)})`
         break
