@@ -38,14 +38,14 @@ export async function middleware(req: NextRequest) {
   const isAuthPath = authPaths.some(path => req.nextUrl.pathname.startsWith(path))
 
   // If accessing app routes on main domain, redirect to app subdomain
-  if (!isAppSubdomain && (isProtectedPath || isAuthPath)) {
+  if (!isAppSubdomain && (isProtectedPath || isAuthPath) && !req.nextUrl.pathname.startsWith('/test-emails')) {
     const appUrl = new URL(req.url)
     appUrl.hostname = `app.${hostname}`
     return NextResponse.redirect(appUrl)
   }
 
   // If accessing marketing pages on app subdomain, redirect to main domain
-  if (isAppSubdomain && !isProtectedPath && !isAuthPath && req.nextUrl.pathname !== '/' && !req.nextUrl.pathname.startsWith('/api')) {
+  if (isAppSubdomain && !isProtectedPath && !isAuthPath && req.nextUrl.pathname !== '/' && !req.nextUrl.pathname.startsWith('/api') && !req.nextUrl.pathname.startsWith('/test-emails')) {
     const mainUrl = new URL(req.url)
     mainUrl.hostname = hostname.replace('app.', '')
     return NextResponse.redirect(mainUrl)
