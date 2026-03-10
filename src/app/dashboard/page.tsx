@@ -84,7 +84,7 @@ async function getDashboardStats(userId: string) {
     const clicks = clicksThisMonth.count || 0
     const reviews = reviewsThisMonth.count || 0
     const feedback = feedbackThisMonth.count || 0
-    const monthlyLimit = (profile as any)?.monthly_request_limit || 50
+    const monthlyLimit = (profile as any)?.monthly_request_limit || 150
 
     // Calculate click through rate
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0

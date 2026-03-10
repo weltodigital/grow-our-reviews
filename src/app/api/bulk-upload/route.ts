@@ -52,13 +52,33 @@ export async function POST(request: NextRequest) {
       .not('sent_at', 'is', null)
 
     const requestsSent = requestsThisMonth?.length || 0
-    const monthlyLimit = (profile as any)?.monthly_request_limit || 50
+    const monthlyLimit = (profile as any)?.monthly_request_limit || 150
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 
     // Limit customers to remaining requests
     const customersToProcess = customers.slice(0, requestsRemaining)
 
     if (customersToProcess.length === 0) {
+      // Send plan limit reached email if user has hit their monthly limit
+      if (requestsSent >= monthlyLimit) {
+        try {
+          await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/plan-limit-reached`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: user.email,
+              businessName: (profile as any)?.business_name || 'there',
+              currentLimit: monthlyLimit,
+              requestsUsed: requestsSent
+            }),
+          })
+        } catch (error) {
+          console.error('Failed to send plan limit email:', error)
+        }
+      }
+
       return NextResponse.json(
         { error: 'No requests remaining in your plan this month' },
         { status: 400 }

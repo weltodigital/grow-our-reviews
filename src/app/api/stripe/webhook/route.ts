@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
             if (profile) {
               try {
                 const retryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')
-                const planName = profile.monthly_request_limit === 50 ? 'Starter' : 'Growth'
+                const planName = profile.monthly_request_limit === 150 ? 'Starter' : 'Growth'
 
                 await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/payment-failed`, {
                   method: 'POST',

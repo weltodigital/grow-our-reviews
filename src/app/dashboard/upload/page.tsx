@@ -27,7 +27,7 @@ async function getUserStats(userId: string) {
       .not('sent_at', 'is', null)
 
     const requestsSent = requestsThisMonth?.length || 0
-    const monthlyLimit = (profile as any)?.monthly_request_limit || 50
+    const monthlyLimit = (profile as any)?.monthly_request_limit || 150
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 
     return {
