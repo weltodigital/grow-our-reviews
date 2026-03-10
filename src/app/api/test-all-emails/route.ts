@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Test Plan Limit Reached Email (Starter)
-    const planLimitResult = await sendPlanLimitReachedEmail(testEmail, testBusiness, 50, 50)
+    const planLimitResult = await sendPlanLimitReachedEmail(testEmail, testBusiness, 150, 150)
     results.push({
       type: 'Plan Limit Reached Email (Starter)',
       success: planLimitResult.success,
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     switch (emailType) {
       case 'plan-limit':
-        const limit = planType === 'growth' ? 150 : 50
+        const limit = planType === 'growth' ? 300 : 150
         result = await sendPlanLimitReachedEmail(testEmail, `${testBusiness} (${planType.charAt(0).toUpperCase() + planType.slice(1)})`, limit, limit)
         emailDescription = `Plan Limit Reached (${planType.charAt(0).toUpperCase() + planType.slice(1)})`
         break

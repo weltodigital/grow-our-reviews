@@ -162,9 +162,9 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
     return { success: false, error: 'Email service not configured' }
   }
 
-  const planName = currentLimit === 50 ? 'Starter' : 'Growth'
-  const nextPlanName = currentLimit === 50 ? 'Growth' : null
-  const nextPlanLimit = currentLimit === 50 ? '150' : null
+  const planName = currentLimit === 150 ? 'Starter' : 'Growth'
+  const nextPlanName = currentLimit === 150 ? 'Growth' : null
+  const nextPlanLimit = currentLimit === 150 ? '300' : null
 
   try {
     const { data, error } = await resend.emails.send({
@@ -178,7 +178,7 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
 
         <p>You've used all <strong>${requestsUsed}/${currentLimit}</strong> review requests in your ${planName} plan for this month.</p>
 
-        ${currentLimit === 50 ? `
+        ${currentLimit === 150 ? `
         <p>To continue sending review requests, you can upgrade to the <strong>${nextPlanName}</strong> plan and get ${nextPlanLimit} requests per month.</p>
 
         <h2>Why upgrade?</h2>
@@ -204,7 +204,7 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
         <p><a href="mailto:ed@growourreviews.com" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Contact Support →</a></p>
         `}
 
-        <p>Your plan will reset next month${currentLimit === 50 ? ', or you can upgrade anytime to continue sending requests immediately' : ' with a fresh allocation of requests'}.</p>
+        <p>Your plan will reset next month${currentLimit === 150 ? ', or you can upgrade anytime to continue sending requests immediately' : ' with a fresh allocation of requests'}.</p>
 
         <p>Questions about upgrading? Just reply to this email and I'll help you choose the right plan.</p>
 
