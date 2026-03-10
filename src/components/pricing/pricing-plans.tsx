@@ -39,7 +39,6 @@ export function PricingPlans() {
         'Everything in Starter plan',
         'Automatic 48-hour nudge follow-ups',
         'Priority email support',
-        'Advanced analytics and insights',
         'Custom SMS timing settings',
         'Private feedback management'
       ]

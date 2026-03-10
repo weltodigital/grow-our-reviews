@@ -29,7 +29,6 @@ export function PricingSection() {
       features: [
         'Up to 300 message credits per month',
         'Everything in Starter',
-        'Advanced analytics',
         'Priority support'
       ],
       recommended: true
