@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Star, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getAppUrl } from '@/lib/utils'
@@ -36,11 +37,14 @@ export function MarketingFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-                <Star className="h-5 w-5 text-white fill-white" />
-              </div>
-              <span className="text-xl font-bold">Grow Our Reviews</span>
+            <Link href="/" className="flex items-center mb-4">
+              <Image
+                src="/grow-our-reviews-white-logo.png"
+                alt="Grow Our Reviews"
+                width={200}
+                height={32}
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="text-gray-400 max-w-md leading-relaxed">
               Helping tradespeople get more Google reviews through smart automation.
