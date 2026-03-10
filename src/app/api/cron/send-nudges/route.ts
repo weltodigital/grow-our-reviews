@@ -79,13 +79,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter requests that are past their nudge delay time
+    // But don't send nudges for very old requests (older than 7 days)
     const now = new Date()
+    const maxNudgeAge = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
+
     const eligibleRequests = nudgeRequests.filter((request: any) => {
       const sentAt = new Date(request.sent_at!)
       const nudgeDelayMs = (request as any).profiles.nudge_delay_hours * 60 * 60 * 1000
       const nudgeTime = new Date(sentAt.getTime() + nudgeDelayMs)
+      const requestAge = now.getTime() - sentAt.getTime()
 
-      return now >= nudgeTime
+      // Must be past nudge time AND within the max age limit
+      return now >= nudgeTime && requestAge <= maxNudgeAge
     })
 
     if (eligibleRequests.length === 0) {
