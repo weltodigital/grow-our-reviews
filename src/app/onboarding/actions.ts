@@ -90,7 +90,10 @@ export async function completeOnboarding(data: OnboardingData) {
 
   // Send welcome email
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`, {
+    const emailUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`
+    console.log('Sending welcome email to:', user.email, 'URL:', emailUrl)
+
+    const response = await fetch(emailUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,6 +103,13 @@ export async function completeOnboarding(data: OnboardingData) {
         businessName: data.businessName.trim(),
       }),
     })
+
+    if (response.ok) {
+      console.log('Welcome email sent successfully to:', user.email)
+    } else {
+      const errorText = await response.text()
+      console.error('Welcome email failed:', response.status, errorText)
+    }
   } catch (error) {
     // Don't fail onboarding if email fails
     console.error('Failed to send welcome email:', error)
