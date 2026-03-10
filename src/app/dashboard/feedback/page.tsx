@@ -33,7 +33,7 @@ export default function FeedbackPage() {
   const [analytics, setAnalytics] = useState({
     totalFeedback: 0,
     averageRating: 0,
-    ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    ratingDistribution: { 1: 0, 2: 0, 3: 0 }
   })
 
   const feedbackPerPage = 10
@@ -101,8 +101,6 @@ export default function FeedbackPage() {
     1: analytics.ratingDistribution[1],
     2: analytics.ratingDistribution[2],
     3: analytics.ratingDistribution[3],
-    4: analytics.ratingDistribution[4],
-    5: analytics.ratingDistribution[5],
   }
 
   if (isLoading) {

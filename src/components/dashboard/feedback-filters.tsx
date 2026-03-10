@@ -11,8 +11,6 @@ interface FeedbackFiltersProps {
     1: number
     2: number
     3: number
-    4: number
-    5: number
   }
 }
 
@@ -28,8 +26,6 @@ export function FeedbackFilters({
     { key: 1, label: '1 Star', count: ratingCounts[1], color: 'red' },
     { key: 2, label: '2 Stars', count: ratingCounts[2], color: 'orange' },
     { key: 3, label: '3 Stars', count: ratingCounts[3], color: 'yellow' },
-    { key: 4, label: '4 Stars', count: ratingCounts[4], color: 'green' },
-    { key: 5, label: '5 Stars', count: ratingCounts[5], color: 'green' },
   ]
 
   const dateFilters = [
