@@ -14,11 +14,28 @@ export const metadata: Metadata = {
   description: "Turn happy customers into 5-star reviews automatically. Smart SMS review requests with sentiment filtering for UK tradespeople.",
   keywords: "review automation, Google reviews, tradespeople, SMS marketing, customer feedback",
   authors: [{ name: "Grow Our Reviews" }],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/grow-our-reviews-icon.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/grow-our-reviews-icon.png",
+  },
+  manifest: "/manifest.json",
   openGraph: {
     title: "Grow Our Reviews - Automated Review Collection",
     description: "Turn happy customers into 5-star reviews automatically. Smart SMS review requests with sentiment filtering.",
     type: "website",
     locale: "en_GB",
+    images: [
+      {
+        url: "/grow-our-reviews-icon.png",
+        width: 512,
+        height: 512,
+        alt: "Grow Our Reviews",
+      },
+    ],
   },
   robots: {
     index: true,
