@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Menu, X, LogOut } from 'lucide-react'
 import { DashboardNav } from './nav'
@@ -32,9 +33,13 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
       <div className="sticky top-0 z-40 lg:hidden">
         <div className="flex h-16 items-center justify-between bg-white px-4 shadow-sm border-b border-gray-200">
           <Link href="/dashboard" className="flex items-center">
-            <div className="text-lg font-bold text-blue-600">
-              Grow Our Reviews
-            </div>
+            <Image
+              src="/grow-our-reviews-logo.png"
+              alt="Grow Our Reviews"
+              width={150}
+              height={24}
+              className="h-6 w-auto"
+            />
           </Link>
 
           <div className="flex items-center gap-2">

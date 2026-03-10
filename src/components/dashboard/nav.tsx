@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
@@ -37,9 +38,13 @@ export function DashboardNav({ className }: DashboardNavProps) {
     )}>
       <div className="flex h-16 items-center px-6 lg:h-20 border-b border-gray-100">
         <Link href="/dashboard" className="flex items-center">
-          <div className="text-xl font-bold text-blue-600">
-            Grow Our Reviews
-          </div>
+          <Image
+            src="/grow-our-reviews-logo.png"
+            alt="Grow Our Reviews"
+            width={200}
+            height={32}
+            className="h-8 w-auto"
+          />
         </Link>
       </div>
 
