@@ -23,174 +23,34 @@ export function FeedbackForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState('')
-  const [debugInfo, setDebugInfo] = useState<string[]>([])
-  const [testResults, setTestResults] = useState<string[]>([])
-
-  const addDebug = (message: string) => {
-    setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`])
-  }
-
-  const addTestResult = (message: string) => {
-    setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`])
-  }
-
-  const testMobileEndpoint = async () => {
-    try {
-      setTestResults([])
-      addTestResult('🧪 Starting mobile endpoint test...')
-
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-      const testUrl = `${baseUrl}/api/debug/mobile-test`
-
-      // Test GET
-      addTestResult(`Testing GET: ${testUrl}`)
-      const getResponse = await fetch(testUrl, { method: 'GET' })
-      addTestResult(`GET Response: ${getResponse.status} ${getResponse.statusText}`)
-
-      // Test POST
-      addTestResult(`Testing POST: ${testUrl}`)
-      const postResponse = await fetch(testUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ test: 'mobile-test' })
-      })
-      addTestResult(`POST Response: ${postResponse.status} ${postResponse.statusText}`)
-
-      if (postResponse.ok) {
-        const data = await postResponse.json()
-        addTestResult(`POST Data: ${JSON.stringify(data).substring(0, 100)}...`)
-      }
-
-    } catch (error) {
-      addTestResult(`❌ Test Error: ${error}`)
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
-    setDebugInfo([])
 
     try {
-      addDebug('🚀 Starting submission')
-
-      // Add debugging info for mobile issues
-      const userAgent = navigator.userAgent
-      const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent)
-      addDebug(`📱 Mobile: ${isMobile}, User Agent: ${userAgent.substring(0, 50)}...`)
-
-      const cleanComment = comment || ''
-      addDebug(`📝 Comment length: ${cleanComment.length}`)
-
-      // Try to create the request body step by step for debugging
-      addDebug('📦 Creating request body...')
-      const requestBody = {
-        token: token,
-        rating: rating,
-        comment: cleanComment
-      }
-      addDebug(`✅ Request body created with token: ${token.substring(0, 8)}...`)
-
-      addDebug('🔄 JSON stringifying...')
-      const requestBodyString = JSON.stringify(requestBody)
-      addDebug(`✅ JSON stringified, length: ${requestBodyString.length}`)
-
-      addDebug('🌐 Making fetch request...')
-      // Use absolute URL to avoid any mobile routing issues
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-      const url = `${baseUrl}/api/feedback`
-      const method = 'POST'
-      addDebug(`📍 Base URL: ${baseUrl}`)
-      addDebug(`📍 Full URL: ${url}, Method: ${method}`)
-      addDebug(`🌍 Window location: ${typeof window !== 'undefined' ? window.location.href : 'server-side'}`)
-
-      const fetchOptions = {
-        method: method,
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: requestBodyString,
-      }
-      addDebug(`⚙️ Fetch options: ${JSON.stringify({...fetchOptions, body: 'BODY_CONTENT'}, null, 2)}`)
-
-      const response = await fetch(url, fetchOptions)
-
-      addDebug(`📡 Response status: ${response.status} ${response.statusText}`)
-
-      // Check what type of response we got
-      const contentType = response.headers.get('content-type')
-      addDebug(`📋 Content-Type: ${contentType}`)
+        body: JSON.stringify({
+          token,
+          rating,
+          comment: comment || ''
+        }),
+      })
 
       if (!response.ok) {
-        addDebug('❌ Response not OK, attempting to get error data...')
-
-        try {
-          // Try to get response as text first to see what we actually received
-          const responseText = await response.text()
-          addDebug(`📄 Response text (first 200 chars): ${responseText.substring(0, 200)}`)
-
-          // Try to parse as JSON if it looks like JSON
-          if (contentType?.includes('application/json')) {
-            try {
-              const errorData = JSON.parse(responseText)
-              addDebug(`💥 Parsed JSON Error: ${JSON.stringify(errorData)}`)
-              throw new Error(errorData.error || 'Failed to submit feedback')
-            } catch (parseError) {
-              addDebug(`🚫 JSON parse failed: ${parseError}`)
-              throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 100)}`)
-            }
-          } else {
-            addDebug('🚫 Response is not JSON, likely HTML error page')
-            throw new Error(`Server error (${response.status}): ${responseText.substring(0, 100)}`)
-          }
-        } catch (readError) {
-          addDebug(`💥 Failed to read response: ${readError}`)
-          throw new Error(`Cannot read server response: ${readError}`)
-        }
+        throw new Error('Failed to submit feedback')
       }
 
-      // For successful response, try to parse JSON safely
-      try {
-        const responseText = await response.text()
-        addDebug(`✅ Success response: ${responseText.substring(0, 100)}`)
-
-        if (contentType?.includes('application/json')) {
-          const successData = JSON.parse(responseText)
-          addDebug(`🎉 Parsed success data: ${JSON.stringify(successData)}`)
-        } else {
-          addDebug('⚠️ Success but no JSON content type')
-        }
-      } catch (successParseError) {
-        addDebug(`⚠️ Success but failed to parse response: ${successParseError}`)
-        // Don't throw error for success case, just log it
-      }
-
-      addDebug('🎉 Success! Setting submitted state...')
       setIsSubmitted(true)
     } catch (err) {
-      addDebug(`💀 Caught error: ${err}`)
-      addDebug(`🔍 Error type: ${typeof err}`)
-      addDebug(`🏗️ Error constructor: ${err?.constructor?.name}`)
-
-      let errorMessage = 'Something went wrong'
-
-      if (err instanceof Error) {
-        errorMessage = err.message
-        addDebug(`📚 Error message: ${err.message}`)
-        if (err.stack) {
-          addDebug(`📋 Error stack: ${err.stack.substring(0, 200)}...`)
-        }
-      } else if (typeof err === 'string') {
-        errorMessage = err
-      } else {
-        errorMessage = `Unknown error: ${JSON.stringify(err)}`
-      }
-
-      setError(`Mobile Error: ${errorMessage}`)
+      setError('Failed to submit feedback. Please try again.')
     } finally {
       setIsSubmitting(false)
-      addDebug('🏁 Submission complete')
     }
   }
 
@@ -270,32 +130,6 @@ export function FeedbackForm({
               </div>
             )}
 
-            {debugInfo.length > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
-                <p className="text-sm font-medium text-blue-800 mb-2">🔍 Debug Info:</p>
-                <div className="text-xs text-blue-700 space-y-1 max-h-40 overflow-y-auto">
-                  {debugInfo.map((info, index) => (
-                    <div key={index} className="font-mono bg-white bg-opacity-50 p-1 rounded">
-                      {info}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {testResults.length > 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-                <p className="text-sm font-medium text-green-800 mb-2">🧪 Mobile Test Results:</p>
-                <div className="text-xs text-green-700 space-y-1 max-h-40 overflow-y-auto">
-                  {testResults.map((result, index) => (
-                    <div key={index} className="font-mono bg-white bg-opacity-50 p-1 rounded">
-                      {result}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="flex gap-3">
               <Button
                 type="submit"
@@ -325,16 +159,6 @@ export function FeedbackForm({
               </Button>
             </div>
 
-            <div className="mt-3">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={testMobileEndpoint}
-                className="w-full"
-              >
-                🧪 Test Mobile API (Debug)
-              </Button>
-            </div>
           </form>
 
           <p className="text-xs text-gray-500 mt-4 text-center">
