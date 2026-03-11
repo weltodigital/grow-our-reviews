@@ -85,6 +85,9 @@ export function MarketingFooter() {
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-3 text-gray-400">
               <li>
+                <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+              </li>
+              <li>
                 <a href="mailto:hello@growourreviews.com" className="hover:text-white transition-colors">Contact</a>
               </li>
             </ul>
