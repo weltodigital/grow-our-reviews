@@ -35,6 +35,9 @@ export function MarketingHeader() {
           <Link href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             Pricing
           </Link>
+          <Link href="/blog" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+            Blog
+          </Link>
           <Link href="#faq" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             FAQ
           </Link>
@@ -89,6 +92,13 @@ export function MarketingHeader() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
+              </Link>
+              <Link
+                href="/blog"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blog
               </Link>
               <Link
                 href="#faq"
