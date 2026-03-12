@@ -8,7 +8,7 @@ export default function HowManyGoogleReviewsToRankLocally() {
         <h3 className="font-semibold text-blue-900 mb-3">Key Takeaways</h3>
         <ul className="space-y-2 text-blue-800">
           <li>• Most Map Pack results have 40-80 reviews in medium-sized UK towns</li>
-          <li>• You don't need hundreds of reviews — you need more than your local competitors</li>
+          <li>• You don't need hundreds of reviews. You need more than your local competitors</li>
           <li>• Recent reviews matter more than old ones for ranking</li>
           <li>• A steady stream of fresh reviews beats a one-time burst every time</li>
         </ul>
@@ -18,7 +18,7 @@ export default function HowManyGoogleReviewsToRankLocally() {
 
       <p>When someone searches for "plumber near me" or "electrician in [your town]", Google shows three local business results at the very top of the page, along with a map. This is called the "Map Pack" or "Local Pack".</p>
 
-      <p>These three results get the lion's share of clicks — studies show that 75-80% of people click on one of these top three businesses.</p>
+      <p>These three results get the lion's share of clicks. Studies show that 75-80% of people click on one of these top three businesses.</p>
 
       <p><strong>If you're not in the Map Pack, most people searching for your trade in your area will never see you.</strong></p>
 
@@ -63,13 +63,13 @@ export default function HowManyGoogleReviewsToRankLocally() {
 
       <p>If the #3 plumber in your town has 35 reviews, your target is 40. Get there, then keep going.</p>
 
-      <h2 id="recency-matters">It's not just about quantity — recency matters more than you think</h2>
+      <h2 id="recency-matters">It's not just about quantity: recency matters more than you think</h2>
 
       <p>Here's what most tradespeople don't realise: Google heavily weights recent reviews over old ones.</p>
 
       <p>A business with 100 reviews but none in the last 6 months will lose ground to a business with 30 reviews but 5 reviews in the last month.</p>
 
-      <p>Google wants to show customers businesses that are currently active and delivering good service. Old reviews suggest you might not be taking on new work — or that your current customers aren't happy.</p>
+      <p>Google wants to show customers businesses that are currently active and delivering good service. Old reviews suggest you might not be taking on new work, or that your current customers aren't happy.</p>
 
       <p><strong>A steady drip of fresh reviews beats a one-time burst every time.</strong></p>
 
@@ -83,7 +83,7 @@ export default function HowManyGoogleReviewsToRankLocally() {
 
       <h3>The sweet spot: 4.2-4.9 stars</h3>
 
-      <p>This range looks authentic and trustworthy. Customers know that some negative reviews are inevitable — a perfect 5.0 rating can actually look suspicious, especially with lots of reviews.</p>
+      <p>This range looks authentic and trustworthy. Customers know that some negative reviews are inevitable. A perfect 5.0 rating can actually look suspicious, especially with lots of reviews.</p>
 
       <h3>4.0-4.1 stars: Borderline</h3>
 
@@ -98,7 +98,7 @@ export default function HowManyGoogleReviewsToRankLocally() {
       <p>One 1-star review among 50 total reviews? Barely noticeable.<br />
       One 1-star review among 8 total reviews? It seriously damages your average and your credibility.</p>
 
-      <p>This is another reason why consistently collecting more positive reviews is crucial — they dilute the impact of the occasional negative one.</p>
+      <p>This is another reason why consistently collecting more positive reviews is crucial because they dilute the impact of the occasional negative one.</p>
 
       <p>And this is where protecting your rating becomes important. Smart tradespeople use systems that check customer satisfaction before asking for a public review. Happy customers leave Google reviews; unhappy customers give private feedback that lets you fix problems before they become public.</p>
 

@@ -25,7 +25,7 @@ export default function GoogleBusinessProfileSetupTradesmen() {
 
       <p>For more context on how Google decides who appears in local search, read our guide on <Link href="/blog/how-google-local-search-works-tradesmen" className="text-blue-600 hover:text-blue-800 underline">how Google's local search algorithm works</Link>.</p>
 
-      <h2 id="step-1-create-or-claim">Step 1 — Create or claim your profile</h2>
+      <h2 id="step-1-create-or-claim">Step 1: Create or claim your profile</h2>
 
       <p>First, check if a profile for your business already exists:</p>
 
@@ -57,7 +57,7 @@ export default function GoogleBusinessProfileSetupTradesmen() {
 
       <p><strong>Important:</strong> Don't stuff keywords into your business name. "Smith Plumbing" is fine. "Smith Plumbing Best Plumber London 24/7" will get you penalised.</p>
 
-      <h2 id="step-2-verify-business">Step 2 — Verify your business</h2>
+      <h2 id="step-2-verify-business">Step 2: Verify your business</h2>
 
       <p>Google needs to verify you're a real business before your profile goes live. You'll have several options:</p>
 
@@ -87,7 +87,7 @@ export default function GoogleBusinessProfileSetupTradesmen() {
 
       <p><strong>Don't skip verification.</strong> Without it, your profile won't appear in search results, and you can't collect reviews or manage your listing.</p>
 
-      <h2 id="step-3-fill-every-field">Step 3 — Fill in every single field</h2>
+      <h2 id="step-3-fill-every-field">Step 3: Fill in every single field</h2>
 
       <p>Google rewards complete profiles. Fill in everything, even if it seems optional:</p>
 
@@ -125,13 +125,13 @@ export default function GoogleBusinessProfileSetupTradesmen() {
 
       <h3>What NOT to do</h3>
       <ul>
-        <li><strong>Don't use a fake address</strong> — Google will suspend your profile</li>
-        <li><strong>Don't keyword-stuff your business name</strong> — "Best Plumber London Emergency 24/7" will get you penalised</li>
-        <li><strong>Don't choose irrelevant categories</strong> — stick to what you actually do</li>
-        <li><strong>Don't copy descriptions from competitors</strong> — be authentic</li>
+        <li><strong>Don't use a fake address</strong>. Google will suspend your profile</li>
+        <li><strong>Don't keyword-stuff your business name</strong>. "Best Plumber London Emergency 24/7" will get you penalised</li>
+        <li><strong>Don't choose irrelevant categories</strong>. Stick to what you actually do</li>
+        <li><strong>Don't copy descriptions from competitors</strong>. Be authentic</li>
       </ul>
 
-      <h2 id="step-4-add-photos">Step 4 — Add photos</h2>
+      <h2 id="step-4-add-photos">Step 4: Add photos</h2>
 
       <p>Photos make a huge difference. Google Business Profiles with photos get significantly more clicks and calls.</p>
 
@@ -151,19 +151,19 @@ export default function GoogleBusinessProfileSetupTradesmen() {
       <h3>Photo tips:</h3>
       <ul>
         <li>Good lighting and clear images work best</li>
-        <li>Show your face — customers trust businesses with real people</li>
+        <li>Show your face. Customers trust businesses with real people</li>
         <li>Include your van/signage to look established</li>
         <li>Before/after photos prove your expertise</li>
       </ul>
 
-      <h2 id="step-5-get-review-link">Step 5 — Get your Google Review link</h2>
+      <h2 id="step-5-get-review-link">Step 5: Get your Google Review link</h2>
 
       <p>This is one of the most important steps. You'll need this link to ask customers for reviews.</p>
 
       <ol>
         <li>In your Google Business Profile dashboard, click "Get more reviews"</li>
         <li>Google will show you a direct link to your review page</li>
-        <li>Copy this link — you'll use it in text messages and emails to customers</li>
+        <li>Copy this link. You'll use it in text messages and emails to customers</li>
       </ol>
 
       <p>The link will look something like: <code>https://g.page/yourbusinessname/review</code></p>
@@ -172,7 +172,7 @@ export default function GoogleBusinessProfileSetupTradesmen() {
 
       <p>For detailed guidance on when and how to ask for reviews, check our guide on <Link href="/blog/best-time-to-ask-for-google-review" className="text-blue-600 hover:text-blue-800 underline">the best time to ask for a Google review</Link>.</p>
 
-      <h2 id="step-6-start-collecting-reviews">Step 6 — Start collecting reviews</h2>
+      <h2 id="step-6-start-collecting-reviews">Step 6: Start collecting reviews</h2>
 
       <p>Your profile is set up, but it's not doing much good with zero reviews. An empty review section looks unprofessional and won't help you rank.</p>
 

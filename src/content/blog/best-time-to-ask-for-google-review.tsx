@@ -4,7 +4,7 @@ import { InternalLinkCTA } from "@/components/blog/internal-link-cta";
 export default function BestTimeToAskForGoogleReview() {
   return (
     <>
-      <p>You know you should be asking for reviews. But when's the right moment? And what do you actually say without sounding desperate? Here's the simple answer — and some word-for-word scripts you can steal.</p>
+      <p>You know you should be asking for reviews. But when's the right moment? And what do you actually say without sounding desperate? Here's the simple answer, plus some word-for-word scripts you can steal.</p>
 
       <h2 id="why-timing-matters">Why timing matters more than you think</h2>
 
@@ -36,7 +36,7 @@ export default function BestTimeToAskForGoogleReview() {
 
       <h3>4. On the spot before you leave</h3>
 
-      <p>This can work, but it's risky. Some tradespeople do this successfully — "If you're happy with the work, I'd really appreciate a quick Google review" — but it puts the customer on the spot.</p>
+      <p>This can work, but it's risky. Some tradespeople do this successfully ("If you're happy with the work, I'd really appreciate a quick Google review") but it puts the customer on the spot.</p>
 
       <p>They might say yes and then forget. Or they might feel pressured. Use this approach only if you're confident and have built good rapport during the job.</p>
 
@@ -58,17 +58,17 @@ export default function BestTimeToAskForGoogleReview() {
 
       <p>You can hand them a business card with your Google review link or a QR code if you've got one set up.</p>
 
-      <p>This approach works best for bigger jobs where you've spent time building rapport — kitchen installs, full rewires, bathroom renovations. For quick call-outs, stick to text messages.</p>
+      <p>This approach works best for bigger jobs where you've spent time building rapport: kitchen installs, full rewires, bathroom renovations. For quick call-outs, stick to text messages.</p>
 
       <h2 id="how-to-ask-via-text">How to ask via text message (the most effective method)</h2>
 
       <p>SMS is the champion for review requests. Here's why:</p>
 
       <ul>
-        <li><strong>98% open rate</strong> — almost everyone reads their texts</li>
-        <li><strong>The link is right there</strong> — one tap takes them straight to the review page</li>
-        <li><strong>Quick and easy</strong> — they can leave a review in 30 seconds without switching apps</li>
-        <li><strong>Not intrusive</strong> — they can respond when convenient</li>
+        <li><strong>98% open rate</strong>: almost everyone reads their texts</li>
+        <li><strong>The link is right there</strong>: one tap takes them straight to the review page</li>
+        <li><strong>Quick and easy</strong>: they can leave a review in 30 seconds without switching apps</li>
+        <li><strong>Not intrusive</strong>: they can respond when convenient</li>
       </ul>
 
       <p>Here are three proven text message templates you can copy and personalise:</p>
@@ -76,11 +76,11 @@ export default function BestTimeToAskForGoogleReview() {
       <h3>Template 1: The Friendly Ask</h3>
 
       <blockquote>
-        <p>"Hi [customer name], thanks for choosing [business name]! If you were happy with the work today, we'd really appreciate a quick Google review — takes 30 seconds: [your Google review link]"</p>
+        <p>"Hi [customer name], thanks for choosing [business name]! If you were happy with the work today, we'd really appreciate a quick Google review. Takes 30 seconds: [your Google review link]"</p>
       </blockquote>
 
       <p><strong>Example:</strong><br />
-      "Hi Sarah, thanks for choosing Mike's Plumbing! If you were happy with the work today, we'd really appreciate a quick Google review — takes 30 seconds: https://g.page/mikesplumbing/review"</p>
+      "Hi Sarah, thanks for choosing Mike's Plumbing! If you were happy with the work today, we'd really appreciate a quick Google review. Takes 30 seconds: https://g.page/mikesplumbing/review"</p>
 
       <h3>Template 2: The Specific Ask</h3>
 
@@ -102,7 +102,7 @@ export default function BestTimeToAskForGoogleReview() {
 
       <h3>Getting your Google review link</h3>
 
-      <p>You'll need your specific Google review link to include in these messages. In your Google Business Profile, look for "Get more reviews" or "Ask for reviews" — Google will give you a direct link that customers can click to leave a review immediately.</p>
+      <p>You'll need your specific Google review link to include in these messages. In your Google Business Profile, look for "Get more reviews" or "Ask for reviews". Google will give you a direct link that customers can click to leave a review immediately.</p>
 
       <p>If you're not sure how to find this, we've got a <Link href="/blog/google-business-profile-setup-tradesmen" className="text-blue-600 hover:text-blue-800 underline">complete step-by-step guide to setting up your Google Business Profile</Link> including how to get your review link.</p>
 
@@ -114,7 +114,7 @@ export default function BestTimeToAskForGoogleReview() {
 
       <h2 id="how-to-ask-via-email">How to ask via email</h2>
 
-      <p>Email is less effective than SMS for review requests, but it can work for certain situations — particularly commercial clients or larger residential projects where you have their email address.</p>
+      <p>Email is less effective than SMS for review requests, but it can work for certain situations, particularly commercial clients or larger residential projects where you have their email address.</p>
 
       <blockquote>
         <p><strong>Subject:</strong> Thank you for choosing [Business Name]</p>
@@ -129,14 +129,14 @@ export default function BestTimeToAskForGoogleReview() {
 
       <p>Keep it short. People skim emails but read every word of a text message.</p>
 
-      <h2 id="the-follow-up">The follow-up — one nudge, that's it</h2>
+      <h2 id="the-follow-up">The follow-up: one nudge, that's it</h2>
 
       <p>If they haven't left a review after 48 hours, you can send one polite reminder. But only one.</p>
 
       <p>Here's a gentle nudge template:</p>
 
       <blockquote>
-        <p>"Hi [name], hope your [job type] is still working perfectly! Just a gentle reminder about that Google review if you get a chance — no worries if you're too busy. Cheers, [your name]"</p>
+        <p>"Hi [name], hope your [job type] is still working perfectly! Just a gentle reminder about that Google review if you get a chance. No worries if you're too busy. Cheers, [your name]"</p>
       </blockquote>
 
       <p><strong>After that, leave it.</strong> Two messages maximum. Never three.</p>
@@ -160,7 +160,7 @@ export default function BestTimeToAskForGoogleReview() {
 
       <p>No forgetting. No missing the timing window. No wondering what to say. The customer gets the perfect message at the perfect time, every single time.</p>
 
-      <p>And because the system can track sentiment — asking unhappy customers for private feedback instead of public reviews — you protect your reputation while still collecting valuable feedback.</p>
+      <p>And because the system can track sentiment (asking unhappy customers for private feedback instead of public reviews), you protect your reputation while still collecting valuable feedback.</p>
 
       <p>The best part? It turns review collection from a daily task into a background process. Set it up once, and every job you complete becomes a potential new review without any extra effort from you.</p>
 
@@ -169,11 +169,11 @@ export default function BestTimeToAskForGoogleReview() {
       <p>A few things that will hurt your review collection:</p>
 
       <ul>
-        <li><strong>Don't ask on the invoice</strong> — they're focused on payment, not helping you</li>
-        <li><strong>Don't ask immediately after a complaint</strong> — fix the problem first, then ask for a review once they're happy</li>
-        <li><strong>Don't send generic messages</strong> — personalise with their name and the work you did</li>
-        <li><strong>Don't ask more than twice</strong> — it becomes harassment</li>
-        <li><strong>Don't wait weeks</strong> — the moment has passed</li>
+        <li><strong>Don't ask on the invoice</strong>. They're focused on payment, not helping you</li>
+        <li><strong>Don't ask immediately after a complaint</strong>. Fix the problem first, then ask for a review once they're happy</li>
+        <li><strong>Don't send generic messages</strong>. Personalise with their name and the work you did</li>
+        <li><strong>Don't ask more than twice</strong>. It becomes harassment</li>
+        <li><strong>Don't wait weeks</strong>. The moment has passed</li>
       </ul>
 
       <h2 id="your-action-plan">Your action plan</h2>
@@ -184,13 +184,13 @@ export default function BestTimeToAskForGoogleReview() {
         <li><strong>Get your Google review link</strong> from your Business Profile</li>
         <li><strong>Pick one of the SMS templates above</strong> and personalise it for your business</li>
         <li><strong>Set a phone reminder</strong> for 3-4 hours after you finish each job</li>
-        <li><strong>Start with your next job</strong> — don't wait for the perfect system</li>
-        <li><strong>Track what works</strong> — which template gets the best response?</li>
+        <li><strong>Start with your next job</strong>. Don't wait for the perfect system</li>
+        <li><strong>Track what works</strong>. Which template gets the best response?</li>
       </ol>
 
       <p>The difference between tradespeople who get lots of reviews and those who don't isn't the quality of their work. It's having a system for asking at the right time with the right message.</p>
 
-      <p>Start today. Your future self — and your busier diary — will thank you.</p>
+      <p>Start today. Your future self (and your busier diary) will thank you.</p>
     </>
   );
 }
