@@ -272,17 +272,17 @@ export function ArticleLayout({
                 prose-headings:font-bold prose-headings:text-gray-900 prose-headings:tracking-tight
                 prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-4 prose-h2:border-b-2 prose-h2:border-gray-200
                 prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:font-semibold
-                prose-p:text-gray-700 prose-p:text-lg prose-p:leading-relaxed prose-p:mb-8 prose-p:mt-4
-                prose-ul:my-8 prose-ul:space-y-4 prose-li:text-gray-700 prose-li:text-lg prose-li:leading-relaxed prose-li:mb-2
-                prose-ol:my-8 prose-ol:space-y-4 prose-ol:text-gray-700 prose-ol:text-lg prose-ol:leading-relaxed
+                prose-p:text-gray-700 prose-p:text-lg prose-p:leading-loose prose-p:mb-10 prose-p:mt-6
+                prose-ul:my-10 prose-ul:space-y-4 prose-li:text-gray-700 prose-li:text-lg prose-li:leading-loose prose-li:mb-4
+                prose-ol:my-10 prose-ol:space-y-4 prose-ol:text-gray-700 prose-ol:text-lg prose-ol:leading-loose
                 prose-strong:text-gray-900 prose-strong:font-semibold
                 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:text-blue-800 hover:prose-a:underline prose-a:font-medium
                 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-medium
-                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:my-10 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-lg
-                [&>div.bg-blue-50]:my-10 [&>div.bg-blue-50]:p-8 [&>div.bg-blue-50]:rounded-xl [&>div.bg-blue-50]:border [&>div.bg-blue-50]:border-blue-200 [&>div.bg-blue-50]:shadow-sm
+                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-8 prose-blockquote:px-8 prose-blockquote:my-12 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-lg prose-blockquote:leading-loose
+                [&>div.bg-blue-50]:my-12 [&>div.bg-blue-50]:p-8 [&>div.bg-blue-50]:rounded-xl [&>div.bg-blue-50]:border [&>div.bg-blue-50]:border-blue-200 [&>div.bg-blue-50]:shadow-sm
                 [&>div.bg-blue-50>h3]:text-blue-900 [&>div.bg-blue-50>h3]:font-bold [&>div.bg-blue-50>h3]:mb-4 [&>div.bg-blue-50>h3]:mt-0 [&>div.bg-blue-50>h3]:text-xl
                 [&>div.bg-blue-50>ul]:text-blue-800 [&>div.bg-blue-50>ul]:space-y-3 [&>div.bg-blue-50>ul]:mb-0 [&>div.bg-blue-50>ul]:text-lg
-                [&>*]:max-w-none
+                [&>*]:max-w-none [&>p+p]:mt-10 [&>p]:block [&>p]:mb-10
               ">
                 {children}
               </div>
