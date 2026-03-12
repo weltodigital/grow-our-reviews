@@ -55,8 +55,9 @@ type ArticleParams = {
   slug: string;
 };
 
-export async function generateMetadata({ params }: { params: ArticleParams }): Promise<Metadata> {
-  const article = articles[params.slug as keyof typeof articles];
+export async function generateMetadata({ params }: { params: Promise<ArticleParams> }): Promise<Metadata> {
+  const { slug } = await params;
+  const article = articles[slug as keyof typeof articles];
 
   if (!article) {
     return {
@@ -65,7 +66,7 @@ export async function generateMetadata({ params }: { params: ArticleParams }): P
     };
   }
 
-  const url = `https://growourreviews.com/blog/${params.slug}`;
+  const url = `https://growourreviews.com/blog/${slug}`;
 
   return {
     title: `${article.title} | Grow Our Reviews`,
@@ -100,8 +101,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function BlogArticlePage({ params }: { params: ArticleParams }) {
-  const article = articles[params.slug as keyof typeof articles];
+export default async function BlogArticlePage({ params }: { params: Promise<ArticleParams> }) {
+  const { slug } = await params;
+  const article = articles[slug as keyof typeof articles];
 
   if (!article) {
     notFound();
@@ -111,7 +113,7 @@ export default async function BlogArticlePage({ params }: { params: ArticleParam
 
   // Get related articles (simple logic - same category, exclude current)
   const relatedArticles = Object.entries(articles)
-    .filter(([slug, data]) => slug !== params.slug && data.category === article.category)
+    .filter(([articleSlug, data]) => articleSlug !== slug && data.category === article.category)
     .slice(0, 3)
     .map(([slug, data]) => ({
       slug,
@@ -145,7 +147,7 @@ export default async function BlogArticlePage({ params }: { params: ArticleParam
               dateModified: article.publishDate,
               mainEntityOfPage: {
                 "@type": "WebPage",
-                "@id": `https://growourreviews.com/blog/${params.slug}`
+                "@id": `https://growourreviews.com/blog/${slug}`
               }
             },
             // Breadcrumb structured data
@@ -169,7 +171,7 @@ export default async function BlogArticlePage({ params }: { params: ArticleParam
                   "@type": "ListItem",
                   position: 3,
                   name: article.title,
-                  item: `https://growourreviews.com/blog/${params.slug}`
+                  item: `https://growourreviews.com/blog/${slug}`
                 }
               ]
             }
