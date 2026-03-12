@@ -4,8 +4,9 @@ import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/sitemap.xml', '/robots.txt']
-  const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route))
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123']
+  const staticFiles = ['/sitemap.xml', '/robots.txt']
+  const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route)) || staticFiles.includes(req.nextUrl.pathname)
 
   if (isPublicRoute) {
     console.log('PUBLIC ROUTE BYPASSED:', req.nextUrl.pathname)
@@ -85,6 +86,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|review|blog|sitemap.xml|robots.txt).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|review|blog|sitemap\\.xml|robots\\.txt).*)',
   ],
 }
