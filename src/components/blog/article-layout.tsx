@@ -270,8 +270,8 @@ export function ArticleLayout({
               {/* Article Content */}
               <div className="prose prose-xl prose-blue max-w-none
                 prose-headings:font-bold prose-headings:text-gray-900 prose-headings:tracking-tight
-                prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-4 prose-h2:border-b-2 prose-h2:border-gray-200
-                prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:font-semibold
+                prose-h2:text-4xl prose-h2:lg:text-5xl prose-h2:mt-20 prose-h2:mb-10 prose-h2:pb-6 prose-h2:border-b-4 prose-h2:border-blue-600 prose-h2:bg-gradient-to-r prose-h2:from-gray-900 prose-h2:to-blue-800 prose-h2:bg-clip-text prose-h2:text-transparent prose-h2:font-black prose-h2:leading-tight
+                prose-h3:text-2xl prose-h3:lg:text-3xl prose-h3:mt-16 prose-h3:mb-8 prose-h3:font-bold prose-h3:text-blue-900 prose-h3:relative prose-h3:pl-6 prose-h3:before:content-[''] prose-h3:before:absolute prose-h3:before:left-0 prose-h3:before:top-1 prose-h3:before:w-1 prose-h3:before:h-8 prose-h3:before:bg-blue-600 prose-h3:before:rounded-full
                 prose-p:text-gray-700 prose-p:text-lg prose-p:leading-loose prose-p:mb-10 prose-p:mt-6
                 prose-ul:my-10 prose-ul:space-y-4 prose-li:text-gray-700 prose-li:text-lg prose-li:leading-loose prose-li:mb-4
                 prose-ol:my-10 prose-ol:space-y-4 prose-ol:text-gray-700 prose-ol:text-lg prose-ol:leading-loose
