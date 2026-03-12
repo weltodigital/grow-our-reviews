@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /onboarding/
+Disallow: /billing/
+Disallow: /review/
+Disallow: /test-emails
+Disallow: /blog-test
+Disallow: /debug-page
+Disallow: /test123
+
+Sitemap: https://www.growourreviews.com/sitemap.xml
