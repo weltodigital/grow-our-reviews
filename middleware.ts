@@ -4,6 +4,15 @@ import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 
 export async function middleware(request: NextRequest) {
+  // Define public routes that should never require auth
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/debug-page', '/blog-test']
+  const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+
+  if (isPublicRoute) {
+    console.log('PUBLIC ROUTE BYPASSED:', request.nextUrl.pathname)
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -58,19 +67,18 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Public routes that don't need authentication
-  const publicRoutes = [
+  // Additional public routes that don't need authentication
+  const additionalPublicRoutes = [
     '/',
     '/login',
     '/signup',
-    '/pricing',
     '/reset-password',
     '/forgot-password',
     '/test-emails',
   ]
 
   // Check if this is a public route, review route, or API route
-  const isPublicRoute = publicRoutes.some(route => pathname === route) ||
+  const isAdditionalPublicRoute = additionalPublicRoutes.some(route => pathname === route) ||
     pathname.startsWith('/review/') ||
     pathname.startsWith('/api/auth/callback') ||
     pathname.startsWith('/api/cron/') ||
@@ -88,7 +96,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // If accessing a protected route without auth, redirect to login
-  if (!isPublicRoute && !user) {
+  if (!isAdditionalPublicRoute && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
