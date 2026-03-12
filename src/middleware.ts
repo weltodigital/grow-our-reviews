@@ -3,9 +3,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // COMPLETELY DISABLE MIDDLEWARE FOR DEBUGGING
-  console.log('MIDDLEWARE HIT:', req.nextUrl.pathname, req.headers.get('host'))
-  return NextResponse.next()
+  // Early return for blog routes - bypass all middleware
+  if (req.nextUrl.pathname.startsWith('/blog')) {
+    return NextResponse.next()
+  }
 
   let response = NextResponse.next({
     request: {
