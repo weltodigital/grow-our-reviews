@@ -111,23 +111,25 @@ function TableOfContents({ headings }: { headings: { id: string; text: string; l
 
       {/* Desktop TOC */}
       <div className="hidden lg:block">
-        <div className="sticky top-8">
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Table of Contents</h3>
-            <nav className="space-y-2">
-              {headings.map(({ id, text }) => (
-                <Link
-                  key={id}
-                  href={`#${id}`}
-                  className={`block text-sm hover:text-blue-600 transition-colors ${
-                    activeId === id ? 'text-blue-600 font-medium' : 'text-gray-600'
-                  }`}
-                >
-                  {text}
-                </Link>
-              ))}
-            </nav>
-          </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h3 className="font-bold text-gray-900 mb-5 text-lg">Table of Contents</h3>
+          <nav className="space-y-3">
+            {headings.map(({ id, text, level }) => (
+              <Link
+                key={id}
+                href={`#${id}`}
+                className={`block text-sm leading-relaxed hover:text-blue-600 transition-all duration-200 py-1 ${
+                  level === 3 ? 'pl-4 text-gray-500' : ''
+                } ${
+                  activeId === id
+                    ? 'text-blue-600 font-semibold border-l-3 border-blue-600 pl-3 -ml-3 bg-blue-50 py-2 rounded-r'
+                    : 'text-gray-700 hover:pl-1'
+                }`}
+              >
+                {text}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </>
@@ -222,23 +224,23 @@ export function ArticleLayout({
 
       <main className="container mx-auto px-4 py-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
+        <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8 max-w-4xl mx-auto">
           <Link href="/" className="hover:text-gray-900 flex items-center">
             <Home className="h-4 w-4" />
           </Link>
           <ChevronRight className="h-4 w-4" />
           <Link href="/blog" className="hover:text-gray-900">Blog</Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-gray-900">{title}</span>
+          <span className="text-gray-900 truncate">{title}</span>
         </nav>
 
-        <div className="max-w-6xl mx-auto">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-16">
             {/* Article Content */}
             <article className="lg:col-span-8">
               {/* Article Header */}
-              <header className="mb-8">
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+              <header className="mb-12 pb-8 border-b border-gray-100">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(category)}`}>
                     {category}
                   </span>
@@ -251,19 +253,36 @@ export function ArticleLayout({
                     {readingTime} min read
                   </div>
                 </div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">
+                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-6 tracking-tight">
                   {title}
                 </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed font-light mb-6">
                   {description}
                 </p>
-                <div className="text-sm text-gray-600 mt-4">
-                  By <span className="font-medium text-gray-900">Ed at Grow Our Reviews</span>
+                <div className="flex items-center text-sm text-gray-600">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium mr-3">
+                    E
+                  </div>
+                  By <span className="font-medium text-gray-900 ml-1">Ed at Grow Our Reviews</span>
                 </div>
               </header>
 
               {/* Article Content */}
-              <div className="prose prose-lg max-w-none">
+              <div className="prose prose-lg prose-blue max-w-none
+                prose-headings:font-bold prose-headings:text-gray-900 prose-headings:tracking-tight
+                prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200
+                prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
+                prose-p:text-gray-700 prose-p:text-lg prose-p:leading-relaxed prose-p:mb-6
+                prose-ul:my-6 prose-ul:space-y-3 prose-li:text-gray-700 prose-li:text-lg
+                prose-ol:my-6 prose-ol:space-y-3 prose-ol:text-gray-700 prose-ol:text-lg
+                prose-strong:text-gray-900 prose-strong:font-semibold
+                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:text-blue-800 hover:prose-a:underline
+                prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded
+                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-8
+                [&>div.bg-blue-50]:my-8 [&>div.bg-blue-50]:p-6 [&>div.bg-blue-50]:rounded-lg [&>div.bg-blue-50]:border [&>div.bg-blue-50]:border-blue-200
+                [&>div.bg-blue-50>h3]:text-blue-900 [&>div.bg-blue-50>h3]:font-semibold [&>div.bg-blue-50>h3]:mb-3 [&>div.bg-blue-50>h3]:mt-0
+                [&>div.bg-blue-50>ul]:text-blue-800 [&>div.bg-blue-50>ul]:space-y-2 [&>div.bg-blue-50>ul]:mb-0
+              ">
                 {children}
               </div>
 
@@ -297,7 +316,9 @@ export function ArticleLayout({
 
             {/* Sidebar */}
             <aside className="lg:col-span-4">
-              <TableOfContents headings={headings} />
+              <div className="sticky top-8">
+                <TableOfContents headings={headings} />
+              </div>
             </aside>
           </div>
         </div>
