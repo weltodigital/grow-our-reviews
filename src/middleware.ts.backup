@@ -11,6 +11,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // TEMPORARY: Bypass all middleware for debugging
+  if (req.nextUrl.pathname === '/sitemap.xml') {
+    console.log('FORCE BYPASS SITEMAP')
+    return NextResponse.next()
+  }
+
   // Define public routes that should never require auth
   const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123']
   const staticFiles = ['/sitemap.xml', '/robots.txt']
