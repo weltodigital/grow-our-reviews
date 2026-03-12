@@ -268,22 +268,82 @@ export function ArticleLayout({
               </header>
 
               {/* Article Content */}
-              <div className="prose prose-xl prose-blue max-w-none
-                prose-headings:font-bold prose-headings:text-gray-900 prose-headings:tracking-tight
-                prose-h2:text-4xl prose-h2:lg:text-5xl prose-h2:mt-20 prose-h2:mb-10 prose-h2:pb-6 prose-h2:border-b-4 prose-h2:border-blue-600 prose-h2:bg-gradient-to-r prose-h2:from-gray-900 prose-h2:to-blue-800 prose-h2:bg-clip-text prose-h2:text-transparent prose-h2:font-black prose-h2:leading-tight
-                prose-h3:text-2xl prose-h3:lg:text-3xl prose-h3:mt-16 prose-h3:mb-8 prose-h3:font-bold prose-h3:text-blue-900 prose-h3:relative prose-h3:pl-6 prose-h3:before:content-[''] prose-h3:before:absolute prose-h3:before:left-0 prose-h3:before:top-1 prose-h3:before:w-1 prose-h3:before:h-8 prose-h3:before:bg-blue-600 prose-h3:before:rounded-full
-                prose-p:text-gray-700 prose-p:text-lg prose-p:leading-loose prose-p:mb-10 prose-p:mt-6
-                prose-ul:my-10 prose-ul:space-y-4 prose-li:text-gray-700 prose-li:text-lg prose-li:leading-loose prose-li:mb-4
-                prose-ol:my-10 prose-ol:space-y-4 prose-ol:text-gray-700 prose-ol:text-lg prose-ol:leading-loose
-                prose-strong:text-gray-900 prose-strong:font-semibold
-                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:text-blue-800 hover:prose-a:underline prose-a:font-medium
-                prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-medium
-                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-8 prose-blockquote:px-8 prose-blockquote:my-12 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-lg prose-blockquote:leading-loose
-                [&>div.bg-blue-50]:my-12 [&>div.bg-blue-50]:p-8 [&>div.bg-blue-50]:rounded-xl [&>div.bg-blue-50]:border [&>div.bg-blue-50]:border-blue-200 [&>div.bg-blue-50]:shadow-sm
-                [&>div.bg-blue-50>h3]:text-blue-900 [&>div.bg-blue-50>h3]:font-bold [&>div.bg-blue-50>h3]:mb-4 [&>div.bg-blue-50>h3]:mt-0 [&>div.bg-blue-50>h3]:text-xl
-                [&>div.bg-blue-50>ul]:text-blue-800 [&>div.bg-blue-50>ul]:space-y-3 [&>div.bg-blue-50>ul]:mb-0 [&>div.bg-blue-50>ul]:text-lg
-                [&>*]:max-w-none [&>p+p]:mt-10 [&>p]:block [&>p]:mb-10
-              ">
+              <div
+                className="prose prose-xl prose-blue max-w-none article-content"
+                style={{
+                  '--tw-gradient-from': '#111827',
+                  '--tw-gradient-to': '#1e40af',
+                }}
+              >
+                <style jsx>{`
+                  .article-content > h2 {
+                    font-size: 2.25rem !important;
+                    font-weight: 900 !important;
+                    margin-top: 5rem !important;
+                    margin-bottom: 2.5rem !important;
+                    padding-bottom: 1.5rem !important;
+                    border-bottom: 4px solid #2563eb !important;
+                    background: linear-gradient(to right, #111827, #1e40af) !important;
+                    background-clip: text !important;
+                    -webkit-background-clip: text !important;
+                    color: transparent !important;
+                    line-height: 1.1 !important;
+                    letter-spacing: -0.025em !important;
+                  }
+
+                  .article-content > h3 {
+                    font-size: 1.5rem !important;
+                    font-weight: 700 !important;
+                    color: #1e3a8a !important;
+                    margin-top: 4rem !important;
+                    margin-bottom: 2rem !important;
+                    position: relative !important;
+                    padding-left: 1.5rem !important;
+                  }
+
+                  .article-content > h3::before {
+                    content: '' !important;
+                    position: absolute !important;
+                    left: 0 !important;
+                    top: 0.25rem !important;
+                    width: 0.25rem !important;
+                    height: 2rem !important;
+                    background-color: #2563eb !important;
+                    border-radius: 9999px !important;
+                  }
+
+                  .article-content > p {
+                    color: #374151 !important;
+                    font-size: 1.125rem !important;
+                    line-height: 1.625 !important;
+                    margin-bottom: 2.5rem !important;
+                    margin-top: 1.5rem !important;
+                  }
+
+                  .article-content > ul,
+                  .article-content > ol {
+                    margin-top: 2.5rem !important;
+                    margin-bottom: 2.5rem !important;
+                  }
+
+                  .article-content > ul > li,
+                  .article-content > ol > li {
+                    color: #374151 !important;
+                    font-size: 1.125rem !important;
+                    line-height: 1.625 !important;
+                    margin-bottom: 1rem !important;
+                  }
+
+                  @media (min-width: 1024px) {
+                    .article-content > h2 {
+                      font-size: 3rem !important;
+                    }
+
+                    .article-content > h3 {
+                      font-size: 1.875rem !important;
+                    }
+                  }
+                `}</style>
                 {children}
               </div>
 
