@@ -280,23 +280,23 @@ export function ArticleLayout({
                 <style dangerouslySetInnerHTML={{
                   __html: `
                     .blog-h2 {
-                      font-size: 2.5rem !important;
-                      font-weight: 900 !important;
-                      color: #1e40af !important;
-                      margin-top: 4rem !important;
-                      margin-bottom: 2rem !important;
-                      padding-bottom: 1rem !important;
-                      border-bottom: 3px solid #2563eb !important;
-                      line-height: 1.2 !important;
+                      font-size: 1.75rem !important;
+                      font-weight: 700 !important;
+                      color: #155dfb !important;
+                      margin-top: 3rem !important;
+                      margin-bottom: 1.5rem !important;
+                      padding-bottom: 0.5rem !important;
+                      border-bottom: 2px solid #155dfb !important;
+                      line-height: 1.3 !important;
                       letter-spacing: -0.025em !important;
                     }
 
                     .blog-h3 {
-                      font-size: 1.75rem !important;
-                      font-weight: 700 !important;
-                      color: #1e3a8a !important;
-                      margin-top: 3rem !important;
-                      margin-bottom: 1.5rem !important;
+                      font-size: 1.25rem !important;
+                      font-weight: 600 !important;
+                      color: #000000 !important;
+                      margin-top: 2.5rem !important;
+                      margin-bottom: 1rem !important;
                     }
 
                     .blog-content p {
@@ -321,11 +321,11 @@ export function ArticleLayout({
 
                     @media (min-width: 1024px) {
                       .blog-h2 {
-                        font-size: 3.5rem !important;
+                        font-size: 2.25rem !important;
                       }
 
                       .blog-h3 {
-                        font-size: 2.25rem !important;
+                        font-size: 1.5rem !important;
                       }
                     }
                   `
