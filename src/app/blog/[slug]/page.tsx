@@ -1,6 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleLayout } from "@/components/blog/article-layout";
+import WhyCompetitorGetsMoreWorkThanYou from "@/content/blog/why-competitor-gets-more-work-than-you";
+import BestTimeToAskForGoogleReview from "@/content/blog/best-time-to-ask-for-google-review";
+import HowGoogleLocalSearchWorksTradesmen from "@/content/blog/how-google-local-search-works-tradesmen";
+import HowManyGoogleReviewsToRankLocally from "@/content/blog/how-many-google-reviews-to-rank-locally";
+import GoogleBusinessProfileSetupTradesmen from "@/content/blog/google-business-profile-setup-tradesmen";
 
 // This would normally come from a CMS or database
 const articles = {
@@ -10,7 +15,7 @@ const articles = {
     category: "Getting More Work",
     publishDate: "2025-01-15",
     readingTime: 8,
-    content: () => import("@/content/blog/why-competitor-gets-more-work-than-you").then(m => m.default),
+    content: WhyCompetitorGetsMoreWorkThanYou,
   },
   "best-time-to-ask-for-google-review": {
     title: "The Best Time to Ask a Customer for a Google Review (And Exactly What to Say)",
@@ -18,7 +23,7 @@ const articles = {
     category: "Google Reviews",
     publishDate: "2025-01-12",
     readingTime: 8,
-    content: () => import("@/content/blog/best-time-to-ask-for-google-review").then(m => m.default),
+    content: BestTimeToAskForGoogleReview,
   },
   "how-google-local-search-works-tradesmen": {
     title: "How Google Decides Which Tradespeople to Show in Local Search Results",
@@ -26,7 +31,7 @@ const articles = {
     category: "Local SEO",
     publishDate: "2025-01-10",
     readingTime: 9,
-    content: () => import("@/content/blog/how-google-local-search-works-tradesmen").then(m => m.default),
+    content: HowGoogleLocalSearchWorksTradesmen,
   },
   "how-many-google-reviews-to-rank-locally": {
     title: "How Many Google Reviews Does a Tradesperson Need to Rank in the Map Pack?",
@@ -34,7 +39,7 @@ const articles = {
     category: "Local SEO",
     publishDate: "2025-01-08",
     readingTime: 8,
-    content: () => import("@/content/blog/how-many-google-reviews-to-rank-locally").then(m => m.default),
+    content: HowManyGoogleReviewsToRankLocally,
   },
   "google-business-profile-setup-tradesmen": {
     title: "How to Set Up a Google Business Profile for Your Trade Business (Step-by-Step)",
@@ -42,7 +47,7 @@ const articles = {
     category: "Local SEO",
     publishDate: "2025-01-05",
     readingTime: 10,
-    content: () => import("@/content/blog/google-business-profile-setup-tradesmen").then(m => m.default),
+    content: GoogleBusinessProfileSetupTradesmen,
   },
 };
 
@@ -102,7 +107,7 @@ export default async function BlogArticlePage({ params }: { params: ArticleParam
     notFound();
   }
 
-  const ArticleContent = await article.content();
+  const ArticleContent = article.content;
 
   // Get related articles (simple logic - same category, exclude current)
   const relatedArticles = Object.entries(articles)
