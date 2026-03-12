@@ -270,10 +270,6 @@ export function ArticleLayout({
               {/* Article Content */}
               <div
                 className="prose prose-xl prose-blue max-w-none article-content"
-                style={{
-                  '--tw-gradient-from': '#111827',
-                  '--tw-gradient-to': '#1e40af',
-                }}
               >
                 <style jsx>{`
                   .article-content > h2 {
