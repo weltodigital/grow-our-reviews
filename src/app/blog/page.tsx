@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { Clock, Calendar, Tag } from "lucide-react";
+import { MarketingHeader } from '@/components/marketing/marketing-header';
+import { MarketingFooter } from '@/components/marketing/marketing-footer';
 
 export const metadata: Metadata = {
   title: "Blog — Grow Our Reviews",
@@ -87,48 +88,32 @@ export default function BlogPage() {
   const regularArticles = blogArticles.filter(article => !article.featured);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/grow-our-reviews-logo.png"
-                alt="Grow Our Reviews"
-                width={200}
-                height={32}
-                className="h-8 w-auto"
-                priority
-              />
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/#features" className="text-gray-600 hover:text-gray-900">Features</Link>
-              <Link href="/#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
-              <Link href="/blog" className="text-blue-600 font-medium">Blog</Link>
-              <a href="https://app.growourreviews.com" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Sign In
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white">
+      <MarketingHeader />
 
       {/* Blog Content */}
-      <main className="container mx-auto px-4 py-12">
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Practical guides on Google reviews, local SEO, and getting more work for tradespeople.
-            Learn how to grow your online reputation and win more local customers.
-          </p>
-        </div>
+      <main>
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-blue-50 to-indigo-100 py-20 sm:py-32">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
+                Blog
+              </h1>
+              <p className="text-lg leading-8 text-gray-600 max-w-3xl mx-auto">
+                Practical guides on Google reviews, local SEO, and getting more work for tradespeople.
+                Learn how to grow your online reputation and win more local customers.
+              </p>
+            </div>
+          </div>
+        </section>
 
-        {/* Featured Articles */}
-        {featuredArticles.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Articles</h2>
+        {/* Articles Section */}
+        <section className="container mx-auto px-4 py-16">
+          {/* Featured Articles */}
+          {featuredArticles.length > 0 && (
+            <div className="mb-16">
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Articles</h2>
             <div className="grid gap-8 md:grid-cols-2">
               {featuredArticles.map((article) => (
                 <article key={article.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -166,12 +151,12 @@ export default function BlogPage() {
                 </article>
               ))}
             </div>
-          </section>
-        )}
+            </div>
+          )}
 
-        {/* All Articles */}
-        <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">All Articles</h2>
+          {/* All Articles */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">All Articles</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {regularArticles.map((article) => (
               <article key={article.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -209,33 +194,11 @@ export default function BlogPage() {
               </article>
             ))}
           </div>
+          </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <Link href="/" className="inline-block mb-4">
-              <Image
-                src="/grow-our-reviews-white-logo.png"
-                alt="Grow Our Reviews"
-                width={200}
-                height={32}
-                className="h-8 w-auto"
-              />
-            </Link>
-            <p className="text-gray-400 mb-4">
-              Helping tradespeople get more Google reviews through smart automation.
-            </p>
-            <div className="flex justify-center space-x-6 text-sm">
-              <Link href="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white">Terms of Service</Link>
-              <Link href="/blog" className="text-gray-400 hover:text-white">Blog</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

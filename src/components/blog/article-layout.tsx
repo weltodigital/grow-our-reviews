@@ -2,9 +2,10 @@
 
 import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Calendar, Clock, Tag, ChevronRight, Home, Menu, X, Copy, Check } from "lucide-react";
 import { BlogCTABanner } from "./blog-cta-banner";
+import { MarketingHeader } from '@/components/marketing/marketing-header';
+import { MarketingFooter } from '@/components/marketing/marketing-footer';
 
 interface ArticleLayoutProps {
   title: string;
@@ -217,31 +218,7 @@ export function ArticleLayout({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/grow-our-reviews-logo.png"
-                alt="Grow Our Reviews"
-                width={200}
-                height={32}
-                className="h-8 w-auto"
-                priority
-              />
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/#features" className="text-gray-600 hover:text-gray-900">Features</Link>
-              <Link href="/#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
-              <Link href="/blog" className="text-gray-600 hover:text-gray-900">Blog</Link>
-              <a href="https://app.growourreviews.com" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Sign In
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="container mx-auto px-4 py-12">
         {/* Breadcrumb */}
@@ -326,30 +303,7 @@ export function ArticleLayout({
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-20">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <Link href="/" className="inline-block mb-4">
-              <Image
-                src="/grow-our-reviews-white-logo.png"
-                alt="Grow Our Reviews"
-                width={200}
-                height={32}
-                className="h-8 w-auto"
-              />
-            </Link>
-            <p className="text-gray-400 mb-4">
-              Helping tradespeople get more Google reviews through smart automation.
-            </p>
-            <div className="flex justify-center space-x-6 text-sm">
-              <Link href="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white">Terms of Service</Link>
-              <Link href="/blog" className="text-gray-400 hover:text-white">Blog</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }
