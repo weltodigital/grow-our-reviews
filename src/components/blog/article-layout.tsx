@@ -336,34 +336,35 @@ export function ArticleLayout({
                   color: '#374151'
                 }}>
                 {children}
+                </div>
+
+                {/* Share Buttons */}
+                <ShareButtons title={title} url={currentUrl} />
+
+                {/* CTA Banner */}
+                <BlogCTABanner />
+
+                {/* Related Articles */}
+                {relatedArticles.length > 0 && (
+                  <section className="mt-12 pt-8 border-t border-gray-200">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h3>
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {relatedArticles.slice(0, 3).map((article) => (
+                        <div key={article.slug} className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
+                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-3 ${getCategoryColor(article.category)}`}>
+                            {article.category}
+                          </span>
+                          <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                            <Link href={`/blog/${article.slug}`} className="hover:text-blue-600">
+                              {article.title}
+                            </Link>
+                          </h4>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
-
-              {/* Share Buttons */}
-              <ShareButtons title={title} url={currentUrl} />
-
-              {/* CTA Banner */}
-              <BlogCTABanner />
-
-              {/* Related Articles */}
-              {relatedArticles.length > 0 && (
-                <section className="mt-12 pt-8 border-t border-gray-200">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h3>
-                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {relatedArticles.slice(0, 3).map((article) => (
-                      <div key={article.slug} className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-3 ${getCategoryColor(article.category)}`}>
-                          {article.category}
-                        </span>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                          <Link href={`/blog/${article.slug}`} className="hover:text-blue-600">
-                            {article.title}
-                          </Link>
-                        </h4>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
             </article>
 
             {/* Sidebar */}
