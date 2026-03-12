@@ -3,8 +3,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // Early return for blog routes - bypass all middleware
-  if (req.nextUrl.pathname.startsWith('/blog')) {
+  // Define public routes that should never require auth
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies']
+  const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route))
+
+  if (isPublicRoute) {
+    console.log('PUBLIC ROUTE BYPASSED:', req.nextUrl.pathname)
     return NextResponse.next()
   }
 
