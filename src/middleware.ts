@@ -3,10 +3,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // Temporarily disable ALL middleware for blog routes to debug
-  if (req.nextUrl.pathname.startsWith('/blog')) {
-    return NextResponse.next()
-  }
+  // COMPLETELY DISABLE MIDDLEWARE FOR DEBUGGING
+  console.log('MIDDLEWARE HIT:', req.nextUrl.pathname, req.headers.get('host'))
+  return NextResponse.next()
 
   let response = NextResponse.next({
     request: {
