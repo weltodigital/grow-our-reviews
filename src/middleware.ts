@@ -3,6 +3,14 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+  console.log('MIDDLEWARE PROCESSING:', req.nextUrl.pathname)
+
+  // Early exit for sitemap and robots files
+  if (req.nextUrl.pathname === '/sitemap.xml' || req.nextUrl.pathname === '/robots.txt') {
+    console.log('STATIC FILE BYPASSED:', req.nextUrl.pathname)
+    return NextResponse.next()
+  }
+
   // Define public routes that should never require auth
   const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123']
   const staticFiles = ['/sitemap.xml', '/robots.txt']
