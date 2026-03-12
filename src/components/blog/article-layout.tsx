@@ -216,6 +216,14 @@ export function ArticleLayout({
       level: parseInt(heading.tagName.substring(1)),
     }));
     setHeadings(headingList);
+
+    // Apply CSS classes to headings for styling
+    document.querySelectorAll('.blog-content h2').forEach((h2) => {
+      h2.classList.add('blog-h2');
+    });
+    document.querySelectorAll('.blog-content h3').forEach((h3) => {
+      h3.classList.add('blog-h3');
+    });
   }, [children]);
 
   return (
@@ -268,78 +276,65 @@ export function ArticleLayout({
               </header>
 
               {/* Article Content */}
-              <div
-                className="prose prose-xl prose-blue max-w-none article-content"
-              >
-                <style jsx>{`
-                  .article-content > h2 {
-                    font-size: 2.25rem !important;
-                    font-weight: 900 !important;
-                    margin-top: 5rem !important;
-                    margin-bottom: 2.5rem !important;
-                    padding-bottom: 1.5rem !important;
-                    border-bottom: 4px solid #2563eb !important;
-                    background: linear-gradient(to right, #111827, #1e40af) !important;
-                    background-clip: text !important;
-                    -webkit-background-clip: text !important;
-                    color: transparent !important;
-                    line-height: 1.1 !important;
-                    letter-spacing: -0.025em !important;
-                  }
-
-                  .article-content > h3 {
-                    font-size: 1.5rem !important;
-                    font-weight: 700 !important;
-                    color: #1e3a8a !important;
-                    margin-top: 4rem !important;
-                    margin-bottom: 2rem !important;
-                    position: relative !important;
-                    padding-left: 1.5rem !important;
-                  }
-
-                  .article-content > h3::before {
-                    content: '' !important;
-                    position: absolute !important;
-                    left: 0 !important;
-                    top: 0.25rem !important;
-                    width: 0.25rem !important;
-                    height: 2rem !important;
-                    background-color: #2563eb !important;
-                    border-radius: 9999px !important;
-                  }
-
-                  .article-content > p {
-                    color: #374151 !important;
-                    font-size: 1.125rem !important;
-                    line-height: 1.625 !important;
-                    margin-bottom: 2.5rem !important;
-                    margin-top: 1.5rem !important;
-                  }
-
-                  .article-content > ul,
-                  .article-content > ol {
-                    margin-top: 2.5rem !important;
-                    margin-bottom: 2.5rem !important;
-                  }
-
-                  .article-content > ul > li,
-                  .article-content > ol > li {
-                    color: #374151 !important;
-                    font-size: 1.125rem !important;
-                    line-height: 1.625 !important;
-                    margin-bottom: 1rem !important;
-                  }
-
-                  @media (min-width: 1024px) {
-                    .article-content > h2 {
-                      font-size: 3rem !important;
+              <div className="max-w-none">
+                <style dangerouslySetInnerHTML={{
+                  __html: `
+                    .blog-h2 {
+                      font-size: 2.5rem !important;
+                      font-weight: 900 !important;
+                      color: #1e40af !important;
+                      margin-top: 4rem !important;
+                      margin-bottom: 2rem !important;
+                      padding-bottom: 1rem !important;
+                      border-bottom: 3px solid #2563eb !important;
+                      line-height: 1.2 !important;
+                      letter-spacing: -0.025em !important;
                     }
 
-                    .article-content > h3 {
-                      font-size: 1.875rem !important;
+                    .blog-h3 {
+                      font-size: 1.75rem !important;
+                      font-weight: 700 !important;
+                      color: #1e3a8a !important;
+                      margin-top: 3rem !important;
+                      margin-bottom: 1.5rem !important;
                     }
-                  }
-                `}</style>
+
+                    .blog-content p {
+                      color: #374151 !important;
+                      font-size: 1.125rem !important;
+                      line-height: 1.7 !important;
+                      margin-bottom: 2rem !important;
+                      margin-top: 1rem !important;
+                    }
+
+                    .blog-content ul, .blog-content ol {
+                      margin-top: 2rem !important;
+                      margin-bottom: 2rem !important;
+                    }
+
+                    .blog-content li {
+                      color: #374151 !important;
+                      font-size: 1.125rem !important;
+                      line-height: 1.7 !important;
+                      margin-bottom: 0.75rem !important;
+                    }
+
+                    @media (min-width: 1024px) {
+                      .blog-h2 {
+                        font-size: 3.5rem !important;
+                      }
+
+                      .blog-h3 {
+                        font-size: 2.25rem !important;
+                      }
+                    }
+                  `
+                }} />
+                <div className="blog-content prose prose-xl max-w-none" style={{
+                  fontSize: '1.125rem',
+                  lineHeight: '1.7',
+                  color: '#374151'
+                }}>
                 {children}
               </div>
 
