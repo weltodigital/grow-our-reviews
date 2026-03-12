@@ -110,6 +110,9 @@ export function MarketingFooter() {
               <Link href="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Cookie Policy
               </Link>
+              <Link href="/sitemap.xml" className="text-gray-400 hover:text-white text-sm transition-colors">
+                Sitemap
+              </Link>
             </div>
           </div>
         </div>
