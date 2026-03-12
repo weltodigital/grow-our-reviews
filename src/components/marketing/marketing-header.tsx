@@ -26,19 +26,19 @@ export function MarketingHeader() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+          <Link href="/#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             How It Works
           </Link>
-          <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+          <Link href="/#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             Features
           </Link>
-          <Link href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+          <Link href="/#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             Pricing
           </Link>
           <Link href="/blog" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             Blog
           </Link>
-          <Link href="#faq" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+          <Link href="/#faq" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             FAQ
           </Link>
         </nav>
@@ -73,21 +73,21 @@ export function MarketingHeader() {
           <div className="container mx-auto px-4 py-4 space-y-4">
             <nav className="flex flex-col space-y-3">
               <Link
-                href="#how-it-works"
+                href="/#how-it-works"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 How It Works
               </Link>
               <Link
-                href="#features"
+                href="/#features"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
-                href="#pricing"
+                href="/#pricing"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -101,7 +101,7 @@ export function MarketingHeader() {
                 Blog
               </Link>
               <Link
-                href="#faq"
+                href="/#faq"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
