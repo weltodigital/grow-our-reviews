@@ -35,7 +35,7 @@ export function PricingComparison() {
     {
       category: 'Support & Limits',
       items: [
-        { feature: 'Monthly request limit', starter: '50 requests', growth: '150 requests' },
+        { feature: 'Monthly request limit', starter: '150 requests', growth: '300 requests' },
         { feature: 'Email support', starter: 'Standard', growth: 'Priority' },
         { feature: 'Setup assistance', starter: 'Self-service', growth: 'Guided setup' },
         { feature: 'Phone support', starter: false, growth: 'Coming soon' }
