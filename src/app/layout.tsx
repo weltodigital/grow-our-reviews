@@ -16,13 +16,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Grow Our Reviews" }],
   icons: {
     icon: [
-      { url: "/favicon-new.png", sizes: "any" },
-      { url: "/favicon-new.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicon-new.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-new.png", sizes: "16x16", type: "image/png" },
+      { url: "/icon-192.png", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-192.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "16x16", type: "image/png" },
     ],
-    shortcut: "/favicon-new.png",
-    apple: "/favicon-new.png",
+    shortcut: "/icon-192.png",
+    apple: "/icon-192.png",
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     locale: "en_GB",
     images: [
       {
-        url: "/grow-our-reviews-icon.png",
-        width: 512,
-        height: 512,
+        url: "/icon-192.png",
+        width: 192,
+        height: 192,
         alt: "Grow Our Reviews",
       },
     ],
@@ -55,8 +55,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon-new.png" type="image/png" />
-        <link rel="shortcut icon" href="/favicon-new.png" type="image/png" />
+        <link rel="icon" href="/icon-192.png?v=5" type="image/png" />
+        <link rel="shortcut icon" href="/icon-192.png?v=5" type="image/png" />
+        <link rel="apple-touch-icon" href="/icon-192.png?v=5" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ErrorBoundary>
