@@ -148,19 +148,21 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         const userId = subscription.metadata?.userId
+        let profile = null
 
         if (!userId) {
           // Try to find user by subscription ID
-          const { data: profile } = await (supabase as any)
+          const { data: foundProfile } = await (supabase as any)
             .from('profiles')
             .select('id')
             .eq('stripe_subscription_id', subscription.id)
             .single()
 
-          if (!profile) {
+          if (!foundProfile) {
             console.error('No user found for subscription:', subscription.id)
             break
           }
+          profile = foundProfile
         }
 
         // Get price info to determine plan limits
