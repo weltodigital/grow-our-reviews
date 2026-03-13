@@ -3,8 +3,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+  console.log('🔍 MIDDLEWARE:', req.nextUrl.pathname, 'HOST:', req.headers.get('host'))
+
   // Immediate bypass for sitemap and robots - no processing at all
   if (req.nextUrl.pathname === '/sitemap.xml' || req.nextUrl.pathname === '/robots.txt') {
+    console.log('✅ IMMEDIATE BYPASS:', req.nextUrl.pathname)
     return NextResponse.next()
   }
 
@@ -13,8 +16,11 @@ export async function middleware(req: NextRequest) {
   const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route))
 
   if (isPublicRoute) {
+    console.log('✅ PUBLIC ROUTE BYPASS:', req.nextUrl.pathname)
     return NextResponse.next()
   }
+
+  console.log('❌ CONTINUING TO AUTH LOGIC:', req.nextUrl.pathname)
 
   let response = NextResponse.next({
     request: {
