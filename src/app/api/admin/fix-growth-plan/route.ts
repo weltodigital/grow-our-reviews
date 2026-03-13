@@ -27,11 +27,11 @@ export async function POST() {
     let newLimit = 150 // Default to Starter
 
     // If they have an active subscription and selected Growth, set to 300
-    if (profile.subscription_status === 'active' || profile.subscription_status === 'trialing') {
+    if ((profile as any).subscription_status === 'active' || (profile as any).subscription_status === 'trialing') {
       // Check if they have Growth plan subscription
       // This would need to be determined by checking Stripe subscription details
       // For now, let's check if they explicitly signed up for Growth
-      if (profile.stripe_subscription_id) {
+      if ((profile as any).stripe_subscription_id) {
         // You might need to check the actual Stripe subscription to determine the plan
         // For immediate fix, we can set to 300 if they have a subscription
         newLimit = 300
