@@ -16,13 +16,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Grow Our Reviews" }],
   icons: {
     icon: [
-      { url: "/favicon.ico?v=2", sizes: "any" },
-      { url: "/grow-our-reviews-icon.png?v=2", sizes: "32x32", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico?v=3", sizes: "any" },
+      { url: "/grow-our-reviews-icon.png?v=3", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png?v=3", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png?v=3", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/favicon.ico?v=2",
-    apple: "/grow-our-reviews-icon.png?v=2",
+    shortcut: "/favicon.ico?v=3",
+    apple: "/grow-our-reviews-icon.png?v=3",
   },
   manifest: "/manifest.json",
   openGraph: {
