@@ -17,11 +17,12 @@ export async function POST(request: Request) {
     if (error1) throw error1
 
     // Update profiles with old Growth limit (150) to new Growth limit (300)
+    // Only update users who are paying Growth plan customers (not trial users who get Starter by default)
     const { error: error2 } = await supabase
       .from('profiles')
       .update({ monthly_request_limit: 300 })
       .eq('monthly_request_limit', 150)
-      .in('subscription_status', ['active', 'trialing'])
+      .eq('subscription_status', 'active') // Only active paying customers, not trialing users
 
     if (error2) throw error2
 
