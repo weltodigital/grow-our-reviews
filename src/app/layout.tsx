@@ -16,13 +16,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Grow Our Reviews" }],
   icons: {
     icon: [
-      { url: "/icon-192.png?v=4", sizes: "any" },
-      { url: "/icon-192.png?v=4", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png?v=4", sizes: "512x512", type: "image/png" },
-      { url: "/icon-192.png?v=4", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-new.png", sizes: "any" },
+      { url: "/favicon-new.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-new.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-new.png", sizes: "16x16", type: "image/png" },
     ],
-    shortcut: "/icon-192.png?v=4",
-    apple: "/icon-192.png?v=4",
+    shortcut: "/favicon-new.png",
+    apple: "/favicon-new.png",
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -54,6 +54,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon-new.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon-new.png" type="image/png" />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ErrorBoundary>
           <ToastProvider>
