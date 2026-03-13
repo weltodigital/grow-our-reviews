@@ -12,7 +12,7 @@ export async function POST() {
     }
 
     // Get user's profile to check subscription status
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await (supabase as any)
       .from('profiles')
       .select('*')
       .eq('id', user.id)
@@ -39,7 +39,7 @@ export async function POST() {
     }
 
     // Update the profile
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('profiles')
       .update({
         monthly_request_limit: newLimit,
