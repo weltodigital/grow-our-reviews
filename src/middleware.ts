@@ -4,8 +4,15 @@ import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123']
-  const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route))
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/sitemap', '/sitemap.xml']
+  const isPublicRoute = publicRoutes.some(route => {
+    // Exact match for sitemap routes
+    if (route === '/sitemap' || route === '/sitemap.xml') {
+      return req.nextUrl.pathname === route
+    }
+    // Prefix match for other routes
+    return req.nextUrl.pathname.startsWith(route)
+  })
 
   if (isPublicRoute) {
     return NextResponse.next()
