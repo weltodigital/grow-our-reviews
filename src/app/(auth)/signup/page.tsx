@@ -64,7 +64,7 @@ export default function SignUpPage() {
           router.push('/onboarding')
         } else {
           // User needs to confirm email first
-          setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup.')
+          setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup. Don\'t forget to check your spam or junk folder if you don\'t see it in your inbox.')
         }
       }
     } catch (err) {
