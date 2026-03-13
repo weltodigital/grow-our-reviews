@@ -88,7 +88,7 @@ export default function TestEmailsPage() {
                 className="w-full"
                 variant="outline"
               >
-                {loading === 'Starter Plan Limit' ? 'Sending...' : 'Test Starter Plan Limit (50/50)'}
+                {loading === 'Starter Plan Limit' ? 'Sending...' : 'Test Starter Plan Limit (150/150)'}
               </Button>
 
               <Button
@@ -97,7 +97,7 @@ export default function TestEmailsPage() {
                 className="w-full"
                 variant="outline"
               >
-                {loading === 'Growth Plan Limit' ? 'Sending...' : 'Test Growth Plan Limit (150/150)'}
+                {loading === 'Growth Plan Limit' ? 'Sending...' : 'Test Growth Plan Limit (300/300)'}
               </Button>
             </CardContent>
           </Card>

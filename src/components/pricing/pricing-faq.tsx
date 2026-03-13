@@ -37,15 +37,15 @@ export function PricingFaq() {
     },
     {
       question: 'What\'s the difference between Starter and Growth?',
-      answer: 'The main differences are the request limit (20 vs 100 per month), automatic follow-up nudges (Growth only), advanced analytics (Growth only), and priority support (Growth only). Growth is best for established businesses sending more than 20 requests per month.'
+      answer: 'The main differences are the request limit (150 vs 300 per month), automatic follow-up nudges (Growth only), advanced analytics (Growth only), and priority support (Growth only). Growth is best for established businesses sending more than 150 requests per month.'
     },
     {
       question: 'Can I get a discount for annual payment?',
       answer: 'Currently we only offer monthly billing, but we\'re considering annual discounts based on customer feedback. If you\'re interested in annual billing, please contact us and we\'ll let you know when it becomes available.'
     },
     {
-      question: 'What if I need more than 100 requests per month?',
-      answer: 'For businesses needing more than 100 requests monthly, please contact us to discuss enterprise pricing. We can create custom plans with higher limits and additional features tailored to your business needs.'
+      question: 'What if I need more than 300 requests per month?',
+      answer: 'For businesses needing more than 300 requests monthly, please contact us to discuss enterprise pricing. We can create custom plans with higher limits and additional features tailored to your business needs.'
     }
   ]
 

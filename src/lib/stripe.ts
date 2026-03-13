@@ -15,14 +15,14 @@ export const STRIPE_CONFIG = {
     amount: 4900, // £49.00 in pence
     currency: 'gbp',
     interval: 'month',
-    monthlyRequestLimit: 50,
+    monthlyRequestLimit: 150,
   },
   growth: {
     priceId: process.env.STRIPE_GROWTH_PRICE_ID!,
     amount: 7900, // £79.00 in pence
     currency: 'gbp',
     interval: 'month',
-    monthlyRequestLimit: 150,
+    monthlyRequestLimit: 300,
   },
 } as const
 
