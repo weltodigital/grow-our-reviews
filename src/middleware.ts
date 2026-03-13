@@ -3,24 +3,13 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  console.log('🔍 MIDDLEWARE:', req.nextUrl.pathname, 'HOST:', req.headers.get('host'))
-
-  // Immediate bypass for sitemap and robots - no processing at all
-  if (req.nextUrl.pathname === '/sitemap.xml' || req.nextUrl.pathname === '/robots.txt') {
-    console.log('✅ IMMEDIATE BYPASS:', req.nextUrl.pathname)
-    return NextResponse.next()
-  }
-
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/sitemap.xml', '/robots.txt']
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123']
   const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route))
 
   if (isPublicRoute) {
-    console.log('✅ PUBLIC ROUTE BYPASS:', req.nextUrl.pathname)
     return NextResponse.next()
   }
-
-  console.log('❌ CONTINUING TO AUTH LOGIC:', req.nextUrl.pathname)
 
   let response = NextResponse.next({
     request: {
@@ -95,6 +84,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|review|blog).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|review|blog|sitemap\\.xml|robots\\.txt).*)',
   ],
 }
