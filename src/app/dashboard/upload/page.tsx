@@ -39,8 +39,8 @@ async function getUserStats(userId: string) {
     console.error('Error fetching user stats:', error)
     return {
       requestsSent: 0,
-      monthlyLimit: 50,
-      requestsRemaining: 50
+      monthlyLimit: 150,
+      requestsRemaining: 150
     }
   }
 }

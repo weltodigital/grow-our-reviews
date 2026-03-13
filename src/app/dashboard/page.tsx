@@ -108,7 +108,7 @@ async function getDashboardStats(userId: string) {
       reviewsThisMonth: 0,
       feedbackThisMonth: 0,
       clickThroughRate: 0,
-      requestsRemaining: 50,
+      requestsRemaining: 150,
       totalRequestsAllTime: 0,
       totalReviewsAllTime: 0,
     }

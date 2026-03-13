@@ -167,6 +167,14 @@ export async function POST(request: NextRequest) {
         const priceId = subscription.items.data[0]?.price.id
         const priceInfo = getPriceInfo(priceId)
 
+        console.log('Webhook processing subscription:', {
+          subscriptionId: subscription.id,
+          priceId,
+          priceInfo,
+          currentProfile: profile,
+          customerId: subscription.customer
+        })
+
         const updateData: any = {
           subscription_status: subscription.status,
           updated_at: new Date().toISOString(),
@@ -174,6 +182,9 @@ export async function POST(request: NextRequest) {
 
         if (priceInfo) {
           updateData.monthly_request_limit = priceInfo.monthlyRequestLimit
+          console.log('Setting monthly_request_limit to:', priceInfo.monthlyRequestLimit)
+        } else {
+          console.warn('No price info found for priceId:', priceId)
         }
 
         if (subscription.trial_end) {
@@ -189,11 +200,21 @@ export async function POST(request: NextRequest) {
         if (updateError) {
           console.error('Error updating subscription:', updateError)
         } else {
-          console.log(`Subscription updated:`, {
+          console.log(`Subscription updated successfully:`, {
             subscriptionId: subscription.id,
             status: subscription.status,
             limit: priceInfo?.monthlyRequestLimit,
+            updateData
           })
+
+          // Verify the update worked by fetching the profile again
+          const { data: updatedProfile } = await (supabase as any)
+            .from('profiles')
+            .select('monthly_request_limit, subscription_status')
+            .eq(userId ? 'id' : 'stripe_subscription_id', userId || subscription.id)
+            .single()
+
+          console.log('Updated profile verification:', updatedProfile)
         }
         break
       }
