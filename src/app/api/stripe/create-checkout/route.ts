@@ -99,8 +99,28 @@ export async function POST(request: NextRequest) {
     }
 
     // UPDATE: Set the correct monthly_request_limit immediately based on selected plan
+    // Handle both planKey and priceId scenarios
+    let selectedPlan = null
+    let planType = 'unknown'
+
     if (planKey) {
-      const selectedPlan = PRICING_PLANS[planKey]
+      selectedPlan = PRICING_PLANS[planKey]
+      planType = planKey
+    } else if (priceId) {
+      // Determine plan from priceId
+      const starterPriceId = process.env.STRIPE_STARTER_PRICE_ID
+      const growthPriceId = process.env.STRIPE_GROWTH_PRICE_ID
+
+      if (priceId === starterPriceId) {
+        selectedPlan = PRICING_PLANS.starter
+        planType = 'starter'
+      } else if (priceId === growthPriceId) {
+        selectedPlan = PRICING_PLANS.growth
+        planType = 'growth'
+      }
+    }
+
+    if (selectedPlan) {
       const { error: updateError } = await (supabase as any)
         .from('profiles')
         .update({
@@ -113,8 +133,10 @@ export async function POST(request: NextRequest) {
         console.error('Error updating monthly limit:', updateError)
         // Don't fail checkout, but log the error
       } else {
-        console.log(`Updated user ${user.id} to ${selectedPlan.monthlyRequestLimit} credits for ${planKey} plan`)
+        console.log(`Updated user ${user.id} to ${selectedPlan.monthlyRequestLimit} credits for ${planType} plan`)
       }
+    } else {
+      console.warn('Could not determine plan to set monthly_request_limit')
     }
 
     // Create Stripe checkout session
