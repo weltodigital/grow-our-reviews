@@ -422,6 +422,43 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
               </CardContent>
             </Card>
 
+            {/* How It Works */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                  How Bulk Sending Works
+                </CardTitle>
+                <CardDescription>
+                  Understanding our smart delivery system
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-3">📱 Smart Rate Limiting</h4>
+                  <ul className="text-sm text-blue-800 space-y-2">
+                    <li><strong>• Batch Size:</strong> Messages are sent in groups of 20 customers</li>
+                    <li><strong>• Timing:</strong> Each batch is sent 15 minutes apart</li>
+                    <li><strong>• Why:</strong> This prevents your messages from being flagged as spam</li>
+                    <li><strong>• Monitoring:</strong> Track progress in real-time on your dashboard</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-3">🕒 Example Timeline</h4>
+                  <div className="text-sm text-green-800 space-y-1">
+                    <p><strong>Upload 100 customers:</strong></p>
+                    <p>• Batch 1 (customers 1-20): Sent immediately</p>
+                    <p>• Batch 2 (customers 21-40): Sent after 15 minutes</p>
+                    <p>• Batch 3 (customers 41-60): Sent after 30 minutes</p>
+                    <p>• Batch 4 (customers 61-80): Sent after 45 minutes</p>
+                    <p>• Batch 5 (customers 81-100): Sent after 60 minutes</p>
+                    <p className="font-medium mt-2">Total time: ~65 minutes for 100 customers</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Step 2: Upload File */}
             <Card>
               <CardHeader>
