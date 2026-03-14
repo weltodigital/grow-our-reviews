@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/sitemap']
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/reset-password', '/sitemap']
   const isPublicRoute = publicRoutes.some(route => {
     return req.nextUrl.pathname.startsWith(route)
   })
