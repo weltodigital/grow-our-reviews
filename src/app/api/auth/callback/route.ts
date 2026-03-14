@@ -37,42 +37,51 @@ export async function GET(request: NextRequest) {
     }
 
     if (data.user) {
-      // Check if user has completed onboarding and billing setup
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('business_name, stripe_customer_id, created_at')
-        .eq('id', data.user.id)
-        .single() as { data: { business_name: string | null; stripe_customer_id: string | null; created_at: string } | null }
+      // Check if this is a password reset flow
+      const isPasswordReset = next.includes('/reset-password')
 
-      // Log for debugging
-      console.log('Auth callback debug:', {
-        userId: data.user.id,
-        next,
-        profile: profile ? {
-          hasBusinessName: !!profile.business_name,
-          hasStripeId: !!profile.stripe_customer_id,
-          createdAt: profile.created_at,
-        } : null
-      })
+      if (isPasswordReset) {
+        // For password reset, just redirect to the reset confirmation page
+        console.log('Password reset flow - redirecting to:', next)
+        response = NextResponse.redirect(requestUrl.origin + next)
+      } else {
+        // Regular auth flow - check onboarding/billing status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('business_name, stripe_customer_id, created_at')
+          .eq('id', data.user.id)
+          .single() as { data: { business_name: string | null; stripe_customer_id: string | null; created_at: string } | null }
 
-      // Check if the redirect is explicitly requesting billing setup (from signup flow)
-      const isBillingSetupRequest = next.includes('/billing/setup')
+        // Log for debugging
+        console.log('Auth callback debug:', {
+          userId: data.user.id,
+          next,
+          profile: profile ? {
+            hasBusinessName: !!profile.business_name,
+            hasStripeId: !!profile.stripe_customer_id,
+            createdAt: profile.created_at,
+          } : null
+        })
 
-      // New flow: Onboarding first, then billing
-      if (!profile) {
-        // No profile at all - this is definitely a new user, start with onboarding
-        console.log('No profile found - redirecting to onboarding')
-        response = NextResponse.redirect(requestUrl.origin + '/onboarding')
-      } else if (!profile.business_name) {
-        // No business info - go to onboarding first
-        console.log('No business name - redirecting to onboarding')
-        response = NextResponse.redirect(requestUrl.origin + '/onboarding')
-      } else if (!profile.stripe_customer_id) {
-        // Has business info but no billing - go to billing setup
-        console.log('No stripe customer ID - redirecting to billing setup')
-        response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
+        // Check if the redirect is explicitly requesting billing setup (from signup flow)
+        const isBillingSetupRequest = next.includes('/billing/setup')
+
+        // New flow: Onboarding first, then billing
+        if (!profile) {
+          // No profile at all - this is definitely a new user, start with onboarding
+          console.log('No profile found - redirecting to onboarding')
+          response = NextResponse.redirect(requestUrl.origin + '/onboarding')
+        } else if (!profile.business_name) {
+          // No business info - go to onboarding first
+          console.log('No business name - redirecting to onboarding')
+          response = NextResponse.redirect(requestUrl.origin + '/onboarding')
+        } else if (!profile.stripe_customer_id) {
+          // Has business info but no billing - go to billing setup
+          console.log('No stripe customer ID - redirecting to billing setup')
+          response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
+        }
+        // Otherwise go to the requested destination (default is /dashboard)
       }
-      // Otherwise go to the requested destination (default is /dashboard)
     }
   }
 
