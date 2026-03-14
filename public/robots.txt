@@ -5,6 +5,3 @@ Disallow: /onboarding/
 Disallow: /billing/
 Disallow: /review/
 Disallow: /test-emails
-Disallow: /blog-test
-Disallow: /debug-page
-Disallow: /test123
