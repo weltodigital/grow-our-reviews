@@ -3,14 +3,18 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+  // First check for static files - these should never be processed by middleware
+  if (req.nextUrl.pathname.endsWith('.xml') ||
+      req.nextUrl.pathname.endsWith('.txt') ||
+      req.nextUrl.pathname.endsWith('.ico') ||
+      req.nextUrl.pathname === '/sitemap.xml' ||
+      req.nextUrl.pathname === '/robots.txt') {
+    return NextResponse.next()
+  }
+
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/sitemap', '/sitemap.xml']
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/sitemap']
   const isPublicRoute = publicRoutes.some(route => {
-    // Exact match for sitemap routes
-    if (route === '/sitemap' || route === '/sitemap.xml') {
-      return req.nextUrl.pathname === route
-    }
-    // Prefix match for other routes
     return req.nextUrl.pathname.startsWith(route)
   })
 
@@ -93,5 +97,9 @@ export const config = {
   matcher: [
     '/(dashboard|onboarding|login|signup|reset-password)/:path*',
     '/',
+    '/sitemap.xml',
+    '/sitemap',
+    '/robots.txt',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.ico$|.*\\.xml$|.*\\.txt$).)*',
   ],
 }
