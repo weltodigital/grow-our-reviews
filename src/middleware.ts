@@ -3,14 +3,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // DEBUG: Log all password reset requests
-  if (req.nextUrl.pathname.includes('reset-password')) {
-    console.log('PASSWORD RESET REQUEST:', {
-      pathname: req.nextUrl.pathname,
-      searchParams: req.nextUrl.searchParams.toString(),
-      hostname: req.headers.get('host'),
-      method: req.method
-    })
+  // COMPLETE BYPASS for reset-password routes
+  if (req.nextUrl.pathname.startsWith('/reset-password')) {
+    console.log('BYPASSING ALL MIDDLEWARE FOR RESET-PASSWORD:', req.nextUrl.pathname)
+    return NextResponse.next()
   }
 
   // First check for API routes and static files - these should never be processed by middleware
@@ -20,7 +16,6 @@ export async function middleware(req: NextRequest) {
       req.nextUrl.pathname.endsWith('.ico') ||
       req.nextUrl.pathname === '/sitemap.xml' ||
       req.nextUrl.pathname === '/robots.txt') {
-    console.log('Early return for:', req.nextUrl.pathname)
     return NextResponse.next()
   }
 
