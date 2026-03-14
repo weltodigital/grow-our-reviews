@@ -82,8 +82,8 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/login', req.url))
     }
 
-    // Redirect to dashboard if logged in and accessing auth pages
-    if (isAuthPath && session) {
+    // Redirect to dashboard if logged in and accessing auth pages (except password reset confirmation)
+    if (isAuthPath && session && !req.nextUrl.pathname.startsWith('/reset-password/confirm')) {
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
   }
