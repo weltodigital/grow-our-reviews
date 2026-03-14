@@ -4,8 +4,10 @@ import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
   // COMPLETE BYPASS for reset-password routes
-  if (req.nextUrl.pathname.startsWith('/reset-password') || req.nextUrl.pathname.startsWith('/password-reset')) {
-    console.log('BYPASSING ALL MIDDLEWARE FOR RESET-PASSWORD:', req.nextUrl.pathname)
+  if (req.nextUrl.pathname.startsWith('/reset-password') ||
+      req.nextUrl.pathname.startsWith('/password-reset') ||
+      req.nextUrl.pathname.startsWith('/test-middleware')) {
+    console.log('BYPASSING ALL MIDDLEWARE FOR:', req.nextUrl.pathname)
     return NextResponse.next()
   }
 
