@@ -3,8 +3,15 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // TEMPORARY DEBUG: Allow everything to bypass middleware
-  console.log('Middleware processing:', req.nextUrl.pathname)
+  // DEBUG: Log all password reset requests
+  if (req.nextUrl.pathname.includes('reset-password')) {
+    console.log('PASSWORD RESET REQUEST:', {
+      pathname: req.nextUrl.pathname,
+      searchParams: req.nextUrl.searchParams.toString(),
+      hostname: req.headers.get('host'),
+      method: req.method
+    })
+  }
 
   // First check for API routes and static files - these should never be processed by middleware
   if (req.nextUrl.pathname.startsWith('/api') ||
