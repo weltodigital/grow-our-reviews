@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+  // TEMPORARY DEBUG: Allow everything to bypass middleware
+  console.log('Middleware processing:', req.nextUrl.pathname)
+
   // First check for API routes and static files - these should never be processed by middleware
   if (req.nextUrl.pathname.startsWith('/api') ||
       req.nextUrl.pathname.endsWith('.xml') ||
@@ -10,6 +13,7 @@ export async function middleware(req: NextRequest) {
       req.nextUrl.pathname.endsWith('.ico') ||
       req.nextUrl.pathname === '/sitemap.xml' ||
       req.nextUrl.pathname === '/robots.txt') {
+    console.log('Early return for:', req.nextUrl.pathname)
     return NextResponse.next()
   }
 
@@ -96,6 +100,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.ico$|.*\\.xml$|.*\\.txt$).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
