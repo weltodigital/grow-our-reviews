@@ -8,5 +8,3 @@ Disallow: /test-emails
 Disallow: /blog-test
 Disallow: /debug-page
 Disallow: /test123
-
-Sitemap: https://www.growourreviews.com/sitemap
