@@ -17,40 +17,20 @@ function ConfirmResetPasswordForm() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Handle the auth callback from email link
-    const handleAuthCallback = async () => {
+    // Check if we have a valid session for password reset
+    const checkSession = async () => {
       if (!supabase) {
         setError('Service temporarily unavailable')
         return
       }
 
-      // Check if there's a code in the URL (direct from email)
-      const urlParams = new URLSearchParams(window.location.search)
-      const code = urlParams.get('code')
-
-      if (code) {
-        try {
-          const { error } = await supabase.auth.exchangeCodeForSession(code)
-          if (error) {
-            console.error('Code exchange error:', error)
-            setError('Invalid or expired reset link. Please request a new one.')
-            return
-          }
-        } catch (err) {
-          console.error('Auth error:', err)
-          setError('Invalid or expired reset link. Please request a new one.')
-          return
-        }
-      }
-
-      // Check if we have a valid session for password reset
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         setError('Invalid reset link. Please request a new one.')
       }
     }
 
-    handleAuthCallback()
+    checkSession()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {

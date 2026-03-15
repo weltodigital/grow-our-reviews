@@ -80,6 +80,8 @@ export async function middleware(request: NextRequest) {
   // Check if this is a public route, review route, or API route
   const isAdditionalPublicRoute = additionalPublicRoutes.some(route => pathname === route) ||
     pathname.startsWith('/review/') ||
+    pathname.startsWith('/reset-password/') ||
+    pathname.startsWith('/auth/callback') ||
     pathname.startsWith('/api/auth/callback') ||
     pathname.startsWith('/api/cron/') ||
     pathname.startsWith('/api/stripe/webhook') ||
