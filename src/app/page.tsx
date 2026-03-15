@@ -19,13 +19,7 @@ function HomePageContent() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const code = searchParams.get('code')
-
-    // If there's an auth code, redirect to server-side callback for proper PKCE handling
-    if (code) {
-      console.log('Auth code detected, redirecting to server callback:', code)
-      router.push(`/auth/callback?code=${code}&next=/reset-password/confirm`)
-    }
+    // Homepage no longer handles auth codes - password reset goes directly to confirm page
   }, [searchParams])
 
   return (

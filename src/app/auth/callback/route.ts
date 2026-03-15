@@ -3,18 +3,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/reset-password/confirm'
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const origin = requestUrl.origin
+  const redirectTo = requestUrl.searchParams.get('next') ?? '/reset-password/confirm'
 
   if (!code) {
     console.error('No auth code provided')
     return NextResponse.redirect(`${origin}/reset-password?error=No auth code provided`)
   }
 
-  console.log('Server-side auth callback - processing code:', code)
+  console.log('Server auth callback - processing code')
 
-  let response = NextResponse.redirect(`${origin}${next}`)
+  let response = NextResponse.redirect(`${origin}${redirectTo}`)
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,19 +39,19 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
-      console.error('Server-side code exchange error:', error)
+      console.error('Server auth exchange error:', error.message)
       return NextResponse.redirect(`${origin}/reset-password?error=${encodeURIComponent(error.message)}`)
     }
 
     if (data.session) {
-      console.log('Server-side code exchange successful for user:', data.session.user?.email)
+      console.log('Server auth exchange successful for:', data.session.user?.email)
       return response
     } else {
-      console.error('No session created after server-side code exchange')
+      console.error('No session created after server auth exchange')
       return NextResponse.redirect(`${origin}/reset-password?error=No session created`)
     }
   } catch (err) {
-    console.error('Unexpected error in server-side code exchange:', err)
-    return NextResponse.redirect(`${origin}/reset-password?error=${encodeURIComponent('Server error: ' + (err as Error).message)}`)
+    console.error('Unexpected error in server auth exchange:', err)
+    return NextResponse.redirect(`${origin}/reset-password?error=${encodeURIComponent('Unexpected error')}`)
   }
 }

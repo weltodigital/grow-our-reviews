@@ -17,20 +17,57 @@ function ConfirmResetPasswordForm() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check if we have a valid session for password reset
-    const checkSession = async () => {
+    // Handle password reset callback
+    const handlePasswordReset = async () => {
       if (!supabase) {
         setError('Service temporarily unavailable')
         return
       }
 
+      // Check for auth tokens in URL hash (Supabase password reset format)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const accessToken = hashParams.get('access_token')
+      const refreshToken = hashParams.get('refresh_token')
+      const type = hashParams.get('type')
+
+      console.log('Password reset confirmation - type:', type)
+      console.log('Has access token:', !!accessToken)
+
+      if (type === 'recovery' && accessToken && refreshToken) {
+        try {
+          // Set the session using the tokens from URL
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          })
+
+          if (error) {
+            console.error('Session setup error:', error)
+            setError('Failed to verify reset link. Please request a new one.')
+            return
+          }
+
+          if (data.session) {
+            console.log('Password reset session established for:', data.session.user?.email)
+            // Clear the URL hash
+            window.history.replaceState(null, '', window.location.pathname)
+            return
+          }
+        } catch (err) {
+          console.error('Password reset session error:', err)
+          setError('Failed to establish reset session.')
+          return
+        }
+      }
+
+      // If no recovery tokens, check for regular session
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         setError('Invalid reset link. Please request a new one.')
       }
     }
 
-    checkSession()
+    handlePasswordReset()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
