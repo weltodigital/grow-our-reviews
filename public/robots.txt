@@ -5,3 +5,5 @@ Disallow: /onboarding/
 Disallow: /billing/
 Disallow: /review/
 Disallow: /test-emails
+
+Sitemap: https://www.growourreviews.com/sitemap.xml
