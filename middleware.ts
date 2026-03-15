@@ -5,7 +5,7 @@ import type { Database } from '@/types/database'
 
 export async function middleware(request: NextRequest) {
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/debug-page', '/blog-test']
+  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/debug-page', '/blog-test', '/sitemap.xml', '/robots.txt']
   const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))
 
   if (isPublicRoute) {
@@ -130,8 +130,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public files (public folder)
+     * - Static files (.xml, .txt, images, etc.)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|xml|txt)$).*)',
   ],
 }
