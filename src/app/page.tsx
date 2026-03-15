@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { HowItWorksSection } from '@/components/marketing/how-it-works-section'
@@ -14,7 +14,7 @@ import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { MarketingHeader } from '@/components/marketing/marketing-header'
 import { supabase } from '@/lib/supabase'
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -67,5 +67,13 @@ export default function HomePage() {
       </main>
       <MarketingFooter />
     </div>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
   )
 }
