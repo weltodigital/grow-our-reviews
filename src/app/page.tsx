@@ -21,42 +21,12 @@ function HomePageContent() {
   useEffect(() => {
     const code = searchParams.get('code')
 
-    // If there's an auth code, handle password reset callback
+    // If there's an auth code, redirect to server-side callback for proper PKCE handling
     if (code) {
-      handlePasswordResetCallback(code)
+      console.log('Auth code detected, redirecting to server callback:', code)
+      router.push(`/auth/callback?code=${code}&next=/reset-password/confirm`)
     }
   }, [searchParams])
-
-  const handlePasswordResetCallback = async (code: string) => {
-    if (!supabase) {
-      console.error('Supabase client not available')
-      router.push('/reset-password?error=Service temporarily unavailable')
-      return
-    }
-
-    try {
-      console.log('Handling password reset callback with code:', code)
-
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
-      if (error) {
-        console.error('Code exchange error:', error)
-        router.push(`/reset-password?error=${encodeURIComponent(error.message)}`)
-        return
-      }
-
-      if (data.session) {
-        console.log('Code exchange successful, session created:', data.session.user?.email)
-        router.push('/reset-password/confirm')
-      } else {
-        console.error('No session created after code exchange')
-        router.push('/reset-password?error=No session created')
-      }
-    } catch (err) {
-      console.error('Unexpected error during code exchange:', err)
-      router.push(`/reset-password?error=${encodeURIComponent('Something went wrong: ' + (err as Error).message)}`)
-    }
-  }
 
   return (
     <div className="min-h-screen bg-white">

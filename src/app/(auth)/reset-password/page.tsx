@@ -36,7 +36,7 @@ function ResetPasswordForm() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.protocol}//app.growourreviews.com`,
+        redirectTo: `${window.location.protocol}//app.growourreviews.com/auth/callback?next=/reset-password/confirm`,
       })
 
       if (error) {
