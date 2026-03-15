@@ -36,10 +36,19 @@ export async function GET(request: NextRequest) {
   )
 
   try {
+    // Try to exchange the code for a session
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
       console.error('Server auth exchange error:', error.message)
+
+      // If it's a PKCE error, try a different approach
+      if (error.message.includes('PKCE code verifier')) {
+        console.log('PKCE error detected, attempting direct redirect to allow client-side handling')
+        // Redirect to confirm page with the code, let client handle it
+        return NextResponse.redirect(`${origin}/reset-password/confirm?code=${code}`)
+      }
+
       return NextResponse.redirect(`${origin}/reset-password?error=${encodeURIComponent(error.message)}`)
     }
 

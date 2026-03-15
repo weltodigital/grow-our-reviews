@@ -19,7 +19,13 @@ function HomePageContent() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Homepage no longer handles auth codes - password reset goes directly to confirm page
+    const code = searchParams.get('code')
+
+    // Handle existing reset links that still use code format
+    if (code) {
+      console.log('Legacy auth code detected, redirecting to server callback:', code)
+      router.push(`/auth/callback?code=${code}&next=/reset-password/confirm`)
+    }
   }, [searchParams])
 
   return (

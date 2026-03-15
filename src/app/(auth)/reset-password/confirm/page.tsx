@@ -24,6 +24,34 @@ function ConfirmResetPasswordForm() {
         return
       }
 
+      // Check for auth code in URL params (legacy format from existing reset links)
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('code')
+
+      if (code) {
+        console.log('Auth code detected in confirm page, attempting exchange')
+        try {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+          if (error) {
+            console.error('Code exchange error on confirm page:', error)
+            setError(`Authentication failed: ${error.message}`)
+            return
+          }
+
+          if (data.session) {
+            console.log('Code exchange successful, session established for:', data.session.user?.email)
+            // Clear the URL params
+            window.history.replaceState(null, '', window.location.pathname)
+            return
+          }
+        } catch (err) {
+          console.error('Code exchange error:', err)
+          setError('Failed to authenticate. Please try requesting a new reset link.')
+          return
+        }
+      }
+
       // Check for auth tokens in URL hash (Supabase password reset format)
       const hashParams = new URLSearchParams(window.location.hash.substring(1))
       const accessToken = hashParams.get('access_token')
@@ -60,7 +88,7 @@ function ConfirmResetPasswordForm() {
         }
       }
 
-      // If no recovery tokens, check for regular session
+      // If no recovery tokens or codes, check for regular session
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         setError('Invalid reset link. Please request a new one.')
