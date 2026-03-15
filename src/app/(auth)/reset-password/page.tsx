@@ -19,7 +19,7 @@ function ResetPasswordForm() {
   useEffect(() => {
     const errorParam = searchParams.get('error')
     if (errorParam) {
-      setError(errorParam)
+      setError(decodeURIComponent(errorParam))
     }
   }, [searchParams])
 
