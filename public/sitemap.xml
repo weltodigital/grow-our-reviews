@@ -3,7 +3,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.growourreviews.com/</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-02-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,7 +11,7 @@
   <!-- Blog listing page -->
   <url>
     <loc>https://www.growourreviews.com/blog</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-02-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -19,35 +19,35 @@
   <!-- Blog articles -->
   <url>
     <loc>https://www.growourreviews.com/blog/why-competitor-gets-more-work-than-you</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-02-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.growourreviews.com/blog/best-time-to-ask-for-google-review</loc>
-    <lastmod>2025-01-12</lastmod>
+    <lastmod>2026-02-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.growourreviews.com/blog/how-google-local-search-works-tradesmen</loc>
-    <lastmod>2025-01-10</lastmod>
+    <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.growourreviews.com/blog/how-many-google-reviews-to-rank-locally</loc>
-    <lastmod>2025-01-08</lastmod>
+    <lastmod>2026-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.growourreviews.com/blog/google-business-profile-setup-tradesmen</loc>
-    <lastmod>2025-01-05</lastmod>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
