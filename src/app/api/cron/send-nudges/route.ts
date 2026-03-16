@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
   try {
     // Find review requests that need nudge SMS
     // Criteria: status = 'sent', nudge_sent = false, nudge_enabled = true,
+    // clicked_at is null (customer hasn't clicked yet),
     // and sent_at is older than user's nudge_delay_hours
     const { data: nudgeRequests, error: fetchError } = await supabase
       .from('review_requests')
@@ -55,11 +56,13 @@ export async function GET(request: NextRequest) {
           nudge_enabled,
           nudge_delay_hours
         ),
-        customers!inner(name, phone)
+        customers!inner(name, phone),
+        feedback(id)
       `)
       .eq('status', 'sent')
       .eq('nudge_sent', false)
       .eq('profiles.nudge_enabled', true)
+      .is('clicked_at', null) // Only send nudges if customer hasn't clicked yet
       .not('sent_at', 'is', null)
       .limit(50) // Process in batches
 
@@ -89,8 +92,11 @@ export async function GET(request: NextRequest) {
       const nudgeTime = new Date(sentAt.getTime() + nudgeDelayMs)
       const requestAge = now.getTime() - sentAt.getTime()
 
-      // Must be past nudge time AND within the max age limit
-      return now >= nudgeTime && requestAge <= maxNudgeAge
+      // Check if customer has already left feedback
+      const hasFeedback = request.feedback && request.feedback.length > 0
+
+      // Must be past nudge time AND within the max age limit AND no existing feedback
+      return now >= nudgeTime && requestAge <= maxNudgeAge && !hasFeedback
     })
 
     if (eligibleRequests.length === 0) {
