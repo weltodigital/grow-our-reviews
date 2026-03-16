@@ -6,9 +6,21 @@ import BestTimeToAskForGoogleReview from "@/content/blog/best-time-to-ask-for-go
 import HowGoogleLocalSearchWorksTradesmen from "@/content/blog/how-google-local-search-works-tradesmen";
 import HowManyGoogleReviewsToRankLocally from "@/content/blog/how-many-google-reviews-to-rank-locally";
 import GoogleBusinessProfileSetupTradesmen from "@/content/blog/google-business-profile-setup-tradesmen";
+import UnfairGoogleReviewTradesmanGuide from "@/content/blog/unfair-google-review-tradesman-guide";
+import GoogleReviewsVsCheckatrade from "@/content/blog/google-reviews-vs-checkatrade";
+import GoogleReviewResponseTemplatesTradesmen from "@/content/blog/google-review-response-templates-tradesmen";
+import CheckatradeMyBuilderGoogleReviews2026 from "@/content/blog/checkatrade-mybuilder-google-reviews-2026";
 
 // This would normally come from a CMS or database
 const articles = {
+  "checkatrade-mybuilder-google-reviews-2026": {
+    title: "Checkatrade, MyBuilder, or Google Reviews: Where Should Tradespeople Focus in 2026?",
+    description: "Comparing Checkatrade, MyBuilder, and Google Reviews for UK tradespeople in 2026. Which platform gives you the best return on your time and money? Here's the honest breakdown.",
+    category: "Getting More Work",
+    publishDate: "2026-03-16",
+    readingTime: 10,
+    content: CheckatradeMyBuilderGoogleReviews2026,
+  },
   "why-competitor-gets-more-work-than-you": {
     title: "Why Your Competitor With Worse Work Gets More Jobs Than You",
     description: "You do better work but your competitor gets more calls. Here's why — and exactly what to do about it. The answer isn't working harder, it's working smarter on your online presence.",
@@ -48,6 +60,30 @@ const articles = {
     publishDate: "2026-01-25",
     readingTime: 10,
     content: GoogleBusinessProfileSetupTradesmen,
+  },
+  "google-review-response-templates-tradesmen": {
+    title: "How to Respond to Every Type of Google Review (With Copy-Paste Templates)",
+    description: "Ready-to-use Google review response templates for tradespeople. Copy, paste, and personalise responses for 5-star reviews, complaints, fake reviews, and everything in between.",
+    category: "Reputation Management",
+    publishDate: "2026-01-20",
+    readingTime: 9,
+    content: GoogleReviewResponseTemplatesTradesmen,
+  },
+  "google-reviews-vs-checkatrade": {
+    title: "Google Reviews vs Checkatrade: Which Actually Gets Tradespeople More Work?",
+    description: "Tradespeople spend £50-100/month on Checkatrade. But do Google reviews get you more work for free? We compare the two to help you decide where to focus.",
+    category: "Getting More Work",
+    publishDate: "2026-01-15",
+    readingTime: 9,
+    content: GoogleReviewsVsCheckatrade,
+  },
+  "unfair-google-review-tradesman-guide": {
+    title: "What to Do When You Get an Unfair Google Review (A Tradesperson's Guide)",
+    description: "Got an unfair or fake Google review? Here's exactly what to do — from responding professionally to reporting it to Google, with copy-paste response templates for tradespeople.",
+    category: "Reputation Management",
+    publishDate: "2026-01-10",
+    readingTime: 10,
+    content: UnfairGoogleReviewTradesmanGuide,
   },
 };
 

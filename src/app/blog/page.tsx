@@ -17,6 +17,15 @@ export const metadata: Metadata = {
 // Blog article data - in a real app this would come from a CMS or database
 const blogArticles = [
   {
+    slug: "checkatrade-mybuilder-google-reviews-2026",
+    title: "Checkatrade, MyBuilder, or Google Reviews: Where Should Tradespeople Focus in 2026?",
+    description: "Comparing Checkatrade, MyBuilder, and Google Reviews for UK tradespeople in 2026. Which platform gives you the best return on your time and money?",
+    category: "Getting More Work",
+    publishDate: "2026-03-16",
+    readingTime: 10,
+    featured: true,
+  },
+  {
     slug: "why-competitor-gets-more-work-than-you",
     title: "Why Your Competitor With Worse Work Gets More Jobs Than You",
     description: "You do better work but your competitor gets more calls. Here's why — and exactly what to do about it.",
@@ -32,7 +41,7 @@ const blogArticles = [
     category: "Google Reviews",
     publishDate: "2026-02-10",
     readingTime: 8,
-    featured: true,
+    featured: false,
   },
   {
     slug: "how-google-local-search-works-tradesmen",
@@ -58,6 +67,33 @@ const blogArticles = [
     description: "A complete step-by-step guide to setting up your Google Business Profile as a tradesperson.",
     category: "Local SEO",
     publishDate: "2026-01-25",
+    readingTime: 10,
+    featured: false,
+  },
+  {
+    slug: "google-review-response-templates-tradesmen",
+    title: "How to Respond to Every Type of Google Review (With Copy-Paste Templates)",
+    description: "Ready-to-use Google review response templates for tradespeople. Copy, paste, and personalise responses for 5-star reviews, complaints, and more.",
+    category: "Reputation Management",
+    publishDate: "2026-01-20",
+    readingTime: 9,
+    featured: false,
+  },
+  {
+    slug: "google-reviews-vs-checkatrade",
+    title: "Google Reviews vs Checkatrade: Which Actually Gets Tradespeople More Work?",
+    description: "Tradespeople spend £50-100/month on Checkatrade. But do Google reviews get you more work for free? We compare the two to help you decide.",
+    category: "Getting More Work",
+    publishDate: "2026-01-15",
+    readingTime: 9,
+    featured: false,
+  },
+  {
+    slug: "unfair-google-review-tradesman-guide",
+    title: "What to Do When You Get an Unfair Google Review (A Tradesperson's Guide)",
+    description: "Got an unfair or fake Google review? Here's exactly what to do — from responding professionally to reporting it to Google, with copy-paste templates.",
+    category: "Reputation Management",
+    publishDate: "2026-01-10",
     readingTime: 10,
     featured: false,
   },
