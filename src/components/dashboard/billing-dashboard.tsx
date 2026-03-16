@@ -411,6 +411,35 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
         </Card>
       )}
 
+      {/* Growth Plan - Need More Credits */}
+      {currentPlan === 'growth' && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="text-blue-900">Need More Than {PRICING_PLANS.growth.monthlyRequestLimit} Message Credits?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-800 mb-2">
+                  Looking for a custom plan with higher limits? We can help create a solution that fits your business needs.
+                </p>
+                <p className="text-sm text-blue-700">
+                  Contact our team to discuss custom pricing and limits for high-volume businesses.
+                </p>
+              </div>
+              <Button
+                asChild
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <a href="mailto:support@growourreviews.com?subject=Custom Plan Request&body=Hi, I'm currently on the Growth plan and would like to discuss increasing my monthly message credit limit. Please get in touch to discuss custom options.">
+                  Contact Support
+                </a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Support */}
       <Card>
         <CardHeader>
