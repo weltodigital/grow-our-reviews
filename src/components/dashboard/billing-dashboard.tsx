@@ -113,24 +113,43 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
   }
 
   const isTrialing = profile.subscription_status === 'trialing'
-  const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null
+
+  // Fix trial end date calculation
+  // If user has Stripe subscription, use trial_ends_at from Stripe
+  // If user is on default trial (no Stripe), calculate from created_at + 14 days
+  let trialEndsAt: Date | null = null
   const trialStartsAt = profile.created_at ? new Date(profile.created_at) : null
+
+  if (profile.trial_ends_at) {
+    trialEndsAt = new Date(profile.trial_ends_at)
+  } else if (trialStartsAt) {
+    // Fallback: calculate trial end as created_at + 14 days if no trial_ends_at
+    trialEndsAt = new Date(trialStartsAt.getTime() + (14 * 24 * 60 * 60 * 1000))
+  }
 
   // Calculate trial progress based on actual dates
   const now = new Date()
-  const trialDaysRemaining = trialEndsAt
-    ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+
+  // Handle timezone properly - ensure we're comparing dates at midnight local time
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const trialEndMidnight = trialEndsAt
+    ? new Date(trialEndsAt.getFullYear(), trialEndsAt.getMonth(), trialEndsAt.getDate())
+    : null
+
+  const trialDaysRemaining = trialEndMidnight
+    ? Math.max(0, Math.ceil((trialEndMidnight.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24)))
     : 0
 
   // Debug logging for trial dates
   console.log('Billing Dashboard Debug:', {
     trial_ends_at_raw: profile.trial_ends_at,
-    trialEndsAt: trialEndsAt?.toISOString(),
-    trialEndsAt_local: trialEndsAt?.toString(),
+    has_stripe_subscription: !!profile.stripe_subscription_id,
+    trialEndsAt_original: trialEndsAt?.toISOString(),
+    trialEndMidnight: trialEndMidnight?.toISOString(),
+    todayMidnight: todayMidnight.toISOString(),
     now: now.toISOString(),
-    now_local: now.toString(),
     trialDaysRemaining,
-    timeDifference_ms: trialEndsAt ? trialEndsAt.getTime() - now.getTime() : 0,
+    timeDifference_ms: trialEndMidnight ? trialEndMidnight.getTime() - todayMidnight.getTime() : 0,
     subscription_status: profile.subscription_status
   })
 
