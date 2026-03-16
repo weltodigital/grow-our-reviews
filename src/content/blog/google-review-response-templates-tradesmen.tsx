@@ -75,8 +75,9 @@ export default function GoogleReviewResponseTemplatesTradesmen() {
       </blockquote>
 
       <InternalLinkCTA
-        text="💡 Want more 5-star reviews to drown out the occasional negative ones? Grow Our Reviews automatically asks happy customers for feedback after every job."
-        link="/pricing"
+        text="💡 Want more 5-star reviews to drown out the occasional negative ones?"
+        href="/pricing"
+        linkText="Grow Our Reviews"
       />
 
       <h2>How to respond to a 1 or 2-star review</h2>

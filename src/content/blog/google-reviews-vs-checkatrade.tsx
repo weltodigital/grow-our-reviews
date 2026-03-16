@@ -129,8 +129,9 @@ export default function GoogleReviewsVsCheckatrade() {
       </p>
 
       <InternalLinkCTA
-        text="💡 Want to build your Google reviews faster? Grow Our Reviews sends automated review requests after every job, helping you climb the local rankings while still using other platforms."
-        link="/pricing"
+        text="💡 Want to build your Google reviews faster?"
+        href="/pricing"
+        linkText="Grow Our Reviews"
       />
 
       <h2>How to build your Google reviews while still using Checkatrade</h2>

@@ -149,8 +149,9 @@ export default function CheckatradeMyBuilderGoogleReviews2026() {
       </p>
 
       <InternalLinkCTA
-        text="💡 Ready to build your long-term Google presence? Grow Our Reviews automates the review collection process, helping you climb local rankings while other platforms provide short-term leads."
-        link="/pricing"
+        text="💡 Ready to build your long-term Google presence?"
+        href="/pricing"
+        linkText="Grow Our Reviews"
       />
 
       <h2>The hybrid strategy (what we'd actually recommend)</h2>

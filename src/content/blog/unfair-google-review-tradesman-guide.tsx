@@ -93,8 +93,9 @@ export default function UnfairGoogleReviewTradesmanGuide() {
       </blockquote>
 
       <InternalLinkCTA
-        text="💡 Want to make sure more happy customers leave reviews? Grow Our Reviews automates review requests after every job, so good reviews always outweigh the occasional bad one."
-        link="/pricing"
+        text="💡 Want to make sure more happy customers leave reviews?"
+        href="/pricing"
+        linkText="Grow Our Reviews"
       />
 
       <h2>The real solution — bury it with good reviews</h2>
