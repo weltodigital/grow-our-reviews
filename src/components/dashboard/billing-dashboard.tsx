@@ -122,6 +122,18 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
     ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
     : 0
 
+  // Debug logging for trial dates
+  console.log('Billing Dashboard Debug:', {
+    trial_ends_at_raw: profile.trial_ends_at,
+    trialEndsAt: trialEndsAt?.toISOString(),
+    trialEndsAt_local: trialEndsAt?.toString(),
+    now: now.toISOString(),
+    now_local: now.toString(),
+    trialDaysRemaining,
+    timeDifference_ms: trialEndsAt ? trialEndsAt.getTime() - now.getTime() : 0,
+    subscription_status: profile.subscription_status
+  })
+
   // Calculate total trial length and days used
   const totalTrialDays = (trialStartsAt && trialEndsAt)
     ? Math.ceil((trialEndsAt.getTime() - trialStartsAt.getTime()) / (1000 * 60 * 60 * 24))
