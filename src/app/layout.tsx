@@ -16,13 +16,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Grow Our Reviews" }],
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-192.png", sizes: "32x32", type: "image/png" },
-      { url: "/icon-192.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-new.ico?v=7&t=20260316", sizes: "any" },
+      { url: "/icon-192.png?v=7&t=20260316", sizes: "192x192", type: "image/png" },
+      { url: "/icon-192.png?v=7&t=20260316", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png?v=7&t=20260316", sizes: "16x16", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
-    apple: "/icon-192.png",
+    shortcut: "/favicon-new.ico?v=7&t=20260316",
+    apple: "/icon-192.png?v=7&t=20260316",
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -55,11 +55,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico?v=6" type="image/x-icon" />
-        <link rel="shortcut icon" href="/favicon.ico?v=6" type="image/x-icon" />
-        <link rel="icon" href="/icon-192.png?v=6" type="image/png" sizes="192x192" />
-        <link rel="icon" href="/icon-192.png?v=6" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/icon-192.png?v=6" />
+        <link rel="icon" href="/favicon-new.ico?v=7&t=20260316" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon-new.ico?v=7&t=20260316" type="image/x-icon" />
+        <link rel="icon" href="/icon-192.png?v=7&t=20260316" type="image/png" sizes="192x192" />
+        <link rel="icon" href="/icon-192.png?v=7&t=20260316" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/icon-192.png?v=7&t=20260316" type="image/png" sizes="16x16" />
+        <link rel="apple-touch-icon" href="/icon-192.png?v=7&t=20260316" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ErrorBoundary>
