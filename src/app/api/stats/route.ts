@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       .from('profiles')
       .select('monthly_request_limit, billing_cycle_date')
       .eq('id', user.id)
-      .single()
+      .single() as { data: { monthly_request_limit: number; billing_cycle_date: number } | null }
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
