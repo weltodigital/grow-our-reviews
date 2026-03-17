@@ -47,7 +47,7 @@ interface UploadBatch {
 }
 
 const EXAMPLE_DATA: CsvRow[] = [
-  { name: 'Example Customer', phone: "'07868287177" }
+  { name: 'Example Customer', phone: '07868287177' }
 ]
 
 export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
@@ -180,7 +180,8 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
   // Download CSV template
   const downloadTemplate = () => {
     const csvContent = Papa.unparse(EXAMPLE_DATA, {
-      header: true
+      header: true,
+      quotes: false
     })
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
