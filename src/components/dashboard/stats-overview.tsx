@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Send, MousePointer, Star, MessageSquare } from 'lucide-react'
+import { getNextBillingDate } from '@/lib/billing-cycle'
 import Link from 'next/link'
 
 interface StatsOverviewProps {
@@ -12,6 +13,8 @@ interface StatsOverviewProps {
     requestsRemaining: number
     totalRequestsAllTime: number
     totalReviewsAllTime: number
+    daysUntilReset?: number
+    billingCycleDate?: number
   }
 }
 
@@ -20,7 +23,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
     {
       title: 'Requests Sent',
       value: stats.requestsSentThisMonth,
-      subtitle: 'This month',
+      subtitle: 'This period',
       icon: Send,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
@@ -83,13 +86,22 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1">
-                Requests Remaining This Month
+                Requests Remaining This Period
               </div>
               <div className="text-3xl font-bold text-blue-600">
                 {stats.requestsRemaining.toLocaleString()}
               </div>
               <div className="text-sm text-gray-500 mt-1">
-                Reset on the 1st of each month
+                {stats.billingCycleDate ? (
+                  <div className="space-y-1">
+                    <div>Next reset: {getNextBillingDate(stats.billingCycleDate).toLocaleDateString('en-GB')}</div>
+                    {stats.daysUntilReset && (
+                      <div>({stats.daysUntilReset} day{stats.daysUntilReset !== 1 ? 's' : ''} remaining)</div>
+                    )}
+                  </div>
+                ) : (
+                  'Reset on the 1st of each month'
+                )}
               </div>
             </div>
             <div className="text-right">

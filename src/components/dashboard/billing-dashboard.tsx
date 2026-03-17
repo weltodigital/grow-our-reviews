@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { PRICING_PLANS, formatPrice, getPlanByLimit } from '@/lib/pricing'
+import { getNextBillingDate } from '@/lib/billing-cycle'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
@@ -310,8 +311,11 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               {billingStats.daysUntilReset && (
                 <div>Credits reset in {billingStats.daysUntilReset} day{billingStats.daysUntilReset !== 1 ? 's' : ''}</div>
               )}
-              {billingStats.billingCycleDate && (
-                <div>Monthly cycle: {billingStats.billingCycleDate}{getOrdinalSuffix(billingStats.billingCycleDate)} of each month</div>
+              {profile.billing_cycle_date && (
+                <div className="space-y-1">
+                  <div>Next reset: {getNextBillingDate(profile.billing_cycle_date).toLocaleDateString('en-GB')}</div>
+                  <div>Monthly cycle: {profile.billing_cycle_date}{getOrdinalSuffix(profile.billing_cycle_date)} of each month</div>
+                </div>
               )}
             </div>
           </div>
