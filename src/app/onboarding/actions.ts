@@ -39,6 +39,27 @@ export async function completeOnboarding(data: OnboardingData) {
 
   // Create or update the profile
   const now = new Date()
+
+  // Check if user already has a profile
+  const { data: existingProfile } = await (supabase as any)
+    .from('profiles')
+    .select('billing_cycle_date, created_at')
+    .eq('id', user.id)
+    .single()
+
+  // Calculate billing cycle date
+  let billingCycleDate: number
+  if (existingProfile?.billing_cycle_date) {
+    // Keep existing billing cycle date
+    billingCycleDate = existingProfile.billing_cycle_date
+  } else {
+    // Set based on when they created their account, or today if no created_at
+    const referenceDate = existingProfile?.created_at
+      ? new Date(existingProfile.created_at)
+      : now
+    billingCycleDate = calculateBillingCycleDate(referenceDate)
+  }
+
   const { error: upsertError } = await (supabase as any)
     .from('profiles')
     .upsert(
@@ -47,7 +68,7 @@ export async function completeOnboarding(data: OnboardingData) {
         email: user.email!,
         business_name: data.businessName.trim(),
         google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
-        billing_cycle_date: calculateBillingCycleDate(now),
+        billing_cycle_date: billingCycleDate,
         updated_at: now.toISOString(),
       },
       {

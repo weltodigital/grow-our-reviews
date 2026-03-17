@@ -22,9 +22,23 @@ async function getDashboardStats(userId: string) {
     }
 
     // Get billing period bounds based on user's billing cycle
-    const billingPeriod = getCurrentBillingPeriod(profile.billing_cycle_date)
-    const startOfPeriod = billingPeriod.start
-    const endOfPeriod = billingPeriod.end
+    // If user doesn't have billing_cycle_date, fall back to calendar month
+    let startOfPeriod: Date, endOfPeriod: Date, daysUntilReset: number, billingCycleDate: number | undefined
+
+    if (profile.billing_cycle_date) {
+      const billingPeriod = getCurrentBillingPeriod(profile.billing_cycle_date)
+      startOfPeriod = billingPeriod.start
+      endOfPeriod = billingPeriod.end
+      daysUntilReset = getDaysUntilReset(profile.billing_cycle_date)
+      billingCycleDate = profile.billing_cycle_date
+    } else {
+      // Fallback to calendar month for users without billing cycle date
+      const now = new Date()
+      startOfPeriod = new Date(now.getFullYear(), now.getMonth(), 1)
+      endOfPeriod = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+      daysUntilReset = 0
+      billingCycleDate = undefined
+    }
 
     // Parallel queries for stats
     const [
@@ -94,9 +108,6 @@ async function getDashboardStats(userId: string) {
     // Calculate click through rate
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0
 
-    // Calculate days until reset
-    const daysUntilReset = getDaysUntilReset(profile.billing_cycle_date)
-
     return {
       requestsSentThisMonth: requestsSent, // Keep same property name for backward compatibility
       clicksThisMonth: clicks,
@@ -107,7 +118,7 @@ async function getDashboardStats(userId: string) {
       totalRequestsAllTime: totalRequestsAllTime.count || 0,
       totalReviewsAllTime: totalReviewsAllTime.count || 0,
       daysUntilReset: daysUntilReset,
-      billingCycleDate: profile.billing_cycle_date
+      billingCycleDate: billingCycleDate
     }
   } catch (error) {
     console.error('Error fetching dashboard stats:', error)
@@ -121,6 +132,8 @@ async function getDashboardStats(userId: string) {
       requestsRemaining: 150,
       totalRequestsAllTime: 0,
       totalReviewsAllTime: 0,
+      daysUntilReset: 0,
+      billingCycleDate: undefined,
     }
   }
 }
