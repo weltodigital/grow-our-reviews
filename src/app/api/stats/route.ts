@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
+import { getCurrentBillingPeriod, getDaysUntilReset } from '@/lib/billing-cycle'
 
 export async function GET(request: NextRequest) {
   let response: NextResponse
@@ -32,61 +33,65 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Get current month bounds
-    const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
-
-    // Get user profile for request limit
+    // Get user profile for request limit and billing cycle date
     const { data: profile } = await supabase
       .from('profiles')
-      .select('monthly_request_limit')
+      .select('monthly_request_limit, billing_cycle_date')
       .eq('id', user.id)
       .single()
 
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
+    // Get billing period bounds based on user's billing cycle
+    const billingPeriod = getCurrentBillingPeriod(profile.billing_cycle_date)
+    const startOfPeriod = billingPeriod.start
+    const endOfPeriod = billingPeriod.end
+
     // Parallel queries for stats
     const [
-      requestsThisMonth,
-      clicksThisMonth,
-      reviewsThisMonth,
-      feedbackThisMonth,
+      requestsThisPeriod,
+      clicksThisPeriod,
+      reviewsThisPeriod,
+      feedbackThisPeriod,
       totalRequestsAllTime,
       totalReviewsAllTime
     ] = await Promise.all([
-      // Requests sent this month
+      // Requests sent this billing period
       supabase
         .from('review_requests')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-        .gte('sent_at', startOfMonth.toISOString())
-        .lte('sent_at', endOfMonth.toISOString())
+        .gte('sent_at', startOfPeriod.toISOString())
+        .lte('sent_at', endOfPeriod.toISOString())
         .not('sent_at', 'is', null),
 
-      // Clicks this month
+      // Clicks this billing period
       supabase
         .from('review_requests')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-        .gte('clicked_at', startOfMonth.toISOString())
-        .lte('clicked_at', endOfMonth.toISOString())
+        .gte('clicked_at', startOfPeriod.toISOString())
+        .lte('clicked_at', endOfPeriod.toISOString())
         .not('clicked_at', 'is', null),
 
-      // Reviews this month
+      // Reviews this billing period
       supabase
         .from('review_requests')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
         .eq('status', 'reviewed')
-        .gte('sent_at', startOfMonth.toISOString())
-        .lte('sent_at', endOfMonth.toISOString()),
+        .gte('sent_at', startOfPeriod.toISOString())
+        .lte('sent_at', endOfPeriod.toISOString()),
 
-      // Feedback this month
+      // Feedback this billing period
       supabase
         .from('feedback')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-        .gte('created_at', startOfMonth.toISOString())
-        .lte('created_at', endOfMonth.toISOString()),
+        .gte('created_at', startOfPeriod.toISOString())
+        .lte('created_at', endOfPeriod.toISOString()),
 
       // Total requests all time
       supabase
@@ -103,24 +108,29 @@ export async function GET(request: NextRequest) {
         .eq('status', 'reviewed')
     ])
 
-    const requestsSent = requestsThisMonth.count || 0
-    const clicks = clicksThisMonth.count || 0
-    const reviews = reviewsThisMonth.count || 0
-    const feedback = feedbackThisMonth.count || 0
-    const monthlyLimit = (profile as any)?.monthly_request_limit || 150
+    const requestsSent = requestsThisPeriod.count || 0
+    const clicks = clicksThisPeriod.count || 0
+    const reviews = reviewsThisPeriod.count || 0
+    const feedback = feedbackThisPeriod.count || 0
+    const monthlyLimit = profile.monthly_request_limit || 150
 
     // Calculate click through rate
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0
 
+    // Calculate days until reset
+    const daysUntilReset = getDaysUntilReset(profile.billing_cycle_date)
+
     const stats = {
-      requestsSentThisMonth: requestsSent,
+      requestsSentThisMonth: requestsSent, // Keep same property name for backward compatibility
       clicksThisMonth: clicks,
       reviewsThisMonth: reviews,
       feedbackThisMonth: feedback,
       clickThroughRate: Math.round(clickThroughRate * 10) / 10, // Round to 1 decimal
       requestsRemaining: Math.max(0, monthlyLimit - requestsSent),
       totalRequestsAllTime: totalRequestsAllTime.count || 0,
-      totalReviewsAllTime: totalReviewsAllTime.count || 0
+      totalReviewsAllTime: totalReviewsAllTime.count || 0,
+      daysUntilReset: daysUntilReset,
+      billingCycleDate: profile.billing_cycle_date
     }
 
     response = NextResponse.json(stats)

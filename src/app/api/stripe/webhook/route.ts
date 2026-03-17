@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { constructWebhookEvent, getPriceInfo } from '@/lib/stripe'
 import { PRICING_PLANS, getPlanByLimit, calculateTrialEndDate } from '@/lib/pricing'
+import { calculateBillingCycleDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 import Stripe from 'stripe'
 
@@ -73,18 +74,36 @@ export async function POST(request: NextRequest) {
             ? new Date(subscription.trial_end * 1000)
             : calculateTrialEndDate()
 
+          // Check if this is an upgrade (user already has stripe_customer_id)
+          const { data: existingProfile } = await (supabase as any)
+            .from('profiles')
+            .select('stripe_customer_id, stripe_subscription_id')
+            .eq('id', userId)
+            .single()
+
+          const updateData: any = {
+            email: session.customer_details?.email || '',
+            stripe_subscription_id: subscription.id,
+            subscription_status: subscription.status,
+            monthly_request_limit: priceInfo.monthlyRequestLimit,
+            trial_ends_at: trialEnd.toISOString(),
+            updated_at: new Date().toISOString(),
+          }
+
+          // Only update stripe_customer_id if user doesn't have one (prevents overwriting existing customer)
+          if (!existingProfile?.stripe_customer_id) {
+            updateData.stripe_customer_id = session.customer as string
+          }
+
+          // Set billing cycle date if user doesn't have one
+          if (!existingProfile || !existingProfile.billing_cycle_date) {
+            updateData.billing_cycle_date = calculateBillingCycleDate(new Date())
+          }
+
           // Update existing profile with subscription info (don't overwrite created_at)
           const { error: updateError } = await (supabase as any)
             .from('profiles')
-            .update({
-              email: session.customer_details?.email || '',
-              stripe_customer_id: session.customer as string,
-              stripe_subscription_id: subscription.id,
-              subscription_status: subscription.status,
-              monthly_request_limit: priceInfo.monthlyRequestLimit,
-              trial_ends_at: trialEnd.toISOString(),
-              updated_at: new Date().toISOString(),
-            })
+            .update(updateData)
             .eq('id', userId)
 
           // If update failed because profile doesn't exist, create it

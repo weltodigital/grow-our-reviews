@@ -2,6 +2,7 @@
 
 import { createServerSupabase } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { calculateBillingCycleDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 
 interface OnboardingData {
@@ -37,6 +38,7 @@ export async function completeOnboarding(data: OnboardingData) {
   }
 
   // Create or update the profile
+  const now = new Date()
   const { error: upsertError } = await (supabase as any)
     .from('profiles')
     .upsert(
@@ -45,7 +47,8 @@ export async function completeOnboarding(data: OnboardingData) {
         email: user.email!,
         business_name: data.businessName.trim(),
         google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
-        updated_at: new Date().toISOString(),
+        billing_cycle_date: calculateBillingCycleDate(now),
+        updated_at: now.toISOString(),
       },
       {
         onConflict: 'id',

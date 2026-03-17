@@ -78,33 +78,41 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const growthPriceId = process.env.STRIPE_GROWTH_PRICE_ID!
 
-    // If user has an existing subscription, modify it
-    if ((profile as any).stripe_subscription_id) {
+    // If user has an existing subscription, try to modify it directly
+    if ((profile as any).stripe_subscription_id && (profile as any).stripe_customer_id) {
       try {
-        // Update the existing subscription to Growth plan
-        await stripe.subscriptions.update((profile as any).stripe_subscription_id, {
-          items: [{
-            id: (await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)).items.data[0].id,
-            price: growthPriceId,
-          }],
-          proration_behavior: 'always_invoice', // Prorate the difference
-        })
+        // First check if subscription exists and is in a modifiable state
+        const existingSubscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
 
-        // Update the profile in the database
-        await (supabase as any)
-          .from('profiles')
-          .update({
-            monthly_request_limit: 300,
-            updated_at: new Date().toISOString()
+        // Only try direct update if subscription is active (not trialing, cancelled, etc.)
+        if (existingSubscription.status === 'active') {
+          // Update the existing subscription to Growth plan
+          await stripe.subscriptions.update((profile as any).stripe_subscription_id, {
+            items: [{
+              id: existingSubscription.items.data[0].id,
+              price: growthPriceId,
+            }],
+            proration_behavior: 'always_invoice', // Prorate the difference
           })
-          .eq('id', user.id)
 
-        response = NextResponse.json({
-          success: true,
-          message: 'Subscription upgraded successfully',
-          redirect: `${baseUrl}/dashboard/billing?upgraded=true`
-        })
-        return response
+          // Update the profile in the database
+          await (supabase as any)
+            .from('profiles')
+            .update({
+              monthly_request_limit: 300,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id)
+
+          response = NextResponse.json({
+            success: true,
+            message: 'Subscription upgraded successfully',
+            redirect: `${baseUrl}/dashboard/billing?upgraded=true`
+          })
+          return response
+        } else {
+          console.log('Subscription is not active (status: ' + existingSubscription.status + '), using checkout flow')
+        }
 
       } catch (subscriptionError: any) {
         console.error('Failed to update subscription directly:', subscriptionError)
@@ -112,11 +120,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback: Create new checkout session (for users without existing subscription)
-    const session = await stripe.checkout.sessions.create({
+    // Fallback: Create new checkout session (for users without existing subscription or failed direct update)
+    const sessionConfig: any = {
       mode: 'subscription',
       payment_method_types: ['card'],
-      customer_email: user.email!,
       line_items: [
         {
           price: growthPriceId,
@@ -136,7 +143,16 @@ export async function POST(request: NextRequest) {
       success_url: `${baseUrl}/dashboard/billing?upgraded=true`,
       cancel_url: `${baseUrl}/dashboard/billing`,
       allow_promotion_codes: true,
-    })
+    }
+
+    // If user has existing Stripe customer, use it; otherwise use email to create new one
+    if ((profile as any).stripe_customer_id) {
+      sessionConfig.customer = (profile as any).stripe_customer_id
+    } else {
+      sessionConfig.customer_email = user.email!
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig)
 
     response = NextResponse.json({
       url: session.url,

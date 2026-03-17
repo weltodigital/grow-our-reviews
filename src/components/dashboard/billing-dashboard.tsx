@@ -23,6 +23,21 @@ interface BillingDashboardProps {
   profile: Database['public']['Tables']['profiles']['Row']
   billingStats: {
     requestsSentThisMonth: number
+    daysUntilReset?: number
+    billingCycleDate?: number
+  }
+}
+
+// Helper function to get ordinal suffix (1st, 2nd, 3rd, etc.)
+function getOrdinalSuffix(day: number): string {
+  if (day >= 11 && day <= 13) {
+    return 'th'
+  }
+  switch (day % 10) {
+    case 1: return 'st'
+    case 2: return 'nd'
+    case 3: return 'rd'
+    default: return 'th'
   }
 }
 
@@ -290,8 +305,14 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                 }}
               />
             </div>
-            <div className="text-xs text-gray-500">
-              {usage.requestsRemaining} message credits remaining
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>{usage.requestsRemaining} message credits remaining</div>
+              {billingStats.daysUntilReset && (
+                <div>Credits reset in {billingStats.daysUntilReset} day{billingStats.daysUntilReset !== 1 ? 's' : ''}</div>
+              )}
+              {billingStats.billingCycleDate && (
+                <div>Monthly cycle: {billingStats.billingCycleDate}{getOrdinalSuffix(billingStats.billingCycleDate)} of each month</div>
+              )}
             </div>
           </div>
 

@@ -16,6 +16,7 @@ export interface Database {
           stripe_subscription_id: string | null
           subscription_status: string
           trial_ends_at: string | null
+          billing_cycle_date: number
           created_at: string
           updated_at: string
         }
@@ -33,6 +34,7 @@ export interface Database {
           stripe_subscription_id?: string | null
           subscription_status?: string
           trial_ends_at?: string | null
+          billing_cycle_date?: number
           created_at?: string
           updated_at?: string
         }
@@ -50,6 +52,7 @@ export interface Database {
           stripe_subscription_id?: string | null
           subscription_status?: string
           trial_ends_at?: string | null
+          billing_cycle_date?: number
           created_at?: string
           updated_at?: string
         }
