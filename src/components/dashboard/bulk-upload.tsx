@@ -47,7 +47,7 @@ interface UploadBatch {
 }
 
 const EXAMPLE_DATA: CsvRow[] = [
-  { name: 'Example Customer', phone: '07868287177' }
+  { name: 'Example Customer', phone: '7868287177' }
 ]
 
 export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
@@ -91,9 +91,14 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
     let normalized = ''
     let isValid = false
 
-    // Only accept UK mobile format: 07xxxxxxxxx (11 digits)
+    // Accept UK mobile format: 07xxxxxxxxx (11 digits) or 7xxxxxxxxx (10 digits, missing leading zero)
     if (digits.startsWith('07') && digits.length === 11) {
+      // Standard format with leading zero
       normalized = `+44${digits.slice(1)}`
+      isValid = true
+    } else if (digits.startsWith('7') && digits.length === 10) {
+      // Missing leading zero - add it back
+      normalized = `+44${digits}`
       isValid = true
     }
 
@@ -347,7 +352,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Send Requests to Previous Customers</h1>
             <p className="text-gray-600">
-              Upload a list of past customers and send them all a review request. Perfect for catching up on reviews you've missed.
+              Upload a list of past customers and send them all a review request. Just add customer names and phone numbers to a CSV file - phone numbers work with or without the leading zero. Perfect for catching up on reviews you've missed.
             </p>
           </div>
         </div>
@@ -363,7 +368,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   Step 1: Download CSV Template
                 </CardTitle>
                 <CardDescription>
-                  Get the correct format for your customer list
+                  Get the correct format for your customer list - phone numbers work with or without leading zero
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -375,7 +380,8 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-medium mb-3">Format Requirements:</h4>
                   <ul className="text-sm text-gray-600 space-y-2">
-                    <li>• Your file should have two columns: <strong>name</strong> and <strong>phone</strong></li>
+                    <li>• Two columns: <strong>name</strong> and <strong>phone</strong></li>
+                    <li>• Phone numbers: UK mobile numbers (with or without leading zero)</li>
                     <li>• Save as .csv (comma separated values)</li>
                     <li>• Maximum 200 rows per upload</li>
                   </ul>
@@ -385,20 +391,20 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <h4 className="font-medium text-blue-900 mb-3">📱 Phone Number Format (REQUIRED):</h4>
                   <div className="bg-white border border-blue-300 rounded p-3 mb-3">
                     <div className="text-center">
-                      <p className="text-lg font-bold text-blue-900 mb-1">Use this format ONLY:</p>
-                      <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded">'07868287177</code>
-                      <p className="text-sm text-blue-700 mt-1">(Apostrophe + UK mobile number)</p>
+                      <p className="text-lg font-bold text-blue-900 mb-1">Phone number formats (both work):</p>
+                      <div className="space-y-2">
+                        <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded block">7868287177</code>
+                        <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded block">07868287177</code>
+                      </div>
+                      <p className="text-sm text-blue-700 mt-1">(With or without leading zero)</p>
                     </div>
                   </div>
                   <ul className="text-sm text-blue-800 space-y-2">
-                    <li><strong>✅ How to enter in Excel/Google Sheets:</strong></li>
-                    <li className="ml-4">1. Type an apostrophe <code>'</code> before the number</li>
-                    <li className="ml-4">2. Then type the full UK mobile: <code>'07868287177</code></li>
-                    <li className="ml-4">3. The apostrophe keeps the leading zero</li>
-                    <li><strong>❌ Don't use:</strong></li>
-                    <li className="ml-4">• <code>07868287177</code> (Excel removes the zero)</li>
-                    <li className="ml-4">• <code>+447868287177</code> (International format)</li>
-                    <li className="ml-4">• Any other format</li>
+                    <li><strong>✅ Easy option (recommended):</strong></li>
+                    <li className="ml-4">• Just enter the number: <code>7868287177</code></li>
+                    <li className="ml-4">• Excel removes the zero? No problem - we add it back automatically</li>
+                    <li><strong>✅ Alternative option:</strong></li>
+                    <li className="ml-4">• Type the full number: <code>07868287177</code></li>
                   </ul>
                 </div>
 
@@ -468,7 +474,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   Step 2: Upload Your File
                 </CardTitle>
                 <CardDescription>
-                  Drag and drop your CSV file or click to browse
+                  Upload your CSV with customer names and phone numbers (we accept phone numbers with or without the leading zero)
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -561,7 +567,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 <div>
                   <p className="font-medium text-gray-700">Can't find your customers?</p>
                   <p className="text-gray-600">
-                    Export from your invoicing software or create a simple spreadsheet with customer names and phone numbers.
+                    Export from your invoicing software or create a simple spreadsheet with customer names and phone numbers. Don't worry about the leading zero on phone numbers - we handle both formats automatically.
                   </p>
                 </div>
                 <div>
