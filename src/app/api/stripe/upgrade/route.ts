@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const growthPriceId = process.env.STRIPE_GROWTH_PRICE_ID!
 
     // If user has an existing subscription, try to modify it directly
-    if ((profile as any).stripe_subscription_id && (profile as any).stripe_customer_id) {
+    if ((profile as any).stripe_subscription_id) {
       try {
         // First check if subscription exists and is in a modifiable state
         const existingSubscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
@@ -108,12 +108,19 @@ export async function POST(request: NextRequest) {
           await stripe.subscriptions.update((profile as any).stripe_subscription_id, updateConfig)
 
           // Update the profile in the database
+          const profileUpdateData: any = {
+            monthly_request_limit: 300,
+            updated_at: new Date().toISOString()
+          }
+
+          // Also save the customer ID if we don't have it in the profile
+          if (!(profile as any).stripe_customer_id && existingSubscription.customer) {
+            profileUpdateData.stripe_customer_id = existingSubscription.customer as string
+          }
+
           await (supabase as any)
             .from('profiles')
-            .update({
-              monthly_request_limit: 300,
-              updated_at: new Date().toISOString()
-            })
+            .update(profileUpdateData)
             .eq('id', user.id)
 
           response = NextResponse.json({
@@ -157,9 +164,21 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
     }
 
-    // If user has existing Stripe customer, use it; otherwise use email to create new one
-    if ((profile as any).stripe_customer_id) {
-      sessionConfig.customer = (profile as any).stripe_customer_id
+    // Get customer ID from profile or try to get it from existing subscription
+    let customerId = (profile as any).stripe_customer_id
+
+    if (!customerId && (profile as any).stripe_subscription_id) {
+      try {
+        const subscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
+        customerId = subscription.customer as string
+      } catch (error) {
+        console.error('Error retrieving customer from subscription:', error)
+      }
+    }
+
+    // If we have existing Stripe customer, use it; otherwise use email to create new one
+    if (customerId) {
+      sessionConfig.customer = customerId
     } else {
       sessionConfig.customer_email = user.email!
     }
