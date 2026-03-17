@@ -84,16 +84,28 @@ export async function POST(request: NextRequest) {
         // First check if subscription exists and is in a modifiable state
         const existingSubscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
 
-        // Only try direct update if subscription is active (not trialing, cancelled, etc.)
-        if (existingSubscription.status === 'active') {
+        // Try direct update if subscription is active or trialing
+        if (existingSubscription.status === 'active' || existingSubscription.status === 'trialing') {
           // Update the existing subscription to Growth plan
-          await stripe.subscriptions.update((profile as any).stripe_subscription_id, {
+          const updateConfig: any = {
             items: [{
               id: existingSubscription.items.data[0].id,
               price: growthPriceId,
             }],
-            proration_behavior: 'always_invoice', // Prorate the difference
-          })
+          }
+
+          // If subscription is trialing, don't prorate - just update the plan and preserve trial
+          if (existingSubscription.status === 'trialing') {
+            updateConfig.proration_behavior = 'none'
+            // Preserve trial end date if it exists
+            if (existingSubscription.trial_end) {
+              updateConfig.trial_end = existingSubscription.trial_end
+            }
+          } else {
+            updateConfig.proration_behavior = 'always_invoice' // Prorate the difference
+          }
+
+          await stripe.subscriptions.update((profile as any).stripe_subscription_id, updateConfig)
 
           // Update the profile in the database
           await (supabase as any)
