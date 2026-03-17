@@ -87,11 +87,49 @@ export async function POST(request: NextRequest) {
       trial_ends_at: (profile as any).trial_ends_at
     })
 
-    // If user has an existing subscription, try to modify it directly
+    // Try to find existing subscription - either from stored ID or by searching customer subscriptions
+    let existingSubscription: any = null
+
+    // First try with stored subscription ID
     if ((profile as any).stripe_subscription_id) {
       try {
-        // First check if subscription exists and is in a modifiable state
-        const existingSubscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
+        existingSubscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
+        console.log('Found subscription using stored ID:', existingSubscription.id)
+      } catch (error) {
+        console.log('Stored subscription ID not found, searching by customer...')
+      }
+    }
+
+    // If no stored subscription ID or it failed, search by customer
+    if (!existingSubscription && (profile as any).stripe_customer_id) {
+      try {
+        const subscriptions = await stripe.subscriptions.list({
+          customer: (profile as any).stripe_customer_id,
+          status: 'all',
+          limit: 1
+        })
+
+        if (subscriptions.data.length > 0) {
+          existingSubscription = subscriptions.data[0]
+          console.log('Found subscription by customer search:', existingSubscription.id)
+
+          // Update our database with the found subscription ID
+          await (supabase as any)
+            .from('profiles')
+            .update({
+              stripe_subscription_id: existingSubscription.id,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id)
+        }
+      } catch (error) {
+        console.log('Error searching subscriptions by customer:', error)
+      }
+    }
+
+    // If we found an existing subscription, try to modify it directly
+    if (existingSubscription) {
+      try {
 
         // Try direct update if subscription is active or trialing
         if (existingSubscription.status === 'active' || existingSubscription.status === 'trialing') {
@@ -119,7 +157,7 @@ export async function POST(request: NextRequest) {
             updateConfig.proration_behavior = 'always_invoice' // Prorate the difference
           }
 
-          await stripe.subscriptions.update((profile as any).stripe_subscription_id, updateConfig)
+          await stripe.subscriptions.update(existingSubscription.id, updateConfig)
 
           // Update the profile in the database
           const profileUpdateData: any = {
@@ -127,9 +165,12 @@ export async function POST(request: NextRequest) {
             updated_at: new Date().toISOString()
           }
 
-          // Also save the customer ID if we don't have it in the profile
+          // Also save the customer ID and subscription ID if we don't have them in the profile
           if (!(profile as any).stripe_customer_id && existingSubscription.customer) {
             profileUpdateData.stripe_customer_id = existingSubscription.customer as string
+          }
+          if (!(profile as any).stripe_subscription_id) {
+            profileUpdateData.stripe_subscription_id = existingSubscription.id
           }
 
           await (supabase as any)
@@ -153,7 +194,86 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback: Create new checkout session (for users without existing subscription or failed direct update)
+    // Declare trial variables early for use in multiple places
+    const isTrialing = (profile as any).subscription_status === 'trialing'
+    let trialEndsAt = (profile as any).trial_ends_at ? new Date((profile as any).trial_ends_at) : null
+    const now = new Date()
+
+    // If user is trialing but has no trial_ends_at, calculate it from their account creation
+    if (isTrialing && !trialEndsAt) {
+      const { calculateTrialEndDate } = await import('@/lib/pricing')
+      const accountCreated = (profile as any).created_at ? new Date((profile as any).created_at) : new Date()
+      trialEndsAt = calculateTrialEndDate(accountCreated)
+      console.log(`User trialing but missing trial_ends_at, calculated: ${trialEndsAt.toISOString()}`)
+    }
+
+    const hasActiveTrialTime = trialEndsAt && trialEndsAt > now
+
+    // Enhanced fallback: If user has customer ID but no subscription, create subscription directly
+    // Otherwise fall back to checkout session
+    const customerId = (profile as any).stripe_customer_id
+
+    if (customerId && !existingSubscription) {
+      try {
+        console.log('User has customer ID but no subscription, creating subscription directly...')
+
+        // Get default payment method for the customer
+        const paymentMethods = await stripe.paymentMethods.list({
+          customer: customerId,
+          type: 'card'
+        })
+
+        if (paymentMethods.data.length > 0) {
+          // Create subscription directly using existing payment method
+          const subscriptionData: any = {
+            customer: customerId,
+            items: [{ price: growthPriceId }],
+            default_payment_method: paymentMethods.data[0].id,
+            metadata: {
+              userId: user.id,
+              upgrade: 'true'
+            }
+          }
+
+          // Add trial period if user should have trial time remaining
+          if (isTrialing && hasActiveTrialTime && trialEndsAt) {
+            const trialDaysRemaining = Math.ceil((trialEndsAt.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+            if (trialDaysRemaining > 0) {
+              subscriptionData.trial_period_days = trialDaysRemaining
+              console.log(`Creating subscription with ${trialDaysRemaining} trial days remaining`)
+            }
+          }
+
+          const newSubscription = await stripe.subscriptions.create(subscriptionData)
+
+          // Update profile with new subscription
+          await (supabase as any)
+            .from('profiles')
+            .update({
+              stripe_subscription_id: newSubscription.id,
+              subscription_status: newSubscription.status,
+              monthly_request_limit: 300,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id)
+
+          console.log('Successfully created subscription directly:', newSubscription.id)
+
+          return NextResponse.json({
+            success: true,
+            message: 'Subscription upgraded successfully',
+            redirect: `${baseUrl}/dashboard/billing?upgraded=true`
+          })
+        } else {
+          console.log('Customer has no saved payment methods, falling back to checkout')
+        }
+      } catch (error) {
+        console.error('Error creating subscription directly:', error)
+        console.log('Falling back to checkout flow')
+      }
+    }
+
+    // Final fallback: Create new checkout session (for users without existing customer or failed direct creation)
     const sessionConfig: any = {
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -178,21 +298,6 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
     }
 
-    // Check if user is currently in trial and preserve trial period
-    const isTrialing = (profile as any).subscription_status === 'trialing'
-    let trialEndsAt = (profile as any).trial_ends_at ? new Date((profile as any).trial_ends_at) : null
-    const now = new Date()
-
-    // If user is trialing but has no trial_ends_at, calculate it from their account creation
-    if (isTrialing && !trialEndsAt) {
-      const { calculateTrialEndDate } = await import('@/lib/pricing')
-      const accountCreated = (profile as any).created_at ? new Date((profile as any).created_at) : new Date()
-      trialEndsAt = calculateTrialEndDate(accountCreated)
-      console.log(`User trialing but missing trial_ends_at, calculated: ${trialEndsAt.toISOString()}`)
-    }
-
-    const hasActiveTrialTime = trialEndsAt && trialEndsAt > now
-
     // If user has active trial time remaining, preserve it in the new subscription
     if (isTrialing && hasActiveTrialTime && trialEndsAt) {
       const trialDaysRemaining = Math.ceil((trialEndsAt.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
@@ -209,19 +314,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Get customer ID from profile or try to get it from existing subscription
-    let customerId = (profile as any).stripe_customer_id
-
-    if (!customerId && (profile as any).stripe_subscription_id) {
-      try {
-        const subscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
-        customerId = subscription.customer as string
-      } catch (error) {
-        console.error('Error retrieving customer from subscription:', error)
-      }
-    }
-
-    // If we have existing Stripe customer, use it; otherwise use email to create new one
+    // Use existing customer ID if available, otherwise use email to create new one
     if (customerId) {
       sessionConfig.customer = customerId
     } else {
