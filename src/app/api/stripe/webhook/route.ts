@@ -64,6 +64,15 @@ export async function POST(request: NextRequest) {
           const priceId = subscription.items.data[0]?.price.id
           const priceInfo = getPriceInfo(priceId)
 
+          console.log('Webhook processing checkout:', {
+            userId,
+            priceId,
+            priceInfo,
+            subscriptionStatus: subscription.status,
+            subscriptionId: subscription.id,
+            customerId: subscription.customer
+          })
+
           if (!priceInfo) {
             console.error('Unknown price ID:', priceId)
             break
@@ -100,6 +109,8 @@ export async function POST(request: NextRequest) {
             updateData.billing_cycle_date = calculateBillingCycleDate(new Date())
           }
 
+          console.log('Updating profile with data:', updateData)
+
           // Update existing profile with subscription info (don't overwrite created_at)
           const { error: updateError } = await (supabase as any)
             .from('profiles')
@@ -108,25 +119,33 @@ export async function POST(request: NextRequest) {
 
           // If update failed because profile doesn't exist, create it
           if (updateError && updateError.code === 'PGRST116') {
+            const insertData = {
+              id: userId,
+              email: session.customer_details?.email || '',
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: subscription.id,
+              subscription_status: subscription.status,
+              monthly_request_limit: priceInfo.monthlyRequestLimit,
+              trial_ends_at: trialEnd.toISOString(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }
+
+            console.log('Creating new profile with data:', insertData)
+
             const { error: insertError } = await (supabase as any)
               .from('profiles')
-              .insert({
-                id: userId,
-                email: session.customer_details?.email || '',
-                stripe_customer_id: session.customer as string,
-                stripe_subscription_id: subscription.id,
-                subscription_status: subscription.status,
-                monthly_request_limit: priceInfo.monthlyRequestLimit,
-                trial_ends_at: trialEnd.toISOString(),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              })
+              .insert(insertData)
 
             if (insertError) {
               console.error('Error creating profile after checkout:', insertError)
+            } else {
+              console.log('Successfully created new profile')
             }
           } else if (updateError) {
             console.error('Error updating profile after checkout:', updateError)
+          } else {
+            console.log('Successfully updated existing profile')
           }
 
           console.log(`Subscription created for user ${userId}:`, {

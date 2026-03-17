@@ -77,6 +77,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Log profile for debugging
+    console.log('Create checkout - Current profile:', {
+      id: user.id,
+      monthly_request_limit: (profile as any)?.monthly_request_limit,
+      subscription_status: (profile as any)?.subscription_status,
+      stripe_subscription_id: (profile as any)?.stripe_subscription_id,
+      trial_ends_at: (profile as any)?.trial_ends_at
+    })
+
     // Check if user already has an active subscription
     if ((profile as any).stripe_subscription_id &&
         ((profile as any).subscription_status === 'active' || (profile as any).subscription_status === 'trialing')) {

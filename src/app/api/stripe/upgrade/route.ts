@@ -78,6 +78,15 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const growthPriceId = process.env.STRIPE_GROWTH_PRICE_ID!
 
+    console.log('Upgrade - Current profile state:', {
+      userId: user.id,
+      monthly_request_limit: (profile as any).monthly_request_limit,
+      subscription_status: (profile as any).subscription_status,
+      stripe_subscription_id: (profile as any).stripe_subscription_id,
+      stripe_customer_id: (profile as any).stripe_customer_id,
+      trial_ends_at: (profile as any).trial_ends_at
+    })
+
     // If user has an existing subscription, try to modify it directly
     if ((profile as any).stripe_subscription_id) {
       try {
@@ -171,17 +180,33 @@ export async function POST(request: NextRequest) {
 
     // Check if user is currently in trial and preserve trial period
     const isTrialing = (profile as any).subscription_status === 'trialing'
-    const trialEndsAt = (profile as any).trial_ends_at ? new Date((profile as any).trial_ends_at) : null
+    let trialEndsAt = (profile as any).trial_ends_at ? new Date((profile as any).trial_ends_at) : null
     const now = new Date()
+
+    // If user is trialing but has no trial_ends_at, calculate it from their account creation
+    if (isTrialing && !trialEndsAt) {
+      const { calculateTrialEndDate } = await import('@/lib/pricing')
+      const accountCreated = (profile as any).created_at ? new Date((profile as any).created_at) : new Date()
+      trialEndsAt = calculateTrialEndDate(accountCreated)
+      console.log(`User trialing but missing trial_ends_at, calculated: ${trialEndsAt.toISOString()}`)
+    }
+
     const hasActiveTrialTime = trialEndsAt && trialEndsAt > now
 
     // If user has active trial time remaining, preserve it in the new subscription
-    if (isTrialing && hasActiveTrialTime) {
+    if (isTrialing && hasActiveTrialTime && trialEndsAt) {
       const trialDaysRemaining = Math.ceil((trialEndsAt.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
       if (trialDaysRemaining > 0) {
         sessionConfig.subscription_data.trial_period_days = trialDaysRemaining
-        console.log(`Preserving ${trialDaysRemaining} trial days for upgrade`)
+        console.log(`Preserving ${trialDaysRemaining} trial days for upgrade (trial ends: ${trialEndsAt.toISOString()})`)
       }
+    } else if (isTrialing) {
+      // User is marked as trialing but trial has ended or no trial end date
+      console.log('User trialing but no active trial time found:', {
+        trialEndsAt: trialEndsAt?.toISOString(),
+        now: now.toISOString(),
+        hasActiveTrialTime
+      })
     }
 
     // Get customer ID from profile or try to get it from existing subscription
