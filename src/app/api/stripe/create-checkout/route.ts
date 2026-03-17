@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // UPDATE: Set the correct monthly_request_limit immediately based on selected plan
+    // UPDATE: Set the correct monthly_request_limit and billing_cycle_date immediately
     // Handle both planKey and priceId scenarios
     let selectedPlan = null
     let planType = 'unknown'
@@ -121,19 +121,29 @@ export async function POST(request: NextRequest) {
     }
 
     if (selectedPlan) {
+      // Import billing cycle calculation function
+      const { calculateBillingCycleDate } = await import('@/lib/billing-cycle')
+
+      const updateData: any = {
+        monthly_request_limit: selectedPlan.monthlyRequestLimit,
+        updated_at: new Date().toISOString()
+      }
+
+      // Set billing cycle date if user doesn't have one
+      if (!profile || !(profile as any).billing_cycle_date) {
+        updateData.billing_cycle_date = calculateBillingCycleDate(new Date())
+      }
+
       const { error: updateError } = await (supabase as any)
         .from('profiles')
-        .update({
-          monthly_request_limit: selectedPlan.monthlyRequestLimit,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', user.id)
 
       if (updateError) {
-        console.error('Error updating monthly limit:', updateError)
+        console.error('Error updating profile:', updateError)
         // Don't fail checkout, but log the error
       } else {
-        console.log(`Updated user ${user.id} to ${selectedPlan.monthlyRequestLimit} credits for ${planType} plan`)
+        console.log(`Updated user ${user.id} to ${selectedPlan.monthlyRequestLimit} credits for ${planType} plan`, updateData)
       }
     } else {
       console.warn('Could not determine plan to set monthly_request_limit')

@@ -94,12 +94,17 @@ export async function POST(request: NextRequest) {
             }],
           }
 
-          // If subscription is trialing, don't prorate - just update the plan and preserve trial
+          // If subscription is trialing, don't prorate and preserve trial
           if (existingSubscription.status === 'trialing') {
             updateConfig.proration_behavior = 'none'
-            // Preserve trial end date if it exists
+            // Preserve trial end date if it exists and is in the future
             if (existingSubscription.trial_end) {
-              updateConfig.trial_end = existingSubscription.trial_end
+              const trialEndDate = new Date(existingSubscription.trial_end * 1000)
+              const now = new Date()
+              if (trialEndDate > now) {
+                updateConfig.trial_end = existingSubscription.trial_end
+                console.log(`Preserving trial end date: ${trialEndDate.toISOString()}`)
+              }
             }
           } else {
             updateConfig.proration_behavior = 'always_invoice' // Prorate the difference
@@ -162,6 +167,21 @@ export async function POST(request: NextRequest) {
       success_url: `${baseUrl}/dashboard/billing?upgraded=true`,
       cancel_url: `${baseUrl}/dashboard/billing`,
       allow_promotion_codes: true,
+    }
+
+    // Check if user is currently in trial and preserve trial period
+    const isTrialing = (profile as any).subscription_status === 'trialing'
+    const trialEndsAt = (profile as any).trial_ends_at ? new Date((profile as any).trial_ends_at) : null
+    const now = new Date()
+    const hasActiveTrialTime = trialEndsAt && trialEndsAt > now
+
+    // If user has active trial time remaining, preserve it in the new subscription
+    if (isTrialing && hasActiveTrialTime) {
+      const trialDaysRemaining = Math.ceil((trialEndsAt.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+      if (trialDaysRemaining > 0) {
+        sessionConfig.subscription_data.trial_period_days = trialDaysRemaining
+        console.log(`Preserving ${trialDaysRemaining} trial days for upgrade`)
+      }
     }
 
     // Get customer ID from profile or try to get it from existing subscription

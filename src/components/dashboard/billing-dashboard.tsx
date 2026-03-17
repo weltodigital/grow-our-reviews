@@ -295,7 +295,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
           {/* Usage Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Message credits used this month</span>
+              <span>Message credits used this period</span>
               <span>{usage.requestsSent} of {profile.monthly_request_limit}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -311,14 +311,25 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               {billingStats.daysUntilReset && (
                 <div>Credits reset in {billingStats.daysUntilReset} day{billingStats.daysUntilReset !== 1 ? 's' : ''}</div>
               )}
-              {profile.billing_cycle_date && (
-                <div className="space-y-1">
-                  <div>Next reset: {getNextBillingDate(profile.billing_cycle_date).toLocaleDateString('en-GB')}</div>
-                  <div>Monthly cycle: {profile.billing_cycle_date}{getOrdinalSuffix(profile.billing_cycle_date)} of each month</div>
-                </div>
-              )}
             </div>
           </div>
+
+          {/* Credit Reset Information - More Prominent */}
+          {profile.billing_cycle_date && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="h-4 w-4 text-blue-600" />
+                <span className="font-medium text-blue-900">Credit Reset Schedule</span>
+              </div>
+              <div className="text-sm text-blue-700 space-y-1">
+                <div><strong>Next reset:</strong> {getNextBillingDate(profile.billing_cycle_date).toLocaleDateString('en-GB')}</div>
+                <div><strong>Reset day:</strong> {profile.billing_cycle_date}{getOrdinalSuffix(profile.billing_cycle_date)} of each month</div>
+                {billingStats.daysUntilReset && (
+                  <div><strong>Days remaining:</strong> {billingStats.daysUntilReset} day{billingStats.daysUntilReset !== 1 ? 's' : ''}</div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Plan Features */}
           <div className="border-t pt-4">
