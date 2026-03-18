@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
             trialEnd: trialEnd.toISOString(),
           })
 
-          // Send subscription confirmation email
+          // Send welcome email first (when user officially starts trial)
           try {
               const { data: profile } = await (supabase as any)
                 .from('profiles')
@@ -164,6 +164,23 @@ export async function POST(request: NextRequest) {
                 .single()
 
               if (profile?.email) {
+                console.log('Sending welcome email after successful checkout to:', profile.email)
+
+                // Send welcome email
+                await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    email: profile.email,
+                    businessName: profile.business_name,
+                  }),
+                })
+
+                console.log('Welcome email sent, now sending subscription confirmation')
+
+                // Send subscription confirmation email
                 await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-confirmation`, {
                   method: 'POST',
                   headers: {
@@ -177,7 +194,7 @@ export async function POST(request: NextRequest) {
                 })
               }
             } catch (error) {
-              console.error('Failed to send subscription confirmation email:', error)
+              console.error('Failed to send welcome or subscription confirmation email:', error)
             }
         }
         break

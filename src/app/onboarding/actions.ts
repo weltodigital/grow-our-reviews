@@ -88,22 +88,7 @@ export async function completeOnboarding(data: OnboardingData) {
     // Don't fail onboarding if templates fail - they can be created later
   }
 
-  // Send welcome email directly (no need for HTTP request in server action)
-  try {
-    const { sendWelcomeEmail } = await import('@/lib/resend')
-    console.log('Sending welcome email to:', user.email)
-
-    const result = await sendWelcomeEmail(user.email!, data.businessName.trim())
-
-    if (result.success) {
-      console.log('Welcome email sent successfully to:', user.email)
-    } else {
-      console.error('Welcome email failed:', result.error)
-    }
-  } catch (error) {
-    // Don't fail onboarding if email fails
-    console.error('Failed to send welcome email:', error)
-  }
+  // Welcome email will be sent after Stripe checkout completion via webhook
 
   return { success: true }
 }
