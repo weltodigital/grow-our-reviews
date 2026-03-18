@@ -88,27 +88,17 @@ export async function completeOnboarding(data: OnboardingData) {
     // Don't fail onboarding if templates fail - they can be created later
   }
 
-  // Send welcome email
+  // Send welcome email directly (no need for HTTP request in server action)
   try {
-    const emailUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`
-    console.log('Sending welcome email to:', user.email, 'URL:', emailUrl)
+    const { sendWelcomeEmail } = await import('@/lib/resend')
+    console.log('Sending welcome email to:', user.email)
 
-    const response = await fetch(emailUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: user.email,
-        businessName: data.businessName.trim(),
-      }),
-    })
+    const result = await sendWelcomeEmail(user.email!, data.businessName.trim())
 
-    if (response.ok) {
+    if (result.success) {
       console.log('Welcome email sent successfully to:', user.email)
     } else {
-      const errorText = await response.text()
-      console.error('Welcome email failed:', response.status, errorText)
+      console.error('Welcome email failed:', result.error)
     }
   } catch (error) {
     // Don't fail onboarding if email fails
