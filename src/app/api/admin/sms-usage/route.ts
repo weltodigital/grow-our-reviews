@@ -33,12 +33,11 @@ export async function GET(request: NextRequest) {
       .eq('date', today)
       .order('hour')
 
-    // Get last 7 days daily totals
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-
+    // Get today's daily total using direct query
     const { data: dailyUsage, error: dailyError } = await supabase
-      .rpc('get_sms_usage', { target_date: today, target_hour: null })
+      .from('sms_usage_tracking')
+      .select('sms_count')
+      .eq('date', today)
 
     // Get rate limits
     const { data: rateLimits } = await supabase
@@ -46,12 +45,15 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('is_active', true)
 
+    // Calculate daily total from hourly breakdown
+    const dailyTotal = dailyUsage?.reduce((sum, hour) => sum + (hour.sms_count || 0), 0) || 0
+
     return NextResponse.json({
       status: usageStatus,
       today: {
         date: today,
         hourlyBreakdown: hourlyUsage || [],
-        totalUsage: dailyUsage?.[0]?.sms_count || 0
+        totalUsage: dailyTotal
       },
       rateLimits: rateLimits || [],
       timestamp: new Date().toISOString()
