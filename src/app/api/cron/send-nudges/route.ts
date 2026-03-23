@@ -176,13 +176,32 @@ export async function GET(request: NextRequest) {
             messageSid: smsResult.messageSid,
           })
         } else {
-          sentCount.failed++
-          results.push({
-            id: (request as any).id,
-            customer: (request as any).customers.name,
-            status: 'failed',
-            error: smsResult.error,
-          })
+          // Handle rate limited vs other failures differently
+          if (smsResult.rateLimited) {
+            // For nudges, we already marked nudge_sent as true, which is correct
+            // We don't want to re-send nudges if they hit rate limits
+            console.log(`Nudge SMS rate limited for request ${(request as any).id}`)
+
+            sentCount.failed++
+            results.push({
+              id: (request as any).id,
+              customer: (request as any).customers.name,
+              status: 'rate_limited',
+              error: smsResult.error,
+            })
+
+            // Break the loop to avoid hitting rate limits on remaining messages
+            console.log('SMS rate limit reached - stopping nudge SMS sending for this batch')
+            break
+          } else {
+            sentCount.failed++
+            results.push({
+              id: (request as any).id,
+              customer: (request as any).customers.name,
+              status: 'failed',
+              error: smsResult.error,
+            })
+          }
         }
 
         // Add a small delay between SMS sends to respect rate limits

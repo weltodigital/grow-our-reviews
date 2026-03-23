@@ -194,24 +194,42 @@ export async function GET(request: NextRequest) {
             })
           }
         } else {
-          // Mark as failed
-          const { error: updateError } = await (supabase as any)
-            .from('review_requests')
-            .update({
-              status: 'failed',
+          // Handle rate limited vs other failures differently
+          if (smsResult.rateLimited) {
+            // Don't mark as failed if rate limited - leave as scheduled to retry later
+            console.log(`SMS rate limited for request ${(request as any).id}, will retry later`)
+
+            sentCount.failed++
+            results.push({
+              id: (request as any).id,
+              customer: (request as any).customers.name,
+              status: 'rate_limited',
+              error: smsResult.error,
             })
-            .eq('id', (request as any).id)
 
-          sentCount.failed++
-          results.push({
-            id: (request as any).id,
-            customer: (request as any).customers.name,
-            status: 'failed',
-            error: smsResult.error,
-          })
+            // Break the loop to avoid hitting rate limits on remaining messages
+            console.log('SMS rate limit reached - stopping SMS sending for this batch')
+            break
+          } else {
+            // Mark as failed for other errors (invalid phone number, etc.)
+            const { error: updateError } = await (supabase as any)
+              .from('review_requests')
+              .update({
+                status: 'failed',
+              })
+              .eq('id', (request as any).id)
 
-          if (updateError) {
-            console.error(`Error updating failed request ${(request as any).id}:`, updateError)
+            sentCount.failed++
+            results.push({
+              id: (request as any).id,
+              customer: (request as any).customers.name,
+              status: 'failed',
+              error: smsResult.error,
+            })
+
+            if (updateError) {
+              console.error(`Error updating failed request ${(request as any).id}:`, updateError)
+            }
           }
         }
 

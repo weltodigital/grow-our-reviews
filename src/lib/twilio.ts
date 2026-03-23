@@ -1,9 +1,16 @@
 import { Twilio } from 'twilio'
+import { createSMSRateLimiter } from './sms-rate-limiter'
 
 // Initialize Twilio client
 const twilioClient = new Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!
+)
+
+// Initialize SMS rate limiter
+const smsRateLimiter = createSMSRateLimiter(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 export interface SMSTemplate {
@@ -93,13 +100,39 @@ export async function sendSMS(to: string, message: string): Promise<{
   success: boolean
   messageSid?: string
   error?: string
+  rateLimited?: boolean
 }> {
   try {
+    // Check SMS rate limits before sending
+    const rateLimitCheck = await smsRateLimiter.canSendSMS()
+
+    if (!rateLimitCheck.allowed) {
+      console.warn(`SMS rate limit exceeded: ${rateLimitCheck.message}`)
+
+      // Send alert if we haven't already
+      await smsRateLimiter.checkAndAlert()
+
+      return {
+        success: false,
+        rateLimited: true,
+        error: `Rate limit exceeded: ${rateLimitCheck.message}`,
+      }
+    }
+
+    // Log usage info for monitoring
+    console.log(`SMS rate limiter: ${rateLimitCheck.message} (${Math.round(rateLimitCheck.percentage)}%)`)
+
     const twilioResponse = await twilioClient.messages.create({
       body: message,
       from: process.env.TWILIO_PHONE_NUMBER!,
       to: to,
     })
+
+    // Increment usage counter after successful send
+    await smsRateLimiter.incrementUsage()
+
+    // Check if we need to send usage alerts
+    await smsRateLimiter.checkAndAlert()
 
     return {
       success: true,
@@ -131,5 +164,8 @@ export async function sendSMS(to: string, message: string): Promise<{
     }
   }
 }
+
+// Export rate limiter for use in cron jobs if needed
+export { smsRateLimiter }
 
 export { twilioClient }
