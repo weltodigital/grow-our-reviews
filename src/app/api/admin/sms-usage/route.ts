@@ -27,14 +27,14 @@ export async function GET(request: NextRequest) {
 
     // Get today's hourly breakdown
     const today = new Date().toISOString().split('T')[0]
-    const { data: hourlyUsage, error } = await supabase
+    const { data: hourlyUsage, error } = await (supabase as any)
       .from('sms_usage_tracking')
       .select('hour, sms_count')
       .eq('date', today)
       .order('hour')
 
     // Get rate limits
-    const { data: rateLimits } = await supabase
+    const { data: rateLimits } = await (supabase as any)
       .from('sms_rate_limits')
       .select('*')
       .eq('is_active', true)
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('sms_rate_limits')
       .update({
         limit_value: limitValue,
