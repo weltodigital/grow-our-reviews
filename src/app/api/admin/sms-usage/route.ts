@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
 
     // Calculate daily total from hourly breakdown
-    const dailyTotal = hourlyUsage?.reduce((sum, hour: any) => sum + (hour.sms_count || 0), 0) || 0
+    const dailyTotal = hourlyUsage?.reduce((sum: number, hour: any) => sum + (hour.sms_count || 0), 0) || 0
 
     return NextResponse.json({
       status: usageStatus,
