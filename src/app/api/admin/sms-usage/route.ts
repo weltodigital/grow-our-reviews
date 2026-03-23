@@ -33,12 +33,6 @@ export async function GET(request: NextRequest) {
       .eq('date', today)
       .order('hour')
 
-    // Get today's daily total using direct query
-    const { data: dailyUsage, error: dailyError } = await supabase
-      .from('sms_usage_tracking')
-      .select('sms_count')
-      .eq('date', today)
-
     // Get rate limits
     const { data: rateLimits } = await supabase
       .from('sms_rate_limits')
@@ -46,7 +40,7 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
 
     // Calculate daily total from hourly breakdown
-    const dailyTotal = dailyUsage?.reduce((sum, hour) => sum + (hour.sms_count || 0), 0) || 0
+    const dailyTotal = hourlyUsage?.reduce((sum, hour) => sum + (hour.sms_count || 0), 0) || 0
 
     return NextResponse.json({
       status: usageStatus,
