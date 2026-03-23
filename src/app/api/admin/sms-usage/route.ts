@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
     const { data: dailyUsage, error: dailyError } = await supabase
-      .rpc('get_sms_usage', { target_date: today })
+      .rpc('get_sms_usage', { target_date: today, target_hour: null })
 
     // Get rate limits
     const { data: rateLimits } = await supabase
