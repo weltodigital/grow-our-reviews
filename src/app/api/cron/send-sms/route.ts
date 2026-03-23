@@ -51,12 +51,18 @@ export async function GET(request: NextRequest) {
     // Find all review requests that should be sent now
     const now = new Date().toISOString()
 
-    // First, get the review requests without JOINs
+    // Get review requests - both scheduled and queued messages
+    // Priority order:
+    // 1. Scheduled messages by scheduled_for (oldest first)
+    // 2. Queued messages by scheduled_for (oldest first)
+    // This ensures fair FIFO processing regardless of status
     const { data: reviewRequests, error: fetchError } = await (supabase as any)
       .from('review_requests')
       .select('*')
-      .eq('status', 'scheduled')
+      .in('status', ['scheduled', 'queued'])
       .lte('scheduled_for', now)
+      .order('scheduled_for', { ascending: true })
+      .order('created_at', { ascending: true }) // Secondary sort for same scheduled_for
       .limit(50) // Process in batches to avoid timeouts
 
     if (fetchError) {
@@ -111,6 +117,37 @@ export async function GET(request: NextRequest) {
       customers: customerMap.get(request.customer_id)
     })).filter((request: any) => request.profiles && request.customers)
 
+    // For fairness, interleave requests from different users if we have queued messages
+    // This prevents one user's bulk upload from monopolizing the queue
+    const hasQueuedMessages = pendingRequests.some((req: any) => req.status === 'queued')
+
+    if (hasQueuedMessages && pendingRequests.length > 10) {
+      // Group by user_id while maintaining order within each user's messages
+      const userGroups = new Map()
+      pendingRequests.forEach((req: any) => {
+        if (!userGroups.has(req.user_id)) {
+          userGroups.set(req.user_id, [])
+        }
+        userGroups.get(req.user_id).push(req)
+      })
+
+      // Round-robin through users to create a fair interleaved order
+      const interleavedRequests = []
+      const userArrays = Array.from(userGroups.values())
+      let maxLength = Math.max(...userArrays.map((arr: any[]) => arr.length))
+
+      for (let i = 0; i < maxLength; i++) {
+        for (const userArray of userArrays) {
+          if (i < userArray.length) {
+            interleavedRequests.push(userArray[i])
+          }
+        }
+      }
+
+      console.log(`Interleaved ${pendingRequests.length} requests from ${userGroups.size} users for fairness`)
+      pendingRequests.splice(0, pendingRequests.length, ...interleavedRequests)
+    }
+
     if (!pendingRequests || pendingRequests.length === 0) {
       return NextResponse.json({
         message: 'No messages to send after filtering',
@@ -162,8 +199,8 @@ export async function GET(request: NextRequest) {
           } : undefined
         })
 
-        // Send SMS
-        const smsResult = await sendSMS((request as any).customers.phone, message)
+        // Send SMS (pass user_id for per-user rate limiting)
+        const smsResult = await sendSMS((request as any).customers.phone, message, (request as any).user_id)
 
         if (smsResult.success) {
           // Update request status to 'sent'
@@ -196,20 +233,37 @@ export async function GET(request: NextRequest) {
         } else {
           // Handle rate limited vs other failures differently
           if (smsResult.rateLimited) {
-            // Don't mark as failed if rate limited - leave as scheduled to retry later
-            console.log(`SMS rate limited for request ${(request as any).id}, will retry later`)
+            // Mark as queued with reason instead of keeping as scheduled
+            const { error: updateError } = await (supabase as any)
+              .from('review_requests')
+              .update({
+                status: 'queued',
+                queued_reason: smsResult.queuedReason || 'rate_limited',
+                queued_at: new Date().toISOString()
+              })
+              .eq('id', (request as any).id)
+
+            console.log(`SMS rate limited for request ${(request as any).id}, marked as queued`)
 
             sentCount.failed++
             results.push({
               id: (request as any).id,
               customer: (request as any).customers.name,
-              status: 'rate_limited',
+              status: 'queued',
+              queuedReason: smsResult.queuedReason,
               error: smsResult.error,
             })
 
-            // Break the loop to avoid hitting rate limits on remaining messages
-            console.log('SMS rate limit reached - stopping SMS sending for this batch')
-            break
+            if (updateError) {
+              console.error(`Error updating queued request ${(request as any).id}:`, updateError)
+            }
+
+            // For per-user limits, continue to other users' messages
+            // For platform limits, stop processing entirely
+            if (smsResult.queuedReason?.includes('platform_')) {
+              console.log('Platform SMS rate limit reached - stopping SMS sending for this batch')
+              break
+            }
           } else {
             // Mark as failed for other errors (invalid phone number, etc.)
             const { error: updateError } = await (supabase as any)

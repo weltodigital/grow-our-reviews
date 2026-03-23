@@ -5,11 +5,12 @@ import {
   Star,
   MessageSquare,
   XCircle,
-  Calendar
+  Calendar,
+  Timer
 } from 'lucide-react'
 
 interface StatusBadgeProps {
-  status: 'scheduled' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed'
+  status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed'
   showIcon?: boolean
 }
 
@@ -21,6 +22,12 @@ export function StatusBadge({ status, showIcon = true }: StatusBadgeProps) {
           label: 'Scheduled',
           icon: Calendar,
           className: 'bg-blue-100 text-blue-700 border-blue-200',
+        }
+      case 'queued':
+        return {
+          label: 'Queued',
+          icon: Timer,
+          className: 'bg-amber-100 text-amber-700 border-amber-200',
         }
       case 'sent':
         return {

@@ -99,6 +99,8 @@ export interface Database {
           nudge_sent: boolean
           nudge_sent_at: string | null
           token: string
+          queued_reason: string | null
+          queued_at: string | null
           created_at: string
         }
         Insert: {
@@ -113,6 +115,8 @@ export interface Database {
           nudge_sent?: boolean
           nudge_sent_at?: string | null
           token?: string
+          queued_reason?: string | null
+          queued_at?: string | null
           created_at?: string
         }
         Update: {
@@ -127,6 +131,8 @@ export interface Database {
           nudge_sent?: boolean
           nudge_sent_at?: string | null
           token?: string
+          queued_reason?: string | null
+          queued_at?: string | null
           created_at?: string
         }
       }

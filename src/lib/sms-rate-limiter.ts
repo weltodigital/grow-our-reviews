@@ -14,11 +14,13 @@ export interface SMSUsageCheck {
   limit: number
   percentage: number
   message?: string
+  queuedReason?: string
+  limitType?: 'platform' | 'user'
 }
 
 export interface SMSRateLimiter {
-  canSendSMS(): Promise<SMSUsageCheck>
-  incrementUsage(): Promise<void>
+  canSendSMS(userId?: string): Promise<SMSUsageCheck>
+  incrementUsage(userId?: string): Promise<void>
   checkAndAlert(): Promise<void>
 }
 
@@ -79,11 +81,54 @@ class SMSRateLimiterImpl implements SMSRateLimiter {
     }
   }
 
-  async canSendSMS(): Promise<SMSUsageCheck> {
+  private async getUserUsage(userId: string, date: string, hour?: number): Promise<number> {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('get_user_sms_usage', {
+          target_user_id: userId,
+          target_date: date,
+          target_hour: hour
+        })
+
+      if (error) {
+        console.error('Error getting user SMS usage:', error)
+        return 0
+      }
+
+      return data?.[0]?.sms_count || 0
+    } catch (error) {
+      console.error('Error in getUserUsage:', error)
+      return 0
+    }
+  }
+
+  async canSendSMS(userId?: string): Promise<SMSUsageCheck> {
     try {
       const { date, hour } = this.getCurrentDateTime()
       const rateLimits = await this.getRateLimits()
 
+      // First check per-user limits if userId provided
+      if (userId) {
+        const perUserLimit = rateLimits.find(limit => limit.limit_type === 'per_user_hourly')
+        if (perUserLimit) {
+          const userHourlyUsage = await this.getUserUsage(userId, date, hour)
+          const userPercentage = (userHourlyUsage / perUserLimit.limit_value) * 100
+
+          if (userHourlyUsage >= perUserLimit.limit_value) {
+            return {
+              allowed: false,
+              currentUsage: userHourlyUsage,
+              limit: perUserLimit.limit_value,
+              percentage: userPercentage,
+              limitType: 'user',
+              queuedReason: 'per_user_hourly_limit',
+              message: `User hourly SMS limit exceeded: ${userHourlyUsage}/${perUserLimit.limit_value}`
+            }
+          }
+        }
+      }
+
+      // Then check platform-wide limits
       // Check hourly limit first (more restrictive)
       const hourlyLimit = rateLimits.find(limit => limit.limit_type === 'hourly')
       if (hourlyLimit) {
@@ -96,7 +141,9 @@ class SMSRateLimiterImpl implements SMSRateLimiter {
             currentUsage: hourlyUsage,
             limit: hourlyLimit.limit_value,
             percentage: hourlyPercentage,
-            message: `Hourly SMS limit exceeded: ${hourlyUsage}/${hourlyLimit.limit_value}`
+            limitType: 'platform',
+            queuedReason: 'platform_hourly_limit',
+            message: `Platform hourly SMS limit exceeded: ${hourlyUsage}/${hourlyLimit.limit_value}`
           }
         }
       }
@@ -113,7 +160,9 @@ class SMSRateLimiterImpl implements SMSRateLimiter {
             currentUsage: dailyUsage,
             limit: dailyLimit.limit_value,
             percentage: dailyPercentage,
-            message: `Daily SMS limit exceeded: ${dailyUsage}/${dailyLimit.limit_value}`
+            limitType: 'platform',
+            queuedReason: 'platform_daily_limit',
+            message: `Platform daily SMS limit exceeded: ${dailyUsage}/${dailyLimit.limit_value}`
           }
         }
       }
@@ -121,19 +170,33 @@ class SMSRateLimiterImpl implements SMSRateLimiter {
       // Return the most restrictive current usage percentage for monitoring
       const hourlyUsage = hourlyLimit ? await this.getCurrentUsage(date, hour) : 0
       const dailyUsage = dailyLimit ? await this.getCurrentUsage(date) : 0
+      const userHourlyUsage = userId ? await this.getUserUsage(userId, date, hour) : 0
 
       const hourlyPercentage = hourlyLimit ? (hourlyUsage / hourlyLimit.limit_value) * 100 : 0
       const dailyPercentage = dailyLimit ? (dailyUsage / dailyLimit.limit_value) * 100 : 0
+      const userPercentage = userId ? (userHourlyUsage / 30) * 100 : 0 // Default per-user limit of 30
 
-      const maxPercentage = Math.max(hourlyPercentage, dailyPercentage)
-      const isHourly = hourlyPercentage >= dailyPercentage
+      const maxPercentage = Math.max(hourlyPercentage, dailyPercentage, userPercentage)
+      const isHourly = hourlyPercentage >= dailyPercentage && hourlyPercentage >= userPercentage
+      const isDaily = dailyPercentage >= hourlyPercentage && dailyPercentage >= userPercentage
+      const isUser = userPercentage >= hourlyPercentage && userPercentage >= dailyPercentage
+
+      let message = 'SMS usage: '
+      if (isUser && userId) {
+        message += `${userHourlyUsage}/30 user hourly`
+      } else if (isHourly) {
+        message += `${hourlyUsage}/${hourlyLimit?.limit_value} platform hourly`
+      } else {
+        message += `${dailyUsage}/${dailyLimit?.limit_value} platform daily`
+      }
 
       return {
         allowed: true,
-        currentUsage: isHourly ? hourlyUsage : dailyUsage,
-        limit: isHourly ? (hourlyLimit?.limit_value || 0) : (dailyLimit?.limit_value || 0),
+        currentUsage: isUser ? userHourlyUsage : (isHourly ? hourlyUsage : dailyUsage),
+        limit: isUser ? 30 : (isHourly ? (hourlyLimit?.limit_value || 0) : (dailyLimit?.limit_value || 0)),
         percentage: maxPercentage,
-        message: `SMS usage: ${isHourly ? hourlyUsage + '/' + hourlyLimit?.limit_value + ' hourly' : dailyUsage + '/' + dailyLimit?.limit_value + ' daily'}`
+        limitType: isUser ? 'user' : 'platform',
+        message: message
       }
     } catch (error) {
       console.error('Error in canSendSMS:', error)
@@ -143,24 +206,41 @@ class SMSRateLimiterImpl implements SMSRateLimiter {
         currentUsage: 0,
         limit: 0,
         percentage: 100,
+        queuedReason: 'system_error',
         message: 'Error checking SMS limits - denying as safety measure'
       }
     }
   }
 
-  async incrementUsage(): Promise<void> {
+  async incrementUsage(userId?: string): Promise<void> {
     try {
       const { date, hour } = this.getCurrentDateTime()
 
-      const { error } = await this.supabase
+      // Increment platform-wide usage
+      const { error: platformError } = await this.supabase
         .rpc('increment_sms_usage', {
           target_date: date,
           target_hour: hour,
           increment_by: 1
         })
 
-      if (error) {
-        console.error('Error incrementing SMS usage:', error)
+      if (platformError) {
+        console.error('Error incrementing platform SMS usage:', platformError)
+      }
+
+      // Increment per-user usage if userId provided
+      if (userId) {
+        const { error: userError } = await this.supabase
+          .rpc('increment_user_sms_usage', {
+            target_user_id: userId,
+            target_date: date,
+            target_hour: hour,
+            increment_by: 1
+          })
+
+        if (userError) {
+          console.error('Error incrementing user SMS usage:', userError)
+        }
       }
     } catch (error) {
       console.error('Error in incrementUsage:', error)

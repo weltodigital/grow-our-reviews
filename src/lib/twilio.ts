@@ -96,15 +96,16 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
   return messageParts.join('\n')
 }
 
-export async function sendSMS(to: string, message: string): Promise<{
+export async function sendSMS(to: string, message: string, userId?: string): Promise<{
   success: boolean
   messageSid?: string
   error?: string
   rateLimited?: boolean
+  queuedReason?: string
 }> {
   try {
-    // Check SMS rate limits before sending
-    const rateLimitCheck = await smsRateLimiter.canSendSMS()
+    // Check SMS rate limits before sending (include userId for per-user limits)
+    const rateLimitCheck = await smsRateLimiter.canSendSMS(userId)
 
     if (!rateLimitCheck.allowed) {
       console.warn(`SMS rate limit exceeded: ${rateLimitCheck.message}`)
@@ -115,6 +116,7 @@ export async function sendSMS(to: string, message: string): Promise<{
       return {
         success: false,
         rateLimited: true,
+        queuedReason: rateLimitCheck.queuedReason,
         error: `Rate limit exceeded: ${rateLimitCheck.message}`,
       }
     }
@@ -128,8 +130,8 @@ export async function sendSMS(to: string, message: string): Promise<{
       to: to,
     })
 
-    // Increment usage counter after successful send
-    await smsRateLimiter.incrementUsage()
+    // Increment usage counter after successful send (include userId for per-user tracking)
+    await smsRateLimiter.incrementUsage(userId)
 
     // Check if we need to send usage alerts
     await smsRateLimiter.checkAndAlert()

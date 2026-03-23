@@ -151,8 +151,8 @@ export async function GET(request: NextRequest) {
           } : undefined
         })
 
-        // Send nudge SMS
-        const smsResult = await sendSMS((request as any).customers.phone, message)
+        // Send nudge SMS (pass user_id for per-user rate limiting)
+        const smsResult = await sendSMS((request as any).customers.phone, message, (request as any).profiles.id)
 
         // Update nudge_sent status regardless of SMS success/failure
         const { error: updateError } = await (supabase as any)
@@ -186,13 +186,17 @@ export async function GET(request: NextRequest) {
             results.push({
               id: (request as any).id,
               customer: (request as any).customers.name,
-              status: 'rate_limited',
+              status: 'nudge_rate_limited',
+              queuedReason: smsResult.queuedReason,
               error: smsResult.error,
             })
 
-            // Break the loop to avoid hitting rate limits on remaining messages
-            console.log('SMS rate limit reached - stopping nudge SMS sending for this batch')
-            break
+            // For per-user limits, continue to other users' messages
+            // For platform limits, stop processing entirely
+            if (smsResult.queuedReason?.includes('platform_')) {
+              console.log('Platform SMS rate limit reached - stopping nudge SMS sending for this batch')
+              break
+            }
           } else {
             sentCount.failed++
             results.push({

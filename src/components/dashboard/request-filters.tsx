@@ -6,6 +6,7 @@ interface RequestFiltersProps {
   statusCounts: {
     all: number
     scheduled: number
+    queued: number
     sent: number
     clicked: number
     reviewed: number
@@ -22,6 +23,7 @@ export function RequestFilters({
   const filters = [
     { key: 'all', label: 'All Requests', count: statusCounts.all, color: 'gray' },
     { key: 'scheduled', label: 'Scheduled', count: statusCounts.scheduled, color: 'blue' },
+    { key: 'queued', label: 'Queued', count: statusCounts.queued, color: 'amber' },
     { key: 'sent', label: 'Sent', count: statusCounts.sent, color: 'yellow' },
     { key: 'clicked', label: 'Clicked', count: statusCounts.clicked, color: 'orange' },
     { key: 'reviewed', label: 'Reviewed', count: statusCounts.reviewed, color: 'green' },
