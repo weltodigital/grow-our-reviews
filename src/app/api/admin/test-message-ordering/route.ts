@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         { name: 'Test Customer B2', phone: '+441234567004' },
       ]
 
-      const { data: customers, error: customerError } = await supabase
+      const { data: customers, error: customerError } = await (supabase as any)
         .from('customers')
         .insert(testCustomers.map(c => ({ ...c, user_id: testUserId })))
         .select()
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         }
       ]
 
-      const { error: requestError } = await supabase
+      const { error: requestError } = await (supabase as any)
         .from('review_requests')
         .insert(testRequests.map(r => ({
           ...r,
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       // Simulate the cron job ordering logic
       const now = new Date().toISOString()
 
-      const { data: reviewRequests, error: fetchError } = await supabase
+      const { data: reviewRequests, error: fetchError } = await (supabase as any)
         .from('review_requests')
         .select(`
           *,
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('review_requests')
       .select(`
         *,
