@@ -3,7 +3,7 @@ import type { Database } from '@/types/database'
 import { resend } from './resend'
 
 export interface SMSRateLimit {
-  limit_type: 'hourly' | 'daily'
+  limit_type: 'hourly' | 'daily' | 'per_user_hourly'
   limit_value: number
   is_active: boolean
 }

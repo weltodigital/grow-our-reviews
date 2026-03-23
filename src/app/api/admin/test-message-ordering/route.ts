@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         return reasons[0] || undefined
       }
 
-      const worstReason = getWorstCaseReason(queuedReasons)
+      const worstReason = getWorstCaseReason(queuedReasons as string[])
 
       return NextResponse.json({
         message: 'Message ordering test results',

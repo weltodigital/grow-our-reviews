@@ -13,7 +13,7 @@ export interface ReviewRequest {
   id: string
   customer_name: string
   customer_phone: string
-  status: 'scheduled' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed'
+  status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed'
   scheduled_for: string
   sent_at: string | null
   clicked_at: string | null
@@ -106,6 +106,7 @@ export default function RequestsPage() {
   const statusCounts = {
     all: requests.length,
     scheduled: requests.filter(r => r.status === 'scheduled').length,
+    queued: requests.filter(r => r.status === 'queued').length,
     sent: requests.filter(r => r.status === 'sent').length,
     clicked: requests.filter(r => r.status === 'clicked').length,
     reviewed: requests.filter(r => r.status === 'reviewed').length,
