@@ -48,11 +48,28 @@ export async function updateBusinessInfo(data: BusinessInfoData) {
     return { error: 'Business name is required' }
   }
 
-  // Basic URL validation (only if provided)
+  // Advanced Google URL validation (only if provided)
   if (data.googleReviewUrl) {
     try {
       new URL(data.googleReviewUrl)
-    } catch {
+
+      // Basic Google domain validation
+      const googleDomains = ['google.com', 'maps.google.com', 'search.google.com', 'goo.gl']
+      const url = new URL(data.googleReviewUrl)
+      const isGoogleDomain = googleDomains.some(domain =>
+        url.hostname === domain || url.hostname.endsWith('.' + domain)
+      )
+
+      if (!isGoogleDomain) {
+        return { error: 'Google Review URL must be from a Google domain (google.com, maps.google.com, etc.)' }
+      }
+
+      // Check for common incorrect URL patterns
+      if (url.pathname.includes('/place/') && !url.pathname.includes('/reviews/') && !url.search.includes('writereview')) {
+        return { error: 'This appears to be a Google Business Profile URL. You need the direct review URL that contains "writereview" or "reviews/write".' }
+      }
+
+    } catch (urlError) {
       return { error: 'Please enter a valid URL for your Google Reviews page' }
     }
   }

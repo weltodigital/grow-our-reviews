@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Building, ExternalLink, Save, HelpCircle, X } from 'lucide-react'
 import { updateBusinessInfo } from './settings-actions'
 import GoogleReviewGuide from '@/components/GoogleReviewGuide'
+import { GoogleUrlValidator } from '@/components/GoogleUrlValidator'
 import type { Database } from '@/types/database'
 
 interface BusinessInfoSettingsProps {
@@ -28,6 +29,7 @@ export function BusinessInfoSettings({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showGuide, setShowGuide] = useState(false)
+  const [isUrlValid, setIsUrlValid] = useState(true) // Start optimistic
 
   const hasChanges =
     businessName !== (profile.business_name || '') ||
@@ -61,14 +63,10 @@ export function BusinessInfoSettings({
       return
     }
 
-    // Basic URL validation (only if provided)
-    if (googleReviewUrl.trim()) {
-      try {
-        new URL(googleReviewUrl)
-      } catch {
-        setError('Please enter a valid URL for your Google Reviews page')
-        return
-      }
+    // Check URL validation status
+    if (googleReviewUrl.trim() && !isUrlValid) {
+      setError('Please fix the Google Review URL before saving. Check the validation feedback above.')
+      return
     }
 
     setIsSaving(true)
@@ -177,28 +175,18 @@ export function BusinessInfoSettings({
             onChange={(e) => handleInputChange('googleReviewUrl', e.target.value)}
             placeholder="https://search.google.com/local/writereview?placeid=..."
           />
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500">
-              Where customers go to leave public reviews. {!googleReviewUrl && <span className="text-orange-600">Required before sending review requests.</span>}
-            </p>
-            {googleReviewUrl && (
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="text-xs"
-              >
-                <a
-                  href={googleReviewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  Test URL
-                </a>
-              </Button>
-            )}
-          </div>
+          <p className="text-xs text-gray-500">
+            Where customers go to leave public reviews. {!googleReviewUrl && <span className="text-orange-600">Required before sending review requests.</span>}
+          </p>
+
+          {/* URL Validation */}
+          {googleReviewUrl && (
+            <GoogleUrlValidator
+              url={googleReviewUrl}
+              autoValidate={true}
+              onValidationChange={(valid) => setIsUrlValid(valid)}
+            />
+          )}
           {!googleReviewUrl && (
             <Button
               type="button"
