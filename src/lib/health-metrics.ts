@@ -64,7 +64,7 @@ export class HealthMetrics {
       }
 
       const metrics = this.getEmptyMetrics()
-      data?.forEach(row => {
+      data?.forEach((row: any) => {
         metrics[row.metric_type as HealthMetricType] = row.count
       })
 
@@ -95,7 +95,7 @@ export class HealthMetrics {
       // Group by date
       const groupedByDate: Record<string, Record<HealthMetricType, number>> = {}
 
-      data?.forEach(row => {
+      data?.forEach((row: any) => {
         if (!groupedByDate[row.date]) {
           groupedByDate[row.date] = this.getEmptyMetrics()
         }

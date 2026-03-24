@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     try {
       event = constructWebhookEvent(body, signature)
     } catch (error) {
-      logWebhookEvent(correlationId, 'error', 'Invalid webhook signature', { error: error.message })
+      logWebhookEvent(correlationId, 'error', 'Invalid webhook signature', { error: (error as any).message })
       return NextResponse.json({ received: true }, { status: 200 }) // Return 200 to prevent retries
     }
 
@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
       logWebhookEvent(correlationId, 'error', 'Webhook processing failed', {
         eventId: event.id,
         eventType: event.type,
-        error: error.message
+        error: (error as any).message
       })
-      await recordWebhookEvent(supabase, event.id, event.type, 'failed', event, error.message)
+      await recordWebhookEvent(supabase, event.id, event.type, 'failed', event, (error as any).message)
 
       // Track failed webhook
       try {
@@ -309,7 +309,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
             } catch (error) {
               logWebhookEvent(correlationId, 'error', 'Failed to send emails', {
                 userId,
-                error: error.message
+                error: (error as any).message
               })
               // Don't throw - email failures shouldn't fail the webhook
             }
@@ -471,7 +471,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
             } catch (error) {
               logWebhookEvent(correlationId, 'error', 'Failed to send payment failed email', {
                 subscriptionId,
-                error: error.message
+                error: (error as any).message
               })
               // Don't throw - email failures shouldn't fail the webhook
             }

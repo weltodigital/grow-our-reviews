@@ -59,14 +59,14 @@ export async function GET(request: Request) {
     console.log(`📊 Checking ${profiles.length} trials ending in next 3 days`)
 
     // Get usage data for these users
-    const userIds = profiles.map(p => p.id)
+    const userIds = (profiles as any[]).map((p: any) => p.id)
     const { data: requests } = await supabase
       .from('review_requests')
       .select('user_id, created_at')
       .in('user_id', userIds)
 
     // Group requests by user
-    const userRequests = (requests || []).reduce((acc, req) => {
+    const userRequests = (requests || []).reduce((acc: any, req: any) => {
       if (!acc[req.user_id]) acc[req.user_id] = []
       acc[req.user_id].push(req)
       return acc
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
     // Analyze each trial
     const warnings: TrialWarning[] = []
 
-    for (const profile of profiles) {
+    for (const profile of profiles as any[]) {
       const trialEnd = new Date(profile.trial_ends_at)
       const daysRemaining = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
       const userReqs = userRequests[profile.id] || []
@@ -141,7 +141,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('❌ Trial warning check failed:', error)
     return NextResponse.json(
-      { error: 'Trial warning check failed', details: error.message },
+      { error: 'Trial warning check failed', details: (error as any).message },
       { status: 500 }
     )
   }
@@ -150,6 +150,11 @@ export async function GET(request: Request) {
 async function sendTrialWarningAlert(highRiskTrials: TrialWarning[]) {
   try {
     const { resend } = await import('@/lib/resend')
+
+    if (!resend) {
+      console.error('Resend not configured, cannot send trial warning alert')
+      return
+    }
 
     let emailBody = `🚨 HIGH-RISK TRIALS ALERT\n\n`
     emailBody += `${highRiskTrials.length} trials ending soon with high conversion risk:\n\n`
