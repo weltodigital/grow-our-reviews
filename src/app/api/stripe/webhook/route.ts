@@ -6,59 +6,165 @@ import { calculateBillingCycleDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 import Stripe from 'stripe'
 
+// Helper function to log webhook events with correlation ID
+function logWebhookEvent(correlationId: string, level: 'info' | 'error', message: string, data?: any) {
+  const logData = { correlationId, message, ...data }
+  if (level === 'error') {
+    console.error(logData)
+  } else {
+    console.log(logData)
+  }
+}
+
+// Helper function to record webhook event
+async function recordWebhookEvent(
+  supabase: any,
+  stripeEventId: string,
+  eventType: string,
+  status: 'success' | 'failed' | 'skipped_duplicate',
+  payload: any,
+  errorMessage?: string
+) {
+  try {
+    await supabase
+      .from('webhook_events')
+      .insert({
+        stripe_event_id: stripeEventId,
+        event_type: eventType,
+        status,
+        error_message: errorMessage,
+        payload
+      })
+  } catch (error) {
+    console.error('Failed to record webhook event:', error)
+  }
+}
+
 export async function POST(request: NextRequest) {
+  const correlationId = `wh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
   try {
     const body = Buffer.from(await request.arrayBuffer())
     const signature = request.headers.get('stripe-signature')
 
     if (!signature) {
-      return NextResponse.json(
-        { error: 'No signature provided' },
-        { status: 400 }
-      )
+      logWebhookEvent(correlationId, 'error', 'No signature provided')
+      return NextResponse.json({ received: true }, { status: 200 }) // Return 200 to prevent retries
     }
 
     // Construct and verify webhook event
-    const event = constructWebhookEvent(body, signature)
+    let event
+    try {
+      event = constructWebhookEvent(body, signature)
+    } catch (error) {
+      logWebhookEvent(correlationId, 'error', 'Invalid webhook signature', { error: error.message })
+      return NextResponse.json({ received: true }, { status: 200 }) // Return 200 to prevent retries
+    }
 
-    let response = NextResponse.json({ received: true })
+    logWebhookEvent(correlationId, 'info', 'Webhook received', {
+      eventId: event.id,
+      eventType: event.type
+    })
 
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!, // Use service role for webhook operations
       {
         cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              request.cookies.set({ name, value, ...options })
-              response.cookies.set({ name, value, ...options })
-            })
-          },
+          getAll() { return [] },
+          setAll() {},
         },
       }
     )
 
-    switch (event.type) {
+    // Check for duplicate event (idempotency)
+    const { data: existingEvent } = await supabase
+      .from('webhook_events')
+      .select('id')
+      .eq('stripe_event_id', event.id)
+      .single()
+
+    if (existingEvent) {
+      logWebhookEvent(correlationId, 'info', 'Duplicate event skipped', { eventId: event.id })
+      await recordWebhookEvent(supabase, event.id, event.type, 'skipped_duplicate', event)
+      return NextResponse.json({ received: true }, { status: 200 })
+    }
+
+    // Process the webhook event
+    let processingError: Error | null = null
+
+    try {
+      await processWebhookEvent(event, supabase, correlationId)
+      await recordWebhookEvent(supabase, event.id, event.type, 'success', event)
+      logWebhookEvent(correlationId, 'info', 'Webhook processed successfully', {
+        eventId: event.id,
+        eventType: event.type
+      })
+
+      // Track health metrics
+      try {
+        const { healthMetrics } = await import('@/lib/health-metrics')
+        await healthMetrics.increment('webhooks_processed')
+      } catch (healthError) {
+        console.error('Failed to track webhook health metrics:', healthError)
+      }
+
+    } catch (error) {
+      processingError = error as Error
+      logWebhookEvent(correlationId, 'error', 'Webhook processing failed', {
+        eventId: event.id,
+        eventType: event.type,
+        error: error.message
+      })
+      await recordWebhookEvent(supabase, event.id, event.type, 'failed', event, error.message)
+
+      // Track failed webhook
+      try {
+        const { healthMetrics } = await import('@/lib/health-metrics')
+        await healthMetrics.increment('webhooks_failed')
+      } catch (healthError) {
+        console.error('Failed to track webhook failure metrics:', healthError)
+      }
+    }
+
+    // Always return 200 to prevent Stripe retries
+    return NextResponse.json({ received: true }, { status: 200 })
+
+  } catch (error: any) {
+    logWebhookEvent(correlationId, 'error', 'Webhook handler failed', { error: error.message })
+    // Always return 200 to prevent Stripe retries
+    return NextResponse.json({ received: true }, { status: 200 })
+  }
+}
+
+// Separate function for processing webhook events
+async function processWebhookEvent(event: any, supabase: any, correlationId: string) {
+  switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+        logWebhookEvent(correlationId, 'info', 'Processing checkout completion', {
+          sessionId: session.id,
+          mode: session.mode,
+          customerId: session.customer
+        })
 
         if (session.mode === 'subscription') {
           const { stripe } = await import('@/lib/stripe')
           if (!stripe) {
-            console.error('Stripe is not configured')
-            return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
+            throw new Error('Stripe is not configured')
           }
 
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
 
           const userId = session.metadata?.userId
           if (!userId) {
-            console.error('No userId in session metadata')
-            break
+            throw new Error('No userId in session metadata')
           }
+
+          logWebhookEvent(correlationId, 'info', 'Processing subscription for user', {
+            userId,
+            subscriptionId: subscription.id
+          })
 
           // Get price info to determine plan
           const priceId = subscription.items.data[0]?.price.id
@@ -74,8 +180,7 @@ export async function POST(request: NextRequest) {
           })
 
           if (!priceInfo) {
-            console.error('Unknown price ID:', priceId)
-            break
+            throw new Error(`Unknown price ID: ${priceId}`)
           }
 
           // Calculate trial end date
@@ -111,7 +216,8 @@ export async function POST(request: NextRequest) {
 
           console.log('Updating profile with data:', updateData)
 
-          // Update existing profile with subscription info (don't overwrite created_at)
+          // Atomic operation: Update or create profile
+          // First try update, then create if needed
           const { error: updateError } = await (supabase as any)
             .from('profiles')
             .update(updateData)
@@ -131,21 +237,20 @@ export async function POST(request: NextRequest) {
               updated_at: new Date().toISOString(),
             }
 
-            console.log('Creating new profile with data:', insertData)
+            logWebhookEvent(correlationId, 'info', 'Creating new profile', { userId, insertData })
 
             const { error: insertError } = await (supabase as any)
               .from('profiles')
               .insert(insertData)
 
             if (insertError) {
-              console.error('Error creating profile after checkout:', insertError)
-            } else {
-              console.log('Successfully created new profile')
+              throw new Error(`Failed to create profile: ${insertError.message}`)
             }
+            logWebhookEvent(correlationId, 'info', 'Successfully created new profile', { userId })
           } else if (updateError) {
-            console.error('Error updating profile after checkout:', updateError)
+            throw new Error(`Failed to update profile: ${updateError.message}`)
           } else {
-            console.log('Successfully updated existing profile')
+            logWebhookEvent(correlationId, 'info', 'Successfully updated existing profile', { userId })
           }
 
           console.log(`Subscription created for user ${userId}:`, {
@@ -154,6 +259,14 @@ export async function POST(request: NextRequest) {
             limit: priceInfo.monthlyRequestLimit,
             trialEnd: trialEnd.toISOString(),
           })
+
+          // Track trial start in health metrics
+          try {
+            const { healthMetrics } = await import('@/lib/health-metrics')
+            await healthMetrics.increment('trials_started')
+          } catch (healthError) {
+            console.error('Failed to track trial start:', healthError)
+          }
 
           // Send welcome email first (when user officially starts trial)
           try {
@@ -194,7 +307,11 @@ export async function POST(request: NextRequest) {
                 })
               }
             } catch (error) {
-              console.error('Failed to send welcome or subscription confirmation email:', error)
+              logWebhookEvent(correlationId, 'error', 'Failed to send emails', {
+                userId,
+                error: error.message
+              })
+              // Don't throw - email failures shouldn't fail the webhook
             }
         }
         break
@@ -205,6 +322,12 @@ export async function POST(request: NextRequest) {
         const userId = subscription.metadata?.userId
         let profile = null
 
+        logWebhookEvent(correlationId, 'info', 'Processing subscription update', {
+          subscriptionId: subscription.id,
+          status: subscription.status,
+          userId
+        })
+
         if (!userId) {
           // Try to find user by subscription ID
           const { data: foundProfile } = await (supabase as any)
@@ -214,8 +337,7 @@ export async function POST(request: NextRequest) {
             .single()
 
           if (!foundProfile) {
-            console.error('No user found for subscription:', subscription.id)
-            break
+            throw new Error(`No user found for subscription: ${subscription.id}`)
           }
           profile = foundProfile
         }
@@ -255,29 +377,23 @@ export async function POST(request: NextRequest) {
           .eq(userId ? 'id' : 'stripe_subscription_id', userId || subscription.id)
 
         if (updateError) {
-          console.error('Error updating subscription:', updateError)
-        } else {
-          console.log(`Subscription updated successfully:`, {
-            subscriptionId: subscription.id,
-            status: subscription.status,
-            limit: priceInfo?.monthlyRequestLimit,
-            updateData
-          })
-
-          // Verify the update worked by fetching the profile again
-          const { data: updatedProfile } = await (supabase as any)
-            .from('profiles')
-            .select('monthly_request_limit, subscription_status')
-            .eq(userId ? 'id' : 'stripe_subscription_id', userId || subscription.id)
-            .single()
-
-          console.log('Updated profile verification:', updatedProfile)
+          throw new Error(`Failed to update subscription: ${updateError.message}`)
         }
+
+        logWebhookEvent(correlationId, 'info', 'Subscription updated successfully', {
+          subscriptionId: subscription.id,
+          status: subscription.status,
+          limit: priceInfo?.monthlyRequestLimit
+        })
         break
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
+
+        logWebhookEvent(correlationId, 'info', 'Processing subscription deletion', {
+          subscriptionId: subscription.id
+        })
 
         // Update profile to cancelled status
         const { error: updateError } = await (supabase as any)
@@ -290,17 +406,25 @@ export async function POST(request: NextRequest) {
           .eq('stripe_subscription_id', subscription.id)
 
         if (updateError) {
-          console.error('Error updating cancelled subscription:', updateError)
-        } else {
-          console.log(`Subscription cancelled: ${subscription.id}`)
+          throw new Error(`Failed to update cancelled subscription: ${updateError.message}`)
         }
+
+        logWebhookEvent(correlationId, 'info', 'Subscription cancelled successfully', {
+          subscriptionId: subscription.id
+        })
         break
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
+        const subscriptionId = (invoice as any).subscription as string
 
-        if ((invoice as any).subscription) {
+        logWebhookEvent(correlationId, 'info', 'Processing payment failure', {
+          invoiceId: invoice.id,
+          subscriptionId
+        })
+
+        if (subscriptionId) {
           // Update subscription status to past_due
           const { data: profile, error: updateError } = await (supabase as any)
             .from('profiles')
@@ -308,46 +432,66 @@ export async function POST(request: NextRequest) {
               subscription_status: 'past_due',
               updated_at: new Date().toISOString(),
             })
-            .eq('stripe_subscription_id', (invoice as any).subscription as string)
+            .eq('stripe_subscription_id', subscriptionId)
             .select('email, business_name, monthly_request_limit')
             .single()
 
           if (updateError) {
-            console.error('Error updating past_due subscription:', updateError)
-          } else {
-            console.log(`Payment failed for subscription: ${(invoice as any).subscription}`)
+            throw new Error(`Failed to update past_due subscription: ${updateError.message}`)
+          }
 
-            // Send payment failed email
-            if (profile) {
-              try {
-                const retryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')
-                const planName = profile.monthly_request_limit === 150 ? 'Starter' : 'Growth'
+          logWebhookEvent(correlationId, 'info', 'Payment failure processed', { subscriptionId })
 
-                await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/payment-failed`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    email: profile.email,
-                    businessName: profile.business_name,
-                    planName: planName,
-                    retryDate: retryDate,
-                  }),
-                })
-              } catch (error) {
-                console.error('Failed to send payment failed email:', error)
-              }
+          // Track trial failure in health metrics
+          try {
+            const { healthMetrics } = await import('@/lib/health-metrics')
+            await healthMetrics.increment('trials_failed')
+          } catch (healthError) {
+            console.error('Failed to track trial failure:', healthError)
+          }
+
+          // Send payment failed email
+          if (profile) {
+            try {
+              const retryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')
+              const planName = profile.monthly_request_limit === 150 ? 'Starter' : 'Growth'
+
+              await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/payment-failed`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  email: profile.email,
+                  businessName: profile.business_name,
+                  planName: planName,
+                  retryDate: retryDate,
+                }),
+              })
+            } catch (error) {
+              logWebhookEvent(correlationId, 'error', 'Failed to send payment failed email', {
+                subscriptionId,
+                error: error.message
+              })
+              // Don't throw - email failures shouldn't fail the webhook
             }
           }
         }
         break
       }
 
+
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice
+        const subscriptionId = (invoice as any).subscription as string
 
-        if ((invoice as any).subscription && invoice.billing_reason === 'subscription_cycle') {
+        logWebhookEvent(correlationId, 'info', 'Processing payment success', {
+          invoiceId: invoice.id,
+          subscriptionId,
+          billingReason: invoice.billing_reason
+        })
+
+        if (subscriptionId && invoice.billing_reason === 'subscription_cycle') {
           // Payment succeeded for recurring subscription
           const { error: updateError } = await (supabase as any)
             .from('profiles')
@@ -355,28 +499,31 @@ export async function POST(request: NextRequest) {
               subscription_status: 'active',
               updated_at: new Date().toISOString(),
             })
-            .eq('stripe_subscription_id', (invoice as any).subscription as string)
+            .eq('stripe_subscription_id', subscriptionId)
 
           if (updateError) {
-            console.error('Error updating paid subscription:', updateError)
-          } else {
-            console.log(`Payment succeeded for subscription: ${(invoice as any).subscription}`)
+            throw new Error(`Failed to update paid subscription: ${updateError.message}`)
+          }
+
+          logWebhookEvent(correlationId, 'info', 'Payment success processed', { subscriptionId })
+
+          // Track trial conversion if this was the first payment
+          if (invoice.billing_reason === 'subscription_cycle') {
+            try {
+              const { healthMetrics } = await import('@/lib/health-metrics')
+              await healthMetrics.increment('trials_converted')
+            } catch (healthError) {
+              console.error('Failed to track trial conversion:', healthError)
+            }
           }
         }
         break
       }
 
       default:
-        console.log(`Unhandled webhook event: ${event.type}`)
+        logWebhookEvent(correlationId, 'info', 'Unhandled webhook event type', {
+          eventType: event.type
+        })
     }
-
-    return response
-
-  } catch (error: any) {
-    console.error('Webhook error:', error)
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 400 }
-    )
   }
 }

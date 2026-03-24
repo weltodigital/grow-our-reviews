@@ -305,6 +305,17 @@ export async function GET(request: NextRequest) {
     // Log summary
     console.log(`SMS Cron Summary: ${sentCount.success} sent, ${sentCount.failed} failed`)
 
+    // Track health metrics
+    try {
+      const { healthMetrics } = await import('@/lib/health-metrics')
+      await healthMetrics.increment('sms_sent', sentCount.success)
+      if (sentCount.failed > 0) {
+        await healthMetrics.increment('sms_failed', sentCount.failed)
+      }
+    } catch (error) {
+      console.error('Failed to track health metrics:', error)
+    }
+
     response = NextResponse.json({
       message: 'SMS sending completed',
       processed: pendingRequests.length,
