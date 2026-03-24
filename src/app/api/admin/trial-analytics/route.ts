@@ -88,7 +88,7 @@ export async function GET() {
 
     return NextResponse.json(analytics)
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Trial analytics failed:', error)
     return NextResponse.json(
       { error: 'Failed to fetch trial analytics', details: error.message },
@@ -130,7 +130,7 @@ async function calculateTrialAnalytics(
       const daysRemaining = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
       const userReqs = userRequests[profile.id] || []
       const lastActivity = userReqs.length > 0
-        ? Math.max(...userReqs.map(r => new Date(r.created_at).getTime()))
+        ? Math.max(...userReqs.map((r: any) => new Date(r.created_at).getTime()))
         : null
 
       return {
@@ -139,11 +139,11 @@ async function calculateTrialAnalytics(
         daysRemaining,
         requestsSent: userReqs.length,
         lastActivity: lastActivity ? new Date(lastActivity).toISOString() : null,
-        paymentMethodStatus: profile.stripe_customer_id ? 'unknown' : 'unknown' // TODO: Check with Stripe
+        paymentMethodStatus: (profile.stripe_customer_id ? 'unknown' : 'unknown') as 'valid' | 'expired' | 'unknown'
       }
     })
     .filter(trial => trial && trial.daysRemaining >= 0 && trial.daysRemaining <= 7)
-    .sort((a, b) => a.daysRemaining - b.daysRemaining)
+    .sort((a, b) => (a as any).daysRemaining - (b as any).daysRemaining)
 
   // Recent conversions (last 7 days)
   const recentConversions = convertedUsers
@@ -178,10 +178,10 @@ async function calculateTrialAnalytics(
     })
 
   // Calculate average usage
-  const totalUsage = Object.values(userRequests).reduce((sum: number, reqs: any[]) => sum + reqs.length, 0)
+  const totalUsage = (Object.values(userRequests) as any[]).reduce((sum: number, reqs: any[]) => sum + reqs.length, 0)
   const averageUsage = activeTrials.length > 0 ? totalUsage / activeTrials.length : 0
 
-  const endingToday = endingSoon.filter(t => t.daysRemaining === 0).length
+  const endingToday = endingSoon.filter(t => t && t.daysRemaining === 0).length
   const endingThisWeek = endingSoon.length
 
   return {
@@ -193,7 +193,7 @@ async function calculateTrialAnalytics(
       conversionRate: Math.round(conversionRate * 100) / 100,
       averageUsage: Math.round(averageUsage * 100) / 100
     },
-    endingSoon,
+    endingSoon: endingSoon.filter(t => t !== null),
     recentConversions,
     failedConversions
   }

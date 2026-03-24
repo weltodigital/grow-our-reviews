@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     await sendFailureAlert(error)
 
     return NextResponse.json(
-      { error: 'Health report failed', details: error.message },
+      { error: 'Health report failed', details: (error as any).message },
       { status: 500 }
     )
   }
@@ -211,6 +211,10 @@ async function sendHealthReport(report: HealthReport) {
   try {
     const { resend } = await import('@/lib/resend')
 
+    if (!resend) {
+      throw new Error('Resend is not configured')
+    }
+
     const subject = `System Health Report — ${report.overall.status.toUpperCase()}: ${report.overall.message}`
     const emailBody = formatHealthReport(report)
 
@@ -268,6 +272,11 @@ function formatHealthReport(report: HealthReport): string {
 async function sendFailureAlert(error: any) {
   try {
     const { resend } = await import('@/lib/resend')
+
+    if (!resend) {
+      console.error('Resend not configured, cannot send failure alert')
+      return
+    }
 
     await resend.emails.send({
       from: 'alerts@growourreviews.com',

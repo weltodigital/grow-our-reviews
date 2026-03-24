@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
 
       profile = foundProfile
 
-      if (profile.stripe_subscription_id) {
-        subscription = await stripe.subscriptions.retrieve(profile.stripe_subscription_id)
+      if ((profile as any).stripe_subscription_id) {
+        subscription = await stripe.subscriptions.retrieve((profile as any).stripe_subscription_id)
       }
     } else {
       // Get subscription from Stripe and find matching profile
@@ -78,10 +78,10 @@ export async function POST(request: NextRequest) {
     const priceId = subscription.items.data[0]?.price.id
     const priceInfo = getPriceInfo(priceId)
 
-    const updateData: any = {
+    const updateData = {
       subscription_status: subscription.status,
       updated_at: new Date().toISOString(),
-    }
+    } as any
 
     if (priceInfo) {
       updateData.monthly_request_limit = priceInfo.monthlyRequestLimit
@@ -91,10 +91,10 @@ export async function POST(request: NextRequest) {
       updateData.trial_ends_at = new Date(subscription.trial_end * 1000).toISOString()
     }
 
-    const { error: syncError } = await supabase
+    const { error: syncError } = await (supabase as any)
       .from('profiles')
       .update(updateData)
-      .eq('id', profile.id)
+      .eq('id', (profile as any).id)
 
     if (syncError) {
       throw new Error(`Sync failed: ${syncError.message}`)
@@ -104,15 +104,15 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Profile synced successfully',
       profile: {
-        id: profile.id,
-        email: profile.email,
+        id: (profile as any).id,
+        email: (profile as any).email,
         subscription_status: subscription.status,
         monthly_request_limit: priceInfo?.monthlyRequestLimit,
         stripe_subscription_id: subscription.id
       }
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Manual sync failed:', error)
     return NextResponse.json(
       { error: 'Sync failed', details: error.message },

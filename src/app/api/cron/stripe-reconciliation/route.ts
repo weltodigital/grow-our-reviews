@@ -78,17 +78,17 @@ export async function GET(request: Request) {
     try {
       const { healthMetrics } = await import('@/lib/health-metrics')
       await healthMetrics.increment('reconciliation_run')
-      if (result.orphanedCount > 0 || result.mismatchedCount > 0) {
-        await healthMetrics.increment('reconciliation_issues', result.orphanedCount + result.mismatchedCount)
+      if (result.summary.orphanedCount > 0 || result.summary.mismatchedCount > 0) {
+        await healthMetrics.increment('reconciliation_issues', result.summary.orphanedCount + result.summary.mismatchedCount)
       }
     } catch (error) {
       console.error('Failed to track reconciliation health metrics:', error)
     }
 
-    if (result.orphanedCount > 0 || result.mismatchedCount > 0) {
+    if (result.summary.orphanedCount > 0 || result.summary.mismatchedCount > 0) {
       console.error('🚨 BILLING MISMATCHES DETECTED:', {
-        orphaned: result.orphanedCount,
-        mismatched: result.mismatchedCount
+        orphaned: result.summary.orphanedCount,
+        mismatched: result.summary.mismatchedCount
       })
 
       await sendAlert(result)
@@ -99,7 +99,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('❌ Stripe reconciliation failed:', error)
     return NextResponse.json(
-      { error: 'Reconciliation failed', details: error.message },
+      { error: 'Reconciliation failed', details: (error as any).message },
       { status: 500 }
     )
   }
@@ -111,8 +111,6 @@ async function checkOrphanedCheckouts(stripe: Stripe, supabase: any, result: Rec
 
   const sessions = await stripe.checkout.sessions.list({
     created: { gte: sevenDaysAgo },
-    status: 'complete',
-    mode: 'subscription',
     limit: 100,
     expand: ['data.customer']
   })
@@ -120,6 +118,11 @@ async function checkOrphanedCheckouts(stripe: Stripe, supabase: any, result: Rec
   console.log(`📅 Checking ${sessions.data.length} completed checkout sessions from last 7 days`)
 
   for (const session of sessions.data) {
+    // Only check completed subscription sessions
+    if (session.status !== 'complete' || session.mode !== 'subscription') {
+      continue
+    }
+
     if (!session.customer || !session.metadata?.userId) {
       continue
     }
@@ -146,7 +149,8 @@ async function checkOrphanedCheckouts(stripe: Stripe, supabase: any, result: Rec
         customerId,
         customerEmail: (customer as any).email || 'Unknown',
         amount: session.amount_total || 0,
-        created: new Date(session.created * 1000).toISOString()
+        created: new Date(session.created * 1000).toISOString(),
+        autoFixed: false
       }
 
       console.log(`💸 Found orphaned checkout: ${session.id} for ${orphanedCheckout.customerEmail}`)
@@ -192,7 +196,7 @@ async function checkOrphanedCheckouts(stripe: Stripe, supabase: any, result: Rec
           }
         }
       } catch (error) {
-        console.error(`❌ Error auto-fixing orphaned checkout ${session.id}:`, error.message)
+        console.error(`❌ Error auto-fixing orphaned checkout ${session.id}:`, (error as any).message)
       }
 
       result.orphanedCheckouts.push(orphanedCheckout)
@@ -246,7 +250,7 @@ async function checkSubscriptionMismatches(stripe: Stripe, supabase: any, result
       }
 
     } catch (error) {
-      console.error(`❌ Failed to check subscription ${profile.stripe_subscription_id}:`, error.message)
+      console.error(`❌ Failed to check subscription ${profile.stripe_subscription_id}:`, (error as any).message)
       // Continue checking other profiles
     }
   }
@@ -256,7 +260,12 @@ async function sendAlert(result: ReconciliationResult) {
   try {
     const { resend } = await import('@/lib/resend')
 
-    const totalIssues = result.orphanedCount + result.mismatchedCount
+    if (!resend) {
+      console.error('Resend not configured, cannot send alert')
+      return
+    }
+
+    const totalIssues = result.summary.orphanedCount + result.summary.mismatchedCount
     let emailBody = `Stripe reconciliation found ${totalIssues} billing issues:\n\n`
 
     if (result.orphanedCheckouts.length > 0) {

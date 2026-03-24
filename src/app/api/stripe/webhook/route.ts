@@ -526,4 +526,3 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
         })
     }
   }
-}

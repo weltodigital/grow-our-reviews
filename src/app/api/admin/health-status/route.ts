@@ -53,7 +53,7 @@ export async function GET() {
       trend: weeklyTrend.slice(-7) // Last 7 days
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Health status check failed:', error)
     return NextResponse.json(
       {
