@@ -28,10 +28,33 @@ export function SentimentGate({
       // High rating - redirect to Google Reviews
       setIsRedirecting(true)
 
-      // Show brief thank you message before redirect
-      setTimeout(() => {
-        window.location.href = googleReviewUrl
-      }, 1500)
+      // Fetch the CURRENT Google review URL instead of using cached prop
+      // This ensures users get redirected to the up-to-date URL even if
+      // the business owner changed it after this review request was created
+      try {
+        const response = await fetch(`/api/current-google-url?token=${encodeURIComponent(token)}`)
+
+        if (response.ok) {
+          const { googleReviewUrl: currentUrl } = await response.json()
+
+          // Show brief thank you message before redirect
+          setTimeout(() => {
+            window.location.href = currentUrl
+          }, 1500)
+        } else {
+          // Fallback to cached URL if API fails
+          console.warn('Failed to fetch current Google URL, using cached version')
+          setTimeout(() => {
+            window.location.href = googleReviewUrl
+          }, 1500)
+        }
+      } catch (error) {
+        // Fallback to cached URL if request fails
+        console.warn('Error fetching current Google URL, using cached version:', error)
+        setTimeout(() => {
+          window.location.href = googleReviewUrl
+        }, 1500)
+      }
     }
     // Low rating (1-3) - show feedback form (handled by component state)
   }
