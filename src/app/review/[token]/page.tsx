@@ -37,6 +37,16 @@ async function getReviewRequest(token: string) {
     return null
   }
 
+  // Check if token has expired (90 days from creation)
+  const createdAt = new Date(reviewRequest.created_at)
+  const now = new Date()
+  const daysSinceCreation = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (daysSinceCreation > 90) {
+    console.log(`Review request ${token} has expired (${daysSinceCreation} days old) - blocking access`)
+    return { expired: true }
+  }
+
   // Only block failed or expired requests
   if (['failed', 'expired'].includes(reviewRequest.status)) {
     console.log(`Review request ${token} has status: ${reviewRequest.status} - blocking access`)
@@ -46,7 +56,8 @@ async function getReviewRequest(token: string) {
   // Log status for monitoring
   console.log(`Review request ${token} has status: ${reviewRequest.status} - allowing access`)
 
-  // Get the profile and customer with proper error handling
+  // Get the CURRENT profile and customer data (not cached from request creation)
+  // This ensures business name and Google URL are up-to-date
   const [profileResult, customerResult] = await Promise.all([
     (supabase as any)
       .from('profiles')
@@ -119,6 +130,32 @@ export default async function ReviewPage({ params }: PageProps) {
 
   if (!reviewRequest) {
     notFound()
+  }
+
+  // Handle expired tokens with helpful messaging
+  if ('expired' in reviewRequest && reviewRequest.expired) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="w-full max-w-md mx-auto text-center bg-white rounded-lg shadow-sm border p-8">
+          <div className="flex justify-center mb-4">
+            <div className="rounded-full bg-orange-100 p-3">
+              <svg className="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 18.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Review Link Has Expired
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This review link is more than 90 days old and has expired for security reasons. The business information may have changed since this link was created.
+          </p>
+          <p className="text-sm text-gray-500">
+            Please contact the business directly if you'd still like to leave feedback about your experience.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   // Track the click (first time only)
