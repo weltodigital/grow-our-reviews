@@ -10,6 +10,7 @@ import { ArrowLeft, Send, Clock, Settings, MessageCircle, Edit } from 'lucide-re
 import Link from 'next/link'
 import { createReviewRequest } from '@/app/dashboard/send/actions'
 import SmsPreview from './SmsPreview'
+import { DuplicateRequestWarning } from './DuplicateRequestWarning'
 import type { Database } from '@/types/database'
 
 interface SendRequestFormProps {
@@ -27,6 +28,8 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
     scheduledTime: string
     token: string
   } | null>(null)
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
+  const [pendingSubmit, setPendingSubmit] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,9 +54,23 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
       return
     }
 
+    // Check for duplicates first (unless already confirmed)
+    if (!pendingSubmit) {
+      setError('')
+      setShowDuplicateWarning(true)
+      return
+    }
+
+    // Proceed with actual submission
+    await processSubmission()
+  }
+
+  const processSubmission = async () => {
     setIsLoading(true)
     setError('')
     setSuccess(null)
+    setShowDuplicateWarning(false)
+    setPendingSubmit(false)
 
     try {
       const result = await createReviewRequest({
@@ -78,6 +95,17 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleDuplicateConfirmed = () => {
+    setPendingSubmit(true)
+    setShowDuplicateWarning(false)
+    processSubmission()
+  }
+
+  const handleDuplicateCancelled = () => {
+    setShowDuplicateWarning(false)
+    setPendingSubmit(false)
   }
 
   const formatPhoneNumber = (value: string) => {
@@ -222,6 +250,15 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
                   <div className="text-sm text-red-600">{error}</div>
                 </div>
               )}
+
+              {/* Duplicate Request Warning */}
+              <DuplicateRequestWarning
+                phoneNumber={customerPhone}
+                customerName={customerName}
+                onProceedConfirmed={handleDuplicateConfirmed}
+                onCancel={handleDuplicateCancelled}
+                isVisible={showDuplicateWarning}
+              />
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>

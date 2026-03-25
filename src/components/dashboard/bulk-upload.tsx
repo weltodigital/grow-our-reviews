@@ -25,11 +25,20 @@ interface CsvRow {
   phone: string
 }
 
+interface DuplicateAnalysis {
+  phoneNumber: string
+  riskLevel: 'none' | 'info' | 'warning' | 'critical'
+  canProceed: boolean
+  message: string
+  reason?: string
+}
+
 interface ValidatedRow extends CsvRow {
   rowIndex: number
-  status: 'valid' | 'error' | 'warning' | 'duplicate'
+  status: 'valid' | 'error' | 'warning' | 'critical'
   errors: string[]
   normalizedPhone: string
+  duplicateAnalysis?: DuplicateAnalysis
 }
 
 interface UploadHistory {
@@ -122,7 +131,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
       })
     })
 
-    const existingPhones = response.ok ? await response.json() : { existingPhones: [] }
+    const duplicateData = response.ok ? await response.json() : { analysis: { details: { blocked: [], warnings: [], info: [], safe: [] } } }
 
     data.forEach((row, index) => {
       const errors: string[] = []
@@ -153,10 +162,33 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             phoneNumbers.add(normalized)
           }
 
-          // Check for existing customers
-          if (existingPhones.existingPhones?.includes(normalized)) {
-            errors.push('Already sent request in last 30 days')
-            status = status === 'error' ? 'error' : 'warning'
+          // Check for duplicate analysis
+          const duplicateInfo = findDuplicateInfo(normalized, duplicateData)
+          if (duplicateInfo) {
+            if (duplicateInfo.riskLevel === 'critical') {
+              errors.push(`🚫 ${duplicateInfo.message}`)
+              status = 'critical'
+            } else if (duplicateInfo.riskLevel === 'warning') {
+              errors.push(`⚠️ ${duplicateInfo.message}`)
+              status = status === 'error' ? 'error' : 'warning'
+            } else if (duplicateInfo.riskLevel === 'info') {
+              errors.push(`ℹ️ ${duplicateInfo.message}`)
+              if (status === 'error' || status === 'critical') {
+                // Keep existing status
+              } else {
+                status = 'warning'
+              }
+            }
+
+            validatedRows.push({
+              ...row,
+              rowIndex: index + 1,
+              status,
+              errors,
+              normalizedPhone: normalized,
+              duplicateAnalysis: duplicateInfo
+            })
+            return
           }
 
           validatedRows.push({
@@ -178,6 +210,49 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
         normalizedPhone: ''
       })
     })
+
+    // Helper function to find duplicate info for a phone number
+    function findDuplicateInfo(phoneNumber: string, data: any): DuplicateAnalysis | null {
+      const { blocked, warnings, info } = data.analysis?.details || {}
+
+      // Check blocked (critical)
+      const blockedItem = blocked?.find((item: any) => item.phoneNumber === phoneNumber)
+      if (blockedItem) {
+        return {
+          phoneNumber,
+          riskLevel: 'critical',
+          canProceed: false,
+          message: blockedItem.message,
+          reason: blockedItem.reason
+        }
+      }
+
+      // Check warnings
+      const warningItem = warnings?.find((item: any) => item.phoneNumber === phoneNumber)
+      if (warningItem) {
+        return {
+          phoneNumber,
+          riskLevel: 'warning',
+          canProceed: true,
+          message: warningItem.message,
+          reason: warningItem.reason
+        }
+      }
+
+      // Check info
+      const infoItem = info?.find((item: any) => item.phoneNumber === phoneNumber)
+      if (infoItem) {
+        return {
+          phoneNumber,
+          riskLevel: 'info',
+          canProceed: true,
+          message: infoItem.message,
+          reason: infoItem.reason
+        }
+      }
+
+      return null
+    }
 
     return validatedRows
   }, [])
@@ -332,11 +407,12 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
     }
   }
 
-  // Get valid rows for sending
+  // Get valid rows for sending (exclude critical duplicates)
   const validRows = csvData.filter(row => row.status === 'valid' || row.status === 'warning')
   const canSend = Math.min(validRows.length, userStats.requestsRemaining)
   const errorCount = csvData.filter(row => row.status === 'error').length
   const warningCount = csvData.filter(row => row.status === 'warning').length
+  const criticalCount = csvData.filter(row => row.status === 'critical').length
 
   if (uploadStep === 'upload') {
     return (
@@ -663,8 +739,8 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Preview Table */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Summary Cards */}
-            <div className="grid grid-cols-4 gap-4">
+            {/* Enhanced Summary Cards */}
+            <div className="grid grid-cols-5 gap-4">
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
@@ -683,7 +759,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                     <CheckCircle className="h-5 w-5 text-green-600" />
                     <div>
                       <p className="text-sm text-gray-600">Valid</p>
-                      <p className="text-xl font-semibold">{validRows.length}</p>
+                      <p className="text-xl font-semibold">{csvData.filter(row => row.status === 'valid').length}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -706,6 +782,18 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <div className="flex items-center gap-2">
                     <XCircle className="h-5 w-5 text-red-600" />
                     <div>
+                      <p className="text-sm text-gray-600">Blocked</p>
+                      <p className="text-xl font-semibold">{criticalCount}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <XCircle className="h-5 w-5 text-gray-600" />
+                    <div>
                       <p className="text-sm text-gray-600">Errors</p>
                       <p className="text-xl font-semibold">{errorCount}</p>
                     </div>
@@ -713,6 +801,52 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Duplicate Protection Summary */}
+            {(criticalCount > 0 || warningCount > 0) && (
+              <Card className="border-orange-200 bg-orange-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-orange-800">
+                    <AlertCircle className="h-5 w-5" />
+                    90-Day Duplicate Protection Active
+                  </CardTitle>
+                  <CardDescription className="text-orange-700">
+                    We've checked your upload against customers who received requests in the last 90 days
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {criticalCount > 0 && (
+                    <div className="bg-red-100 border border-red-300 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-red-800">{criticalCount} customers blocked</p>
+                          <p className="text-red-700 mt-1">
+                            These customers already reviewed, gave feedback, or received recent requests.
+                            Sending to them could annoy customers and hurt your reputation.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {warningCount > 0 && (
+                    <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-yellow-800">{warningCount} customers flagged with warnings</p>
+                          <p className="text-yellow-700 mt-1">
+                            These customers can receive requests but may remember previous interactions.
+                            Review the details to decide if you want to proceed.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Preview Table */}
             <Card>
@@ -752,8 +886,14 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                                 <span className="text-xs">Warning</span>
                               </div>
                             )}
-                            {row.status === 'error' && (
+                            {row.status === 'critical' && (
                               <div className="flex items-center gap-1 text-red-600">
+                                <XCircle className="h-4 w-4" />
+                                <span className="text-xs">Blocked</span>
+                              </div>
+                            )}
+                            {row.status === 'error' && (
+                              <div className="flex items-center gap-1 text-gray-600">
                                 <XCircle className="h-4 w-4" />
                                 <span className="text-xs">Error</span>
                               </div>
@@ -767,11 +907,22 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                           <td className="py-3 px-2">
                             {row.errors.length > 0 ? (
                               <div className="space-y-1">
-                                {row.errors.map((error, errorIndex) => (
-                                  <div key={errorIndex} className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
-                                    {error}
-                                  </div>
-                                ))}
+                                {row.errors.map((error, errorIndex) => {
+                                  const isBlocked = error.includes('🚫')
+                                  const isWarning = error.includes('⚠️')
+                                  const isInfo = error.includes('ℹ️')
+
+                                  return (
+                                    <div key={errorIndex} className={`text-xs px-2 py-1 rounded ${
+                                      isBlocked ? 'text-red-700 bg-red-100 border border-red-200' :
+                                      isWarning ? 'text-yellow-700 bg-yellow-100 border border-yellow-200' :
+                                      isInfo ? 'text-blue-700 bg-blue-100 border border-blue-200' :
+                                      'text-gray-600 bg-gray-50'
+                                    }`}>
+                                      {error}
+                                    </div>
+                                  )
+                                })}
                               </div>
                             ) : (
                               <span className="text-xs text-gray-400">No issues</span>
@@ -815,14 +966,28 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   </div>
                 )}
 
-                {errorCount > 0 && (
+                {criticalCount > 0 && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                     <div className="flex items-start gap-2">
                       <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                       <div className="text-sm">
-                        <p className="font-medium text-red-800">Errors Found</p>
+                        <p className="font-medium text-red-800">Blocked Customers</p>
                         <p className="text-red-700 mt-1">
-                          {errorCount} {errorCount === 1 ? 'row has' : 'rows have'} errors and will be skipped.
+                          {criticalCount} {criticalCount === 1 ? 'customer is' : 'customers are'} blocked due to duplicate protection (already reviewed, gave feedback, or recent requests).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {errorCount > 0 && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <XCircle className="h-5 w-5 text-gray-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-800">Data Errors Found</p>
+                        <p className="text-gray-700 mt-1">
+                          {errorCount} {errorCount === 1 ? 'row has' : 'rows have'} data errors (invalid names/phones) and will be skipped.
                         </p>
                       </div>
                     </div>
@@ -836,7 +1001,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                       <div className="text-sm">
                         <p className="font-medium text-yellow-800">Warnings</p>
                         <p className="text-yellow-700 mt-1">
-                          {warningCount} {warningCount === 1 ? 'row has' : 'rows have'} warnings but will still be processed.
+                          {warningCount} {warningCount === 1 ? 'row has' : 'rows have'} warnings but will still be processed. Review duplicate protection details above.
                         </p>
                       </div>
                     </div>

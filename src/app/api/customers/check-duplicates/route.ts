@@ -23,18 +23,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check for existing review requests in the last 30 days
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    // Enhanced duplicate check for last 90 days with risk analysis
+    const ninetyDaysAgo = new Date()
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
 
     const { data: existingRequests, error } = await supabase
       .from('review_requests')
       .select(`
-        customers!inner(phone)
+        id,
+        status,
+        created_at,
+        customers!inner(name, phone)
       `)
       .eq('user_id', user.id)
-      .gte('created_at', thirtyDaysAgo.toISOString())
+      .gte('created_at', ninetyDaysAgo.toISOString())
       .in('customers.phone', phoneNumbers)
+      .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Error checking duplicates:', error)
@@ -44,11 +48,109 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Extract phone numbers that already have requests
-    const existingPhones = existingRequests?.map((req: any) => req.customers.phone) || []
+    // Analyze each phone number for risk level
+    const duplicateAnalysis = phoneNumbers.map(phone => {
+      const phoneRequests = existingRequests?.filter((req: any) => req.customers.phone === phone) || []
+
+      if (phoneRequests.length === 0) {
+        return {
+          phoneNumber: phone,
+          riskLevel: 'none',
+          canProceed: true,
+          message: 'No previous requests found'
+        }
+      }
+
+      const mostRecent = phoneRequests[0] as any
+      const daysAgo = Math.ceil((Date.now() - new Date(mostRecent.created_at).getTime()) / (1000 * 60 * 60 * 24))
+      const hasReviewed = phoneRequests.some((req: any) => req.status === 'reviewed')
+      const hasGivenFeedback = phoneRequests.some((req: any) => req.status === 'feedback_given')
+
+      // Critical blocks (should not upload)
+      if (hasReviewed) {
+        return {
+          phoneNumber: phone,
+          riskLevel: 'critical',
+          canProceed: false,
+          message: `Customer already left a review (${daysAgo} days ago)`,
+          reason: 'already_reviewed'
+        }
+      }
+
+      if (hasGivenFeedback) {
+        return {
+          phoneNumber: phone,
+          riskLevel: 'critical',
+          canProceed: false,
+          message: `Customer already gave feedback (${daysAgo} days ago)`,
+          reason: 'gave_feedback'
+        }
+      }
+
+      if (daysAgo < 30) {
+        return {
+          phoneNumber: phone,
+          riskLevel: 'critical',
+          canProceed: false,
+          message: `Recent request sent ${daysAgo} days ago`,
+          reason: 'recent_request'
+        }
+      }
+
+      // Warnings (can upload but should review)
+      if (phoneRequests.length >= 3) {
+        return {
+          phoneNumber: phone,
+          riskLevel: 'warning',
+          canProceed: true,
+          message: `${phoneRequests.length} requests in last 90 days`,
+          reason: 'multiple_requests'
+        }
+      }
+
+      if (daysAgo >= 30 && daysAgo < 60) {
+        return {
+          phoneNumber: phone,
+          riskLevel: 'warning',
+          canProceed: true,
+          message: `Previous request ${daysAgo} days ago`,
+          reason: 'moderate_recent'
+        }
+      }
+
+      // Low risk (generally safe)
+      return {
+        phoneNumber: phone,
+        riskLevel: 'info',
+        canProceed: true,
+        message: `Previous request ${daysAgo} days ago`,
+        reason: 'old_request'
+      }
+    })
+
+    // Separate into different categories
+    const blocked = duplicateAnalysis.filter(item => !item.canProceed)
+    const warnings = duplicateAnalysis.filter(item => item.canProceed && item.riskLevel === 'warning')
+    const info = duplicateAnalysis.filter(item => item.canProceed && item.riskLevel === 'info')
+    const safe = duplicateAnalysis.filter(item => item.riskLevel === 'none')
 
     return NextResponse.json({
-      existingPhones
+      // Legacy compatibility
+      existingPhones: blocked.map(item => item.phoneNumber),
+
+      // Enhanced analysis
+      analysis: {
+        total: phoneNumbers.length,
+        safe: safe.length,
+        warnings: warnings.length,
+        blocked: blocked.length,
+        details: {
+          blocked,
+          warnings,
+          info,
+          safe
+        }
+      }
     })
 
   } catch (error) {
