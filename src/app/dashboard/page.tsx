@@ -1,7 +1,7 @@
 import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
-import { getCurrentBillingPeriod, getDaysUntilReset } from '@/lib/billing-cycle'
+import { getCurrentBillingPeriod, getDaysUntilReset, getNextBillingDate } from '@/lib/billing-cycle'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -229,9 +229,26 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             Welcome back, {(profile as any).business_name}
           </h1>
-          <p className="text-gray-600">
-            Here's how your review requests are performing this month
-          </p>
+          <div className="space-y-1">
+            <p className="text-gray-600">
+              Here's how your review requests are performing this period
+            </p>
+            {/* Prominent credit reset information for user clarity */}
+            {stats.billingCycleDate ? (
+              <p className="text-sm text-gray-500">
+                Credits reset on {getNextBillingDate(stats.billingCycleDate).toLocaleDateString('en-GB')}
+                {stats.daysUntilReset && (
+                  <span className="text-gray-700 font-medium">
+                    {" "}({stats.daysUntilReset} day{stats.daysUntilReset !== 1 ? 's' : ''} remaining)
+                  </span>
+                )}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-500">
+                Credits reset on the 1st of each month
+              </p>
+            )}
+          </div>
         </div>
         <Button asChild>
           <Link href="/dashboard/send" className="flex items-center gap-2">

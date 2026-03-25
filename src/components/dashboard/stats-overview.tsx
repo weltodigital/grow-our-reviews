@@ -81,26 +81,56 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
       </div>
 
       {/* Requests remaining card */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      <Card className={`bg-gradient-to-r border-2 ${
+        stats.requestsRemaining <= 10
+          ? 'from-red-50 to-orange-50 border-red-200'
+          : stats.requestsRemaining <= 25
+          ? 'from-yellow-50 to-orange-50 border-yellow-200'
+          : 'from-blue-50 to-indigo-50 border-blue-200'
+      }`}>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1">
                 Requests Remaining This Period
               </div>
-              <div className="text-3xl font-bold text-blue-600">
+              <div className={`text-3xl font-bold ${
+                stats.requestsRemaining <= 10
+                  ? 'text-red-600'
+                  : stats.requestsRemaining <= 25
+                  ? 'text-yellow-600'
+                  : 'text-blue-600'
+              }`}>
                 {stats.requestsRemaining.toLocaleString()}
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+
+              {/* Enhanced reset date information - more prominent when credits are low */}
+              <div className={`mt-2 ${
+                stats.requestsRemaining <= 10
+                  ? 'text-red-700 font-semibold'
+                  : stats.requestsRemaining <= 25
+                  ? 'text-yellow-700 font-medium'
+                  : 'text-gray-500'
+              }`}>
                 {stats.billingCycleDate ? (
                   <div className="space-y-1">
-                    <div>Next reset: {getNextBillingDate(stats.billingCycleDate).toLocaleDateString('en-GB')}</div>
+                    <div className="text-sm">
+                      <span className="font-medium">Credits reset:</span>{' '}
+                      {getNextBillingDate(stats.billingCycleDate).toLocaleDateString('en-GB')}
+                    </div>
                     {stats.daysUntilReset && (
-                      <div>({stats.daysUntilReset} day{stats.daysUntilReset !== 1 ? 's' : ''} remaining)</div>
+                      <div className="text-xs">
+                        {stats.daysUntilReset} day{stats.daysUntilReset !== 1 ? 's' : ''} remaining
+                        {stats.requestsRemaining <= 10 && stats.daysUntilReset > 5 && (
+                          <span className="ml-2 text-red-600">⚠️ Consider upgrading</span>
+                        )}
+                      </div>
                     )}
                   </div>
                 ) : (
-                  'Reset on the 1st of each month'
+                  <div className="text-sm">
+                    <span className="font-medium">Credits reset:</span> 1st of each month
+                  </div>
                 )}
               </div>
             </div>
@@ -110,7 +140,13 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
               </div>
               <Link
                 href="/dashboard/billing"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
+                className={`text-sm font-medium hover:underline ${
+                  stats.requestsRemaining <= 10
+                    ? 'text-red-600 hover:text-red-700'
+                    : stats.requestsRemaining <= 25
+                    ? 'text-yellow-600 hover:text-yellow-700'
+                    : 'text-blue-600 hover:text-blue-700'
+                }`}
               >
                 Upgrade plan →
               </Link>
