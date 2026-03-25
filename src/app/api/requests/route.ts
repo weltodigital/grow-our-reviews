@@ -54,6 +54,10 @@ export async function GET(request: NextRequest) {
         nudge_sent_at,
         token,
         created_at,
+        sms_error_code,
+        sms_error_message,
+        sms_failed_at,
+        retry_count,
         customers(name, phone)
       `)
       .eq('user_id', user.id)

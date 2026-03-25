@@ -89,18 +89,42 @@ export async function POST(request: NextRequest) {
 
     // Update status based on Twilio message status
     let newStatus = (reviewRequest as any).status
+    let updateData: any = {}
 
     switch (messageStatus) {
       case 'delivered':
         // Message was delivered successfully
         console.log(`SMS delivered for request ${(reviewRequest as any).id}`)
+        // Clear any previous failure data if message is now delivered
+        if ((reviewRequest as any).sms_error_code) {
+          updateData = {
+            sms_error_code: null,
+            sms_error_message: null,
+            sms_failed_at: null
+          }
+        }
         break
 
       case 'failed':
       case 'undelivered':
-        // Message failed to deliver
+        // Message failed to deliver - store failure details
         newStatus = 'failed'
+        updateData = {
+          status: newStatus,
+          sms_error_code: errorCode || null,
+          sms_error_message: errorMessage || null,
+          sms_failed_at: new Date().toISOString(),
+          retry_count: ((reviewRequest as any).retry_count || 0) + 1
+        }
         console.error(`SMS failed for request ${(reviewRequest as any).id}: ${errorMessage} (Code: ${errorCode})`)
+
+        // Track health metrics
+        try {
+          const { healthMetrics } = await import('@/lib/health-metrics')
+          await healthMetrics.increment('sms_failed')
+        } catch (healthError) {
+          console.error('Failed to track SMS failure metrics:', healthError)
+        }
         break
 
       case 'sent':
@@ -112,15 +136,21 @@ export async function POST(request: NextRequest) {
         console.log(`SMS status update for request ${(reviewRequest as any).id}: ${messageStatus}`)
     }
 
-    // Update the review request if status changed
-    if (newStatus !== (reviewRequest as any).status) {
+    // Update the review request if status changed or we have failure data to store
+    if (newStatus !== (reviewRequest as any).status || Object.keys(updateData).length > 0) {
+      if (newStatus !== (reviewRequest as any).status && !updateData.status) {
+        updateData.status = newStatus
+      }
+
       const { error: updateError } = await (supabase as any)
         .from('review_requests')
-        .update({ status: newStatus })
+        .update(updateData)
         .eq('id', (reviewRequest as any).id)
 
       if (updateError) {
         console.error(`Error updating review request ${(reviewRequest as any).id}:`, updateError)
+      } else {
+        console.log(`Updated request ${(reviewRequest as any).id} with data:`, updateData)
       }
     }
 

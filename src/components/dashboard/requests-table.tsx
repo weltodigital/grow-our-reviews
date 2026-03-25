@@ -177,7 +177,19 @@ export function RequestsTable({
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <StatusBadge status={request.status} />
+                        <div className="space-y-1">
+                          <StatusBadge status={request.status} />
+                          {request.status === 'failed' && request.sms_error_message && (
+                            <div className="text-xs text-red-600 max-w-xs">
+                              {request.sms_error_code && (
+                                <span className="font-mono bg-red-50 px-1 rounded">
+                                  {request.sms_error_code}:
+                                </span>
+                              )}{' '}
+                              {request.sms_error_message}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {formatDateTime(request.scheduled_for)}
@@ -227,7 +239,19 @@ export function RequestsTable({
                       {formatPhone(request.customer_phone)}
                     </div>
                   </div>
-                  <StatusBadge status={request.status} />
+                  <div className="text-right">
+                    <StatusBadge status={request.status} />
+                    {request.status === 'failed' && request.sms_error_message && (
+                      <div className="text-xs text-red-600 mt-1 max-w-xs">
+                        {request.sms_error_code && (
+                          <span className="font-mono bg-red-50 px-1 rounded">
+                            {request.sms_error_code}:
+                          </span>
+                        )}{' '}
+                        {request.sms_error_message}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">

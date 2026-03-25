@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { RequestsTable } from '@/components/dashboard/requests-table'
 import { RequestFilters } from '@/components/dashboard/request-filters'
+import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
 import { ArrowLeft, Search, Plus, Download } from 'lucide-react'
 import Link from 'next/link'
 
@@ -21,6 +22,10 @@ export interface ReviewRequest {
   nudge_sent_at: string | null
   token: string
   created_at: string
+  sms_error_code?: string | null
+  sms_error_message?: string | null
+  sms_failed_at?: string | null
+  retry_count?: number
 }
 
 export default function RequestsPage() {
@@ -216,6 +221,9 @@ export default function RequestsPage() {
           </Button>
         </div>
       </div>
+
+      {/* SMS Failure Alert */}
+      <SmsFailureAlert />
 
       {/* Filters and Search */}
       <Card>

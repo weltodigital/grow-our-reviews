@@ -1,5 +1,6 @@
 import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
+import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
 import { getCurrentBillingPeriod, getDaysUntilReset } from '@/lib/billing-cycle'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -239,6 +240,9 @@ export default async function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* SMS Failure Alert */}
+      <SmsFailureAlert />
 
       {/* Stats Overview */}
       <StatsOverview stats={stats} />
