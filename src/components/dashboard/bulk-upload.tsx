@@ -173,9 +173,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
               status = status === 'error' ? 'error' : 'warning'
             } else if (duplicateInfo.riskLevel === 'info') {
               errors.push(`ℹ️ ${duplicateInfo.message}`)
-              if (status === 'error' || status === 'critical') {
-                // Keep existing status
-              } else {
+              if (status !== 'error') {
                 status = 'warning'
               }
             }
