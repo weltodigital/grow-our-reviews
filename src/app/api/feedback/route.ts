@@ -163,6 +163,12 @@ export async function POST(request: NextRequest) {
   try {
     const { token, rating, comment } = await request.json()
 
+    // Get client IP for rate limiting
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+               request.headers.get('x-real-ip') ||
+               '127.0.0.1'
+    const userAgent = request.headers.get('user-agent')
+
     // Validate input
     if (!token) {
       return NextResponse.json(
@@ -176,6 +182,46 @@ export async function POST(request: NextRequest) {
         { error: 'Valid rating (1-5) is required' },
         { status: 400 }
       )
+    }
+
+    // RATE LIMITING: Check submission limits before processing
+    const { feedbackRateLimiter } = await import('@/lib/feedback-rate-limiter')
+    const rateCheck = await feedbackRateLimiter.canSubmitFeedback(token, ip)
+
+    // Log the submission attempt (allowed or blocked)
+    await feedbackRateLimiter.logSubmissionAttempt({
+      token,
+      ip,
+      userAgent: userAgent || undefined,
+      rating,
+      commentLength: comment?.length || 0,
+      timestamp: new Date()
+    }, rateCheck.allowed)
+
+    if (!rateCheck.allowed) {
+      console.warn(`Feedback submission blocked: ${rateCheck.reason}`, {
+        token: token.substring(0, 8) + '...',
+        ip,
+        submissionsUsed: rateCheck.submissionsUsed,
+        userAgent: userAgent?.substring(0, 100)
+      })
+
+      return NextResponse.json(
+        {
+          error: rateCheck.reason || 'Submission limit exceeded',
+          details: {
+            submissionsUsed: rateCheck.submissionsUsed,
+            maxSubmissions: rateCheck.maxSubmissions
+          }
+        },
+        { status: 429 } // Too Many Requests
+      )
+    }
+
+    // ABUSE DETECTION: Check for suspicious patterns
+    const abuseCheck = await feedbackRateLimiter.detectAbuse(ip)
+    if (abuseCheck.suspiciousActivity) {
+      console.warn(`Suspicious feedback activity detected from IP ${ip}:`, abuseCheck.reasons)
     }
 
     let response = NextResponse.json({ success: true })
@@ -207,6 +253,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if feedback already exists for this review request
+    // Note: Rate limiter above already handles per-token limits more comprehensively
     const { data: existingFeedback } = await supabase
       .from('feedback')
       .select('id')
@@ -220,12 +267,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create the feedback record
+    // Create the feedback record with token for rate limiting
     const { error: feedbackError } = await (supabase as any)
       .from('feedback')
       .insert({
         review_request_id: (reviewRequest as any).id,
         user_id: (reviewRequest as any).user_id,
+        token, // Store token for future rate limiting checks
         rating,
         comment: comment?.trim() || null,
       })
