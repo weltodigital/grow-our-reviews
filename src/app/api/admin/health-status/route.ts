@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { healthMetrics } from '@/lib/health-metrics'
+import { createServerClient } from '@supabase/ssr'
+import type { Database } from '@/types/database'
 
 // Real-time health status endpoint for admin dashboard
 export async function GET() {
@@ -8,19 +10,47 @@ export async function GET() {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
     const yesterdayStr = yesterday.toISOString().split('T')[0]
+    const now = new Date().toISOString()
 
-    const [todayMetrics, yesterdayMetrics, weeklyTrend] = await Promise.all([
+    // Get SMS queue depth for real-time monitoring
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          getAll() { return [] },
+          setAll() {},
+        },
+      }
+    )
+
+    const [todayMetrics, yesterdayMetrics, weeklyTrend, queueDepth] = await Promise.all([
       healthMetrics.getDailyMetrics(today),
       healthMetrics.getDailyMetrics(yesterdayStr),
-      healthMetrics.getWeeklyTrend()
+      healthMetrics.getWeeklyTrend(),
+      // Check current SMS queue depth
+      supabase
+        .from('review_requests')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['scheduled', 'queued'])
+        .lte('scheduled_for', now)
     ])
+
+    // SMS queue metrics for scalability monitoring
+    const SMS_BATCH_SIZE = parseInt(process.env.SMS_BATCH_SIZE || '50')
+    const currentQueueDepth = queueDepth.count || 0
 
     // Quick health status indicators
     const status = {
       sms: {
         today: todayMetrics.sms_sent,
         failed: todayMetrics.sms_failed,
-        status: todayMetrics.sms_failed > todayMetrics.sms_sent * 0.1 ? 'warning' : 'healthy'
+        queueDepth: currentQueueDepth,
+        queueHealth: currentQueueDepth > SMS_BATCH_SIZE * 6 ? 'critical' :
+                     currentQueueDepth > SMS_BATCH_SIZE * 3 ? 'warning' : 'healthy',
+        status: currentQueueDepth > SMS_BATCH_SIZE * 6 ? 'critical' :
+                currentQueueDepth > SMS_BATCH_SIZE * 3 ? 'warning' :
+                todayMetrics.sms_failed > todayMetrics.sms_sent * 0.1 ? 'warning' : 'healthy'
       },
       webhooks: {
         today: todayMetrics.webhooks_processed,

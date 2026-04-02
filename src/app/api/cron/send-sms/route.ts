@@ -51,6 +51,30 @@ export async function GET(request: NextRequest) {
     // Find all review requests that should be sent now
     const now = new Date().toISOString()
 
+    // SCALABILITY: Configurable batch size based on environment variable
+    // Default 50, but can be increased as user base grows
+    const SMS_BATCH_SIZE = parseInt(process.env.SMS_BATCH_SIZE || '50')
+    console.log(`SMS cron processing up to ${SMS_BATCH_SIZE} messages this batch`)
+
+    // MONITORING: Check queue depth before processing for capacity planning
+    const { count: totalPendingCount, error: countError } = await (supabase as any)
+      .from('review_requests')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['scheduled', 'queued'])
+      .lte('scheduled_for', now)
+
+    if (totalPendingCount && totalPendingCount > 0) {
+      console.log(`Queue depth: ${totalPendingCount} messages pending (processing ${Math.min(SMS_BATCH_SIZE, totalPendingCount)})`)
+
+      // ALERT: Log warnings if queue is backing up
+      if (totalPendingCount > SMS_BATCH_SIZE * 3) {
+        console.warn(`🚨 SMS QUEUE WARNING: ${totalPendingCount} messages pending, >3x batch size. Consider increasing batch size or frequency.`)
+      }
+      if (totalPendingCount > SMS_BATCH_SIZE * 6) {
+        console.error(`🚨 SMS QUEUE CRITICAL: ${totalPendingCount} messages pending, >6x batch size. Queue backup detected!`)
+      }
+    }
+
     // Get review requests - both scheduled and queued messages
     // Priority order:
     // 1. Scheduled messages by scheduled_for (oldest first)
@@ -63,7 +87,7 @@ export async function GET(request: NextRequest) {
       .lte('scheduled_for', now)
       .order('scheduled_for', { ascending: true })
       .order('created_at', { ascending: true }) // Secondary sort for same scheduled_for
-      .limit(50) // Process in batches to avoid timeouts
+      .limit(SMS_BATCH_SIZE)
 
     if (fetchError) {
       console.error('Error fetching pending requests:', fetchError)
@@ -312,15 +336,31 @@ export async function GET(request: NextRequest) {
       if (sentCount.failed > 0) {
         await healthMetrics.increment('sms_failed', sentCount.failed)
       }
+      // Note: Queue depth is tracked in real-time via direct database queries
+      // in health status endpoints, not as daily metrics
     } catch (error) {
       console.error('Failed to track health metrics:', error)
     }
+
+    // SCALABILITY METRICS: Calculate queue backup risk
+    const remainingAfterBatch = Math.max(0, (totalPendingCount || 0) - pendingRequests.length)
+    const hoursToProcessRemaining = remainingAfterBatch > 0 ? Math.ceil(remainingAfterBatch / (SMS_BATCH_SIZE * 12)) : 0
 
     response = NextResponse.json({
       message: 'SMS sending completed',
       processed: pendingRequests.length,
       success: sentCount.success,
       failed: sentCount.failed,
+      queueMetrics: {
+        totalPending: totalPendingCount || 0,
+        remainingAfterBatch: remainingAfterBatch,
+        hoursToProcessRemaining: hoursToProcessRemaining,
+        batchSize: SMS_BATCH_SIZE,
+        queueHealth: totalPendingCount ? (
+          totalPendingCount > SMS_BATCH_SIZE * 6 ? 'critical' :
+          totalPendingCount > SMS_BATCH_SIZE * 3 ? 'warning' : 'good'
+        ) : 'good'
+      },
       results,
     })
     return response
