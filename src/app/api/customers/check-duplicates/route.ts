@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Analyze each phone number for risk level
     const duplicateAnalysis = phoneNumbers.map(phone => {
       // SECURITY: Check if customer has opted out first (highest priority block)
-      const suppression = suppressions?.find((s: any) => s.phone_number === phone)
+      const suppression = (suppressions as any[])?.find((s: any) => s.phone_number === phone)
       if (suppression) {
         const suppressedDate = new Date(suppression.suppressed_at)
         const daysAgoSuppressed = Math.ceil((Date.now() - suppressedDate.getTime()) / (1000 * 60 * 60 * 24))
