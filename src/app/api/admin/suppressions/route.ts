@@ -150,7 +150,7 @@ export async function DELETE(request: NextRequest) {
     console.log('Admin suppression removal:', {
       phone_number: phone_number.replace(/(\+\d{2})\d+(\d{3})/, '$1***xxx$2'),
       user_id,
-      business_name: businessInfo?.business_name,
+      business_name: (businessInfo as any)?.business_name,
       suppressed_at: (existing as any).suppressed_at,
       removed_at: new Date().toISOString(),
       reason: reason || 'Admin removal - re-consent'
@@ -160,7 +160,7 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Suppression removed successfully',
       phone_number_masked: phone_number.replace(/(\+\d{2})\d+(\d{3})/, '$1***xxx$2'),
-      business: businessInfo?.business_name || 'Unknown'
+      business: (businessInfo as any)?.business_name || 'Unknown'
     })
 
   } catch (error) {
