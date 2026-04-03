@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Star, Mail } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { getAppUrl } from '@/lib/utils'
 
 export function MarketingFooter() {
@@ -18,12 +17,40 @@ export function MarketingFooter() {
               Every job you finish without sending a review request is a missed opportunity to climb Google's local rankings. Start your free trial today and turn your happy customers into the 5-star reviews your business deserves.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700">
-                <a href={getAppUrl('/signup')}>Start Your Free Trial</a>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="border-gray-600 text-gray-300 hover:bg-gray-800">
-                <Link href="#pricing">See Pricing</Link>
-              </Button>
+              <a
+                href={getAppUrl('/signup')}
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full transition-colors"
+                style={{
+                  backgroundColor: 'var(--accent)',
+                  color: 'var(--accent-text)',
+                  border: 'none'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--accent)'
+                }}
+              >
+                Start Your Free Trial
+              </a>
+              <a
+                href="#pricing"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-full border transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: '#d1d5db',
+                  borderColor: '#4b5563'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1f2937'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }}
+              >
+                See Pricing
+              </a>
             </div>
             <p className="text-sm text-gray-400 mt-4">
               14-day free trial • Credit card required • Cancel anytime

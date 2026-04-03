@@ -11,7 +11,7 @@ import { PricingSection } from '@/components/marketing/pricing-section'
 import { LocalSeoCallout } from '@/components/marketing/local-seo-callout'
 import { FaqSection } from '@/components/marketing/faq-section'
 import { MarketingFooter } from '@/components/marketing/marketing-footer'
-import { MarketingHeader } from '@/components/marketing/marketing-header'
+import { NavBubble } from '@/components/navigation/NavBubble'
 import { supabase } from '@/lib/supabase'
 
 function HomePageContent() {
@@ -30,7 +30,7 @@ function HomePageContent() {
 
   return (
     <div className="min-h-screen bg-white">
-      <MarketingHeader />
+      <NavBubble />
       <main>
         <HeroSection />
         <HowItWorksSection />

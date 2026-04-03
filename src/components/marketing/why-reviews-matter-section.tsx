@@ -20,12 +20,10 @@ export function WhyReviewsMatterSection() {
   ]
 
   return (
-    <section className="py-24 sm:py-32 bg-gray-50">
+    <section className="section" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Why Google Reviews Are the Most Important Thing for Your Business Right Now
-          </h2>
+        <div className="section-header">
+          <h2>Why Google Reviews Are the Most Important Thing for Your Business Right Now</h2>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -50,8 +48,8 @@ export function WhyReviewsMatterSection() {
                   <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
                     <div className="flex items-start space-x-4">
                       <div className="flex-shrink-0">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                          <Icon className="h-5 w-5 text-blue-600" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--accent-light)' }}>
+                          <Icon className="h-5 w-5" style={{ color: 'var(--accent)' }} />
                         </div>
                       </div>
                       <div>
@@ -68,7 +66,7 @@ export function WhyReviewsMatterSection() {
               })}
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--accent-light)' }}>
               <p className="text-gray-700 leading-relaxed">
                 This is why 'doing great work' isn't enough. You need your happy customers to actually say so — on Google, regularly. That's exactly what Grow Our Reviews automates for you.
               </p>
@@ -82,7 +80,7 @@ export function WhyReviewsMatterSection() {
 
               {/* Mock Google Map Pack */}
               <div className="space-y-3">
-                <div className="border-l-4 border-green-500 pl-4 py-3 bg-green-50">
+                <div className="border-l-4 pl-4 py-3" style={{ borderLeftColor: 'var(--accent)', backgroundColor: 'var(--accent-light)' }}>
                   <div className="font-semibold text-gray-900">Elite Plumbing Services</div>
                   <div className="flex items-center space-x-2 mt-1">
                     <div className="flex">
@@ -125,7 +123,7 @@ export function WhyReviewsMatterSection() {
               </div>
 
               <div className="mt-4 flex items-center">
-                <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                <div className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent-dark)' }}>
                   ← This is where you want to be
                 </div>
               </div>

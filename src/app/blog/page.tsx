@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Clock, Calendar, Tag } from "lucide-react";
-import { MarketingHeader } from '@/components/marketing/marketing-header';
+import { NavBubble } from '@/components/navigation/NavBubble';
 import { MarketingFooter } from '@/components/marketing/marketing-footer';
 
 export const metadata: Metadata = {
@@ -125,18 +125,16 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <MarketingHeader />
+      <NavBubble />
 
       {/* Blog Content */}
       <main>
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-blue-50 to-indigo-100 py-20 sm:py-32">
+        <section className="section" style={{ backgroundColor: 'var(--bg-primary)' }}>
           <div className="container mx-auto px-4">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
-                Blog
-              </h1>
-              <p className="text-lg leading-8 text-gray-600 max-w-3xl mx-auto">
+            <div className="section-header">
+              <h1>Blog</h1>
+              <p className="page-subtitle mx-auto">
                 Practical guides on Google reviews, local SEO, and getting more work for tradespeople.
                 Learn how to grow your online reputation and win more local customers.
               </p>
@@ -145,16 +143,17 @@ export default function BlogPage() {
         </section>
 
         {/* Articles Section */}
-        <section className="container mx-auto px-4 py-16">
-          {/* Featured Articles */}
-          {featuredArticles.length > 0 && (
-            <div className="mb-16">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Articles</h2>
+        <section className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+          <div className="container mx-auto px-4">
+            {/* Featured Articles */}
+            {featuredArticles.length > 0 && (
+              <div className="mb-16">
+                <h2 className="mb-8">Featured Articles</h2>
             <div className="grid gap-8 md:grid-cols-2">
               {featuredArticles.map((article) => (
                 <article key={article.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="h-48 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                    <div className="text-center text-white">
+                  <div className="h-48 flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, var(--accent), var(--accent-hover))' }}>
+                    <div className="text-center" style={{ color: 'var(--accent-text)' }}>
                       <Tag className="mx-auto mb-3 h-12 w-12" />
                       <div className="text-sm font-medium">{article.category}</div>
                     </div>
@@ -176,7 +175,9 @@ export default function BlogPage() {
                       </div>
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                      <Link href={`/blog/${article.slug}`} className="hover:text-blue-600">
+                      <Link href={`/blog/${article.slug}`} className="hover:underline" style={{ color: 'inherit' }}
+                        onMouseOver={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+                        onMouseOut={(e) => { e.currentTarget.style.color = 'inherit' }}>
                         {article.title}
                       </Link>
                     </h3>
@@ -190,14 +191,14 @@ export default function BlogPage() {
             </div>
           )}
 
-          {/* All Articles */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">All Articles</h2>
+            {/* All Articles */}
+            <div>
+              <h2 className="mb-8">All Articles</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {regularArticles.map((article) => (
               <article key={article.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-32 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                  <div className="text-center text-white">
+                <div className="h-32 flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, var(--text-tertiary), var(--text-secondary))' }}>
+                  <div className="text-center" style={{ color: 'var(--bg-primary)' }}>
                     <Tag className="mx-auto mb-2 h-8 w-8" />
                     <div className="text-xs font-medium">{article.category}</div>
                   </div>
@@ -219,7 +220,9 @@ export default function BlogPage() {
                     </div>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    <Link href={`/blog/${article.slug}`} className="hover:text-blue-600">
+                    <Link href={`/blog/${article.slug}`} className="hover:underline" style={{ color: 'inherit' }}
+                      onMouseOver={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+                      onMouseOut={(e) => { e.currentTarget.style.color = 'inherit' }}>
                       {article.title}
                     </Link>
                   </h3>
@@ -229,7 +232,8 @@ export default function BlogPage() {
                 </div>
               </article>
             ))}
-          </div>
+            </div>
+            </div>
           </div>
         </section>
       </main>

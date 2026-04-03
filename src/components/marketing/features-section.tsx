@@ -29,13 +29,11 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section id="features" className="py-24 sm:py-32 bg-gray-50">
+    <section id="features" className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container mx-auto px-4">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Everything you need to grow your reviews
-          </h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+        <div className="section-header">
+          <h2>Everything you need to grow your reviews</h2>
+          <p className="page-subtitle mx-auto">
             Powerful features designed specifically for tradespeople who want more Google reviews without the hassle.
           </p>
         </div>
@@ -47,8 +45,8 @@ export function FeaturesSection() {
               <div key={index} className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                      <Icon className="h-6 w-6 text-blue-600" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--accent-light)' }}>
+                      <Icon className="h-6 w-6" style={{ color: 'var(--accent)' }} />
                     </div>
                   </div>
                   <div className="flex-1">

@@ -1,6 +1,11 @@
+'use client'
+
 import { CheckCircle, MessageSquare, Star } from 'lucide-react'
+import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 export function HowItWorksSection() {
+  const { isVisible, elementRef } = useScrollAnimation()
+
   const steps = [
     {
       icon: CheckCircle,
@@ -23,13 +28,15 @@ export function HowItWorksSection() {
   ]
 
   return (
-    <section id="how-it-works" className="py-24 sm:py-32 bg-white">
+    <section
+      ref={elementRef}
+      id="how-it-works"
+      className={`section animate-fade-in-up ${isVisible ? 'visible' : ''}`}
+      style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container mx-auto px-4">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            How It Works
-          </h2>
-          <p className="mt-4 text-lg text-gray-600">
+        <div className="section-header">
+          <h2>How It Works</h2>
+          <p className="page-subtitle mx-auto">
             Simple, automated, and effective. No technical knowledge required.
           </p>
         </div>
@@ -42,12 +49,12 @@ export function HowItWorksSection() {
                 <div key={index} className="relative">
                   {/* Connection line */}
                   {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-12 left-[calc(100%+1rem)] w-8 h-px bg-gradient-to-r from-blue-200 to-blue-300 z-0" />
+                    <div className="hidden md:block absolute top-12 left-[calc(100%+1rem)] w-8 h-px z-0" style={{ background: 'linear-gradient(to right, var(--accent-light), var(--accent-medium))' }} />
                   )}
 
                   <div className="relative text-center">
                     <div className="flex justify-center">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-white">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-text)' }}>
                         <Icon className="h-8 w-8" />
                       </div>
                     </div>
@@ -82,7 +89,7 @@ export function HowItWorksSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               {/* Customer journey */}
               <div className="space-y-4">
-                <div className="bg-white rounded-lg p-4 border-l-4 border-green-500">
+                <div className="bg-white rounded-lg p-4 border-l-4" style={{ borderLeftColor: 'var(--accent)' }}>
                   <div className="flex items-center space-x-2 mb-2">
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
@@ -95,7 +102,7 @@ export function HowItWorksSection() {
                   </p>
                 </div>
 
-                <div className="bg-white rounded-lg p-4 border-l-4 border-orange-500">
+                <div className="bg-white rounded-lg p-4 border-l-4" style={{ borderLeftColor: 'var(--status-warning)' }}>
                   <div className="flex items-center space-x-2 mb-2">
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
@@ -112,25 +119,25 @@ export function HowItWorksSection() {
               {/* Benefits */}
               <div className="space-y-3">
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                   <p className="text-sm text-gray-600">
                     Only happy customers reach Google Reviews
                   </p>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                   <p className="text-sm text-gray-600">
                     Get private feedback to improve your service
                   </p>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                   <p className="text-sm text-gray-600">
                     Protect your online reputation automatically
                   </p>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                   <p className="text-sm text-gray-600">
                     One gentle nudge if they don't respond (optional)
                   </p>

@@ -1,12 +1,15 @@
-import { MarketingHeader } from '@/components/marketing/marketing-header'
+import { NavBubble } from '@/components/navigation/NavBubble'
 import { MarketingFooter } from '@/components/marketing/marketing-footer'
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <MarketingHeader />
-      <main className="container mx-auto px-4 py-16 max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
+      <NavBubble />
+      <main className="section" style={{ backgroundColor: 'var(--bg-primary)' }}>
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="section-header">
+            <h1>Privacy Policy</h1>
+          </div>
 
         <div className="prose prose-lg max-w-none">
           <p className="text-gray-600 mb-8">
@@ -94,7 +97,7 @@ export default function PrivacyPage() {
               <li><strong>Withdraw Consent:</strong> Withdraw consent at any time where processing is based on consent</li>
             </ul>
             <p className="text-gray-700 mt-4">
-              To exercise these rights, contact us at <a href="mailto:hello@growourreviews.com" className="text-blue-600 hover:text-blue-800">hello@growourreviews.com</a>
+              To exercise these rights, contact us at <a href="mailto:hello@growourreviews.com" className="hover:underline" style={{ color: 'var(--accent)' }}>hello@growourreviews.com</a>
             </p>
           </section>
 
@@ -132,10 +135,11 @@ export default function PrivacyPage() {
               If you have any questions about this privacy policy or our data practices, please contact us at:
             </p>
             <p className="text-gray-700 mt-4">
-              <strong>Email:</strong> <a href="mailto:hello@growourreviews.com" className="text-blue-600 hover:text-blue-800">hello@growourreviews.com</a><br/>
+              <strong>Email:</strong> <a href="mailto:hello@growourreviews.com" className="hover:underline" style={{ color: 'var(--accent)' }}>hello@growourreviews.com</a><br/>
               <strong>Address:</strong> Welto Digital, United Kingdom
             </p>
           </section>
+          </div>
         </div>
       </main>
       <MarketingFooter />

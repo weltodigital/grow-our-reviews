@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import { getAppUrl } from '@/lib/utils'
 
 export function SoundFamiliarSection() {
@@ -10,18 +9,16 @@ export function SoundFamiliarSection() {
   ]
 
   return (
-    <section className="py-24 sm:py-32 bg-white">
+    <section className="section" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Sound familiar?
-          </h2>
+        <div className="section-header">
+          <h2>Sound familiar?</h2>
         </div>
 
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {problems.map((problem, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-6 border-l-4 border-orange-400">
+              <div key={index} className="rounded-xl p-6 border-l-4" style={{ backgroundColor: 'var(--bg-secondary)', borderLeftColor: 'var(--status-warning)' }}>
                 <p className="text-gray-700 leading-relaxed italic">
                   "{problem}"
                 </p>
@@ -33,9 +30,23 @@ export function SoundFamiliarSection() {
             <p className="text-xl text-gray-900 font-semibold mb-8">
               Grow Our Reviews fixes all of this. Automatically.
             </p>
-            <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700">
-              <a href={getAppUrl('/signup')}>Start Your Free Trial</a>
-            </Button>
+            <a
+              href={getAppUrl('/signup')}
+              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-full transition-colors"
+              style={{
+                backgroundColor: 'var(--accent)',
+                color: 'var(--accent-text)',
+                border: 'none'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--accent)'
+              }}
+            >
+              Start Your Free Trial
+            </a>
           </div>
         </div>
       </div>

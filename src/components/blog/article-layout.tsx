@@ -4,7 +4,7 @@ import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { Calendar, Clock, Tag, ChevronRight, Home, Menu, X, Copy, Check } from "lucide-react";
 import { BlogCTABanner } from "./blog-cta-banner";
-import { MarketingHeader } from '@/components/marketing/marketing-header';
+import { NavBubble } from '@/components/navigation/NavBubble';
 import { MarketingFooter } from '@/components/marketing/marketing-footer';
 
 interface ArticleLayoutProps {
@@ -97,7 +97,7 @@ function TableOfContents({ headings }: { headings: { id: string; text: string; l
                   key={id}
                   href={`#${id}`}
                   onClick={() => setIsOpen(false)}
-                  className={`block text-sm hover:text-blue-600 ${
+                  className={`block text-sm hover:text-gray-600 ${
                     activeId === id ? 'text-blue-600 font-medium' : 'text-gray-600'
                   }`}
                 >
@@ -118,13 +118,18 @@ function TableOfContents({ headings }: { headings: { id: string; text: string; l
               <Link
                 key={id}
                 href={`#${id}`}
-                className={`block text-sm leading-relaxed hover:text-blue-600 transition-all duration-200 py-1 ${
+                className={`block text-sm leading-relaxed transition-all duration-200 py-1 ${
                   level === 3 ? 'pl-4 text-gray-500' : ''
                 } ${
                   activeId === id
-                    ? 'text-blue-600 font-semibold border-l-3 border-blue-600 pl-3 -ml-3 bg-blue-50 py-2 rounded-r'
+                    ? 'font-semibold border-l-3 pl-3 -ml-3 py-2 rounded-r'
                     : 'text-gray-700 hover:pl-1'
                 }`}
+                style={activeId === id ? {
+                  color: 'var(--accent)',
+                  borderColor: 'var(--accent)',
+                  backgroundColor: 'var(--accent-light)'
+                } : {}}
               >
                 {text}
               </Link>
@@ -228,7 +233,7 @@ export function ArticleLayout({
 
   return (
     <div className="min-h-screen bg-white">
-      <MarketingHeader />
+      <NavBubble />
 
       <main className="container mx-auto px-4 py-12">
         {/* Breadcrumb */}
@@ -282,11 +287,11 @@ export function ArticleLayout({
                     .blog-h2 {
                       font-size: 1.75rem !important;
                       font-weight: 700 !important;
-                      color: #155dfb !important;
+                      color: var(--accent) !important;
                       margin-top: 3rem !important;
                       margin-bottom: 1.5rem !important;
                       padding-bottom: 0.5rem !important;
-                      border-bottom: 2px solid #155dfb !important;
+                      border-bottom: 2px solid var(--accent) !important;
                       line-height: 1.3 !important;
                       letter-spacing: -0.025em !important;
                     }
@@ -355,7 +360,9 @@ export function ArticleLayout({
                             {article.category}
                           </span>
                           <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                            <Link href={`/blog/${article.slug}`} className="hover:text-blue-600">
+                            <Link href={`/blog/${article.slug}`} className="hover:underline" style={{ color: 'inherit' }}
+                              onMouseOver={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+                              onMouseOut={(e) => { e.currentTarget.style.color = 'inherit' }}>
                               {article.title}
                             </Link>
                           </h4>

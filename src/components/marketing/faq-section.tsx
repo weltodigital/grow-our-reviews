@@ -46,13 +46,11 @@ export function FaqSection() {
   ]
 
   return (
-    <section id="faq" className="py-24 sm:py-32 bg-white">
+    <section id="faq" className="section" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="container mx-auto px-4">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Frequently asked questions
-          </h2>
-          <p className="mt-4 text-lg text-gray-600">
+        <div className="section-header">
+          <h2>Frequently asked questions</h2>
+          <p className="page-subtitle mx-auto">
             Everything you need to know about Grow Our Reviews
           </p>
         </div>
