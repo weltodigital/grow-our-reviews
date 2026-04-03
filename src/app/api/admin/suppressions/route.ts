@@ -53,8 +53,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Get business info separately to avoid type issues
+    const { data: businessInfo } = await supabase
+      .from('profiles')
+      .select('business_name, email')
+      .eq('id', userId)
+      .single()
+
     // Mask phone numbers for privacy (show last 3 digits only)
-    const maskedSuppressions = suppressions?.map((suppression: any) => ({
+    const maskedSuppressions = (suppressions as any[])?.map((suppression: any) => ({
       ...suppression,
       phone_number_masked: suppression.phone_number.replace(/(\+\d{2})\d+(\d{3})/, '$1***xxx$2'),
       phone_number: undefined // Remove full number from response
@@ -63,7 +70,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       suppressions: maskedSuppressions || [],
       total: suppressions?.length || 0,
-      business: suppressions?.[0]?.profiles || null
+      business: businessInfo || null
     })
 
   } catch (error) {
@@ -105,7 +112,7 @@ export async function DELETE(request: NextRequest) {
     // Verify the suppression exists before deleting
     const { data: existing, error: findError } = await supabase
       .from('sms_suppressions')
-      .select('id, phone_number, suppressed_at, profiles!inner(business_name)')
+      .select('id, phone_number, suppressed_at')
       .eq('phone_number', phone_number)
       .eq('user_id', user_id)
       .single()
@@ -116,6 +123,13 @@ export async function DELETE(request: NextRequest) {
         { status: 404 }
       )
     }
+
+    // Get business info separately
+    const { data: businessInfo } = await supabase
+      .from('profiles')
+      .select('business_name')
+      .eq('id', user_id)
+      .single()
 
     // Delete the suppression
     const { error: deleteError } = await supabase
@@ -136,8 +150,8 @@ export async function DELETE(request: NextRequest) {
     console.log('Admin suppression removal:', {
       phone_number: phone_number.replace(/(\+\d{2})\d+(\d{3})/, '$1***xxx$2'),
       user_id,
-      business_name: existing.profiles.business_name,
-      suppressed_at: existing.suppressed_at,
+      business_name: businessInfo?.business_name,
+      suppressed_at: (existing as any).suppressed_at,
       removed_at: new Date().toISOString(),
       reason: reason || 'Admin removal - re-consent'
     })
@@ -146,7 +160,7 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Suppression removed successfully',
       phone_number_masked: phone_number.replace(/(\+\d{2})\d+(\d{3})/, '$1***xxx$2'),
-      business: existing.profiles.business_name
+      business: businessInfo?.business_name || 'Unknown'
     })
 
   } catch (error) {
