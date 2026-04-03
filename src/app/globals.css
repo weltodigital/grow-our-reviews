@@ -302,4 +302,8 @@ h4 {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .hover\:text-accent:hover {
+    color: var(--accent) !important;
+  }
 }

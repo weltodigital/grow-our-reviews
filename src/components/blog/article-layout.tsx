@@ -360,9 +360,7 @@ export function ArticleLayout({
                             {article.category}
                           </span>
                           <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                            <Link href={`/blog/${article.slug}`} className="hover:underline" style={{ color: 'inherit' }}
-                              onMouseOver={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
-                              onMouseOut={(e) => { e.currentTarget.style.color = 'inherit' }}>
+                            <Link href={`/blog/${article.slug}`} className="hover:underline hover:text-accent" style={{ color: 'inherit' }}>
                               {article.title}
                             </Link>
                           </h4>
