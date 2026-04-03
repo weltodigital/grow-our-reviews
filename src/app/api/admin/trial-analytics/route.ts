@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
 interface TrialAnalytics {
   overview: {
@@ -35,7 +36,10 @@ interface TrialAnalytics {
   }>
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
   try {
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

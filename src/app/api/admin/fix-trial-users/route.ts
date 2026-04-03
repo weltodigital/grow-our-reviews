@@ -4,13 +4,12 @@ import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 import { calculateBillingCycleDate } from '@/lib/billing-cycle'
 import { calculateTrialEndDate } from '@/lib/pricing'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
 export async function POST(request: NextRequest) {
-  // Admin authentication - check for admin key
-  const adminKey = request.headers.get('x-admin-key')
-  if (adminKey !== process.env.ADMIN_API_KEY) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

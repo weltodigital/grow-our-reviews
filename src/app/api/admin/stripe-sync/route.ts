@@ -2,9 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
 import { getPriceInfo } from '@/lib/stripe'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
 // Manual sync API for admin use
 export async function POST(request: NextRequest) {
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
   try {
     const { userId, subscriptionId } = await request.json()
 

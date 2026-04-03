@@ -1,8 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
   try {
     // Use service role key for admin access
     const supabase = createServerClient<Database>(

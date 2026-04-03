@@ -2,9 +2,12 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { createSMSRateLimiter } from '@/lib/sms-rate-limiter'
 import type { Database } from '@/types/database'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
-// Simple admin endpoint to check SMS usage - protect with basic auth or admin role
 export async function GET(request: NextRequest) {
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
   try {
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,8 +65,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Allow updating rate limits (admin only)
 export async function POST(request: NextRequest) {
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
   try {
     const body = await request.json()
     const { limitType, limitValue } = body

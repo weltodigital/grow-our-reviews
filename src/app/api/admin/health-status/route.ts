@@ -1,10 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { healthMetrics } from '@/lib/health-metrics'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
 // Real-time health status endpoint for admin dashboard
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // SECURITY: Protect admin endpoint
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
   try {
     const today = new Date().toISOString().split('T')[0]
     const yesterday = new Date()

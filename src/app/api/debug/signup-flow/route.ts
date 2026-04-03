@@ -4,45 +4,34 @@ import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 import { PRICING_PLANS } from '@/lib/pricing'
 import { STRIPE_CONFIG } from '@/lib/stripe'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
+  // SECURITY: Protect debug endpoint - admin access only
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
+
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          // Readonly for debugging
-        },
+        getAll() { return [] },
+        setAll() {},
       },
     }
   )
 
-  // Get the current user
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  }
-
   try {
-    // Get user profile
-    const { data: profile } = await supabase
+    // Get all user profiles for debugging (admin view)
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', user.id)
-      .single()
+      .order('created_at', { ascending: false })
+      .limit(10)
 
     const debug = {
-      user: {
-        id: user.id,
-        email: user.email,
-        created_at: user.created_at
-      },
-      profile,
+      recentProfiles: profiles,
       pricingConfig: PRICING_PLANS,
       stripeConfig: STRIPE_CONFIG,
       envVars: {
