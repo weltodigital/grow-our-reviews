@@ -141,6 +141,22 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
     // Normalize phone number
     const normalizedPhone = normalizePhoneNumber(data.customerPhone)
 
+    // SECURITY: Check if customer has opted out (STOP message protection)
+    const { data: suppression } = await (supabase as any)
+      .from('sms_suppressions')
+      .select('id, suppressed_at, reason')
+      .eq('phone_number', normalizedPhone)
+      .eq('user_id', user.id)
+      .limit(1)
+      .single()
+
+    if (suppression) {
+      return {
+        error: 'This customer has opted out of receiving SMS messages from your business. We cannot send them a review request.',
+        type: 'suppressed'
+      }
+    }
+
     // Find or create customer
     let customer
     const { data: existingCustomer } = await (supabase as any)

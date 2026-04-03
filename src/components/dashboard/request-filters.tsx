@@ -12,6 +12,7 @@ interface RequestFiltersProps {
     reviewed: number
     feedback_given: number
     failed: number
+    suppressed: number
   }
 }
 
@@ -29,6 +30,7 @@ export function RequestFilters({
     { key: 'reviewed', label: 'Reviewed', count: statusCounts.reviewed, color: 'green' },
     { key: 'feedback_given', label: 'Feedback', count: statusCounts.feedback_given, color: 'purple' },
     { key: 'failed', label: 'Failed', count: statusCounts.failed, color: 'red' },
+    { key: 'suppressed', label: 'Suppressed', count: statusCounts.suppressed, color: 'gray' },
   ]
 
   const getButtonStyle = (filter: any, isActive: boolean) => {
@@ -38,6 +40,8 @@ export function RequestFilters({
       switch (filter.color) {
         case 'blue':
           return `${baseStyle} bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200`
+        case 'amber':
+          return `${baseStyle} bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200`
         case 'yellow':
           return `${baseStyle} bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200`
         case 'orange':

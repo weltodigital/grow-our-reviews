@@ -132,6 +132,39 @@ export async function GET(request: NextRequest) {
     // Process each eligible request
     for (const request of eligibleRequests) {
       try {
+        // SECURITY: Check if customer has opted out (STOP message protection)
+        const { data: suppression } = await supabase
+          .from('sms_suppressions')
+          .select('id')
+          .eq('phone_number', (request as any).customers.phone)
+          .eq('user_id', (request as any).profiles.id)
+          .limit(1)
+          .single()
+
+        if (suppression) {
+          // Customer has opted out - skip nudge and mark nudge as sent to prevent retries
+          const { error: suppressError } = await (supabase as any)
+            .from('review_requests')
+            .update({
+              nudge_sent: true,
+              nudge_sent_at: new Date().toISOString()
+            })
+            .eq('id', (request as any).id)
+
+          if (suppressError) {
+            console.error(`Error marking nudge as skipped for suppressed request ${(request as any).id}:`, suppressError)
+          } else {
+            console.log(`Nudge skipped for request ${(request as any).id} - customer ${(request as any).customers.phone} has opted out`)
+          }
+
+          results.push({
+            requestId: (request as any).id,
+            status: 'suppressed',
+            reason: 'Customer has opted out'
+          })
+          continue // Skip to next request
+        }
+
         // Create the sentiment gate URL
         const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 

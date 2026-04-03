@@ -201,6 +201,36 @@ export async function GET(request: NextRequest) {
     // Process each request
     for (const request of pendingRequests) {
       try {
+        // SECURITY: Check if customer has opted out (STOP message protection)
+        const { data: suppression } = await supabase
+          .from('sms_suppressions')
+          .select('id')
+          .eq('phone_number', (request as any).customers.phone)
+          .eq('user_id', (request as any).user_id)
+          .limit(1)
+          .single()
+
+        if (suppression) {
+          // Customer has opted out - mark as suppressed and skip
+          const { error: suppressError } = await (supabase as any)
+            .from('review_requests')
+            .update({ status: 'suppressed' })
+            .eq('id', (request as any).id)
+
+          if (suppressError) {
+            console.error(`Error marking request ${(request as any).id} as suppressed:`, suppressError)
+          } else {
+            console.log(`Request ${(request as any).id} suppressed - customer ${(request as any).customers.phone} has opted out`)
+          }
+
+          results.push({
+            requestId: (request as any).id,
+            status: 'suppressed',
+            reason: 'Customer has opted out'
+          })
+          continue // Skip to next request
+        }
+
         // Create the sentiment gate URL
         const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
 

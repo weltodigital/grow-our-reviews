@@ -14,7 +14,7 @@ export interface ReviewRequest {
   id: string
   customer_name: string
   customer_phone: string
-  status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed'
+  status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed' | 'suppressed'
   scheduled_for: string
   sent_at: string | null
   clicked_at: string | null
@@ -117,6 +117,7 @@ export default function RequestsPage() {
     reviewed: requests.filter(r => r.status === 'reviewed').length,
     feedback_given: requests.filter(r => r.status === 'feedback_given').length,
     failed: requests.filter(r => r.status === 'failed').length,
+    suppressed: requests.filter(r => r.status === 'suppressed').length,
   }
 
   if (isLoading) {

@@ -27,6 +27,18 @@ export async function POST(request: NextRequest) {
     const ninetyDaysAgo = new Date()
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
 
+    // SECURITY: Check for SMS suppressions (opt-outs)
+    const { data: suppressions, error: suppressionError } = await supabase
+      .from('sms_suppressions')
+      .select('phone_number, reason, suppressed_at')
+      .eq('user_id', user.id)
+      .in('phone_number', phoneNumbers)
+
+    if (suppressionError) {
+      console.error('Error checking suppressions:', suppressionError)
+      // Continue without suppression data rather than failing completely
+    }
+
     const { data: existingRequests, error } = await supabase
       .from('review_requests')
       .select(`
@@ -50,6 +62,21 @@ export async function POST(request: NextRequest) {
 
     // Analyze each phone number for risk level
     const duplicateAnalysis = phoneNumbers.map(phone => {
+      // SECURITY: Check if customer has opted out first (highest priority block)
+      const suppression = suppressions?.find((s: any) => s.phone_number === phone)
+      if (suppression) {
+        const suppressedDate = new Date(suppression.suppressed_at)
+        const daysAgoSuppressed = Math.ceil((Date.now() - suppressedDate.getTime()) / (1000 * 60 * 60 * 24))
+
+        return {
+          phoneNumber: phone,
+          riskLevel: 'critical',
+          canProceed: false,
+          message: `⛔ Customer opted out ${daysAgoSuppressed} days ago`,
+          reason: 'opted_out'
+        }
+      }
+
       const phoneRequests = existingRequests?.filter((req: any) => req.customers.phone === phone) || []
 
       if (phoneRequests.length === 0) {
