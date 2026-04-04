@@ -1,3 +1,5 @@
+'use client'
+
 import { getAppUrl } from '@/lib/utils'
 
 export function LocalSeoCallout() {
