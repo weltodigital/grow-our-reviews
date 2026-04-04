@@ -59,14 +59,22 @@ export function DashboardNav({ className }: DashboardNavProps) {
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-sm'
+                      ? 'border-l-4 shadow-sm'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1'
                   )}
+                  style={isActive ? {
+                    backgroundColor: 'var(--accent-light)',
+                    color: 'var(--accent-dark)',
+                    borderLeftColor: 'var(--accent)'
+                  } : {}}
                 >
-                  <item.icon className={cn(
-                    'h-5 w-5',
-                    isActive ? 'text-blue-600' : 'text-gray-400'
-                  )} />
+                  <item.icon
+                    className={cn(
+                      'h-5 w-5',
+                      isActive ? '' : 'text-gray-400'
+                    )}
+                    style={isActive ? { color: 'var(--accent)' } : {}}
+                  />
                   {item.name}
                 </Link>
               </li>

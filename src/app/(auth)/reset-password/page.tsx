@@ -67,7 +67,7 @@ function ResetPasswordForm() {
             Click the link in your email to reset your password. If you don't see the email, check your spam folder.
           </div>
           <div className="text-center">
-            <Link href="/login" className="text-blue-600 hover:text-blue-500">
+            <Link href="/login" className="hover:underline" style={{ color: 'var(--accent)' }}>
               Back to sign in
             </Link>
           </div>
@@ -107,7 +107,7 @@ function ResetPasswordForm() {
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
-          <Link href="/login" className="text-blue-600 hover:text-blue-500">
+          <Link href="/login" className="hover:underline" style={{ color: 'var(--accent)' }}>
             Back to sign in
           </Link>
         </div>

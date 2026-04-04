@@ -103,13 +103,13 @@ export default function LoginPage() {
         </form>
         <div className="mt-4 text-center text-sm space-y-2">
           <div>
-            <Link href="/reset-password" className="text-blue-600 hover:text-blue-500">
+            <Link href="/reset-password" className="hover:underline" style={{ color: 'var(--accent)' }}>
               Forgot your password?
             </Link>
           </div>
           <div>
             Don't have an account?{' '}
-            <Link href="/signup" className="text-blue-600 hover:text-blue-500">
+            <Link href="/signup" className="hover:underline" style={{ color: 'var(--accent)' }}>
               Sign up
             </Link>
           </div>

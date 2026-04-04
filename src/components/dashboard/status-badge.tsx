@@ -22,7 +22,12 @@ export function StatusBadge({ status, showIcon = true }: StatusBadgeProps) {
         return {
           label: 'Scheduled',
           icon: Calendar,
-          className: 'bg-blue-100 text-blue-700 border-blue-200',
+          className: 'border',
+          style: {
+            backgroundColor: 'var(--accent-light)',
+            color: 'var(--accent-dark)',
+            borderColor: 'var(--accent)'
+          },
         }
       case 'queued':
         return {
@@ -79,10 +84,13 @@ export function StatusBadge({ status, showIcon = true }: StatusBadgeProps) {
   const Icon = config.icon
 
   return (
-    <span className={`
-      inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border
-      ${config.className}
-    `}>
+    <span
+      className={`
+        inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border
+        ${config.className}
+      `}
+      style={(config as any).style || {}}
+    >
       {showIcon && <Icon className="h-3 w-3" />}
       {config.label}
     </span>

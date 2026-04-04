@@ -319,8 +319,8 @@ export default async function DashboardPage() {
           <Link href="/dashboard/send">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-blue-50 p-3">
-                  <Plus className="h-6 w-6 text-blue-600" />
+                <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--accent-light)' }}>
+                  <Plus className="h-6 w-6" style={{ color: 'var(--accent)' }} />
                 </div>
                 <div>
                   <div className="font-medium text-gray-900">Send Request</div>

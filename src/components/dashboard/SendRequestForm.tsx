@@ -260,9 +260,9 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
                 isVisible={showDuplicateWarning}
               />
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
-                <ul className="text-sm text-blue-700 space-y-1">
+              <div className="rounded-lg p-4 border" style={{ backgroundColor: 'var(--accent-light)', borderColor: 'var(--accent)' }}>
+                <h4 className="font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>What happens next?</h4>
+                <ul className="text-sm space-y-1" style={{ color: 'var(--accent-dark)' }}>
                   <li>• The SMS will be scheduled based on your delay settings ({(profile as any).sms_delay_hours} hour{(profile as any).sms_delay_hours !== 1 ? 's' : ''} delay)</li>
                   <li>• SMS won't send between 9pm-8am (moved to 8am if needed)</li>
                   <li>• If they rate 4-5 stars, they'll go to Google Reviews</li>
@@ -302,7 +302,7 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-blue-600" />
+                <MessageCircle className="h-5 w-5" style={{ color: 'var(--accent)' }} />
                 SMS Message Preview
               </CardTitle>
               <Button variant="outline" size="sm" asChild>

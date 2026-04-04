@@ -25,8 +25,8 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
       value: stats.requestsSentThisMonth,
       subtitle: 'This period',
       icon: Send,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'var(--accent)',
+      bgColor: 'var(--accent-light)',
     },
     {
       title: 'Clicks',
@@ -64,8 +64,14 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
               <CardTitle className="text-sm font-medium text-gray-600">
                 {stat.title}
               </CardTitle>
-              <div className={`rounded-lg p-2 ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+              <div
+                className={`rounded-lg p-2 ${typeof stat.bgColor === 'string' && stat.bgColor.startsWith('var') ? '' : stat.bgColor}`}
+                style={typeof stat.bgColor === 'string' && stat.bgColor.startsWith('var') ? { backgroundColor: stat.bgColor } : {}}
+              >
+                <stat.icon
+                  className={`h-4 w-4 ${typeof stat.color === 'string' && stat.color.startsWith('var') ? '' : stat.color}`}
+                  style={typeof stat.color === 'string' && stat.color.startsWith('var') ? { color: stat.color } : {}}
+                />
               </div>
             </CardHeader>
             <CardContent>
@@ -86,8 +92,13 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           ? 'from-red-50 to-orange-50 border-red-200'
           : stats.requestsRemaining <= 25
           ? 'from-yellow-50 to-orange-50 border-yellow-200'
-          : 'from-blue-50 to-indigo-50 border-blue-200'
-      }`}>
+          : ''
+      }`}
+      style={stats.requestsRemaining > 25 ? {
+        background: `linear-gradient(to right, var(--accent-light), var(--bg-primary))`,
+        borderColor: 'var(--accent)'
+      } : {}}
+      >
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -99,8 +110,10 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
                   ? 'text-red-600'
                   : stats.requestsRemaining <= 25
                   ? 'text-yellow-600'
-                  : 'text-blue-600'
-              }`}>
+                  : ''
+              }`}
+              style={stats.requestsRemaining > 25 ? { color: 'var(--accent)' } : {}}
+              >
                 {stats.requestsRemaining.toLocaleString()}
               </div>
 
@@ -145,8 +158,9 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
                     ? 'text-red-600 hover:text-red-700'
                     : stats.requestsRemaining <= 25
                     ? 'text-yellow-600 hover:text-yellow-700'
-                    : 'text-blue-600 hover:text-blue-700'
+                    : 'hover:underline'
                 }`}
+                style={stats.requestsRemaining > 25 ? { color: 'var(--accent)' } : {}}
               >
                 Upgrade plan →
               </Link>

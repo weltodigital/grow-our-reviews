@@ -54,7 +54,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
       case 'active':
         return <Badge className="bg-green-100 text-green-700">Active</Badge>
       case 'trialing':
-        return <Badge className="bg-blue-100 text-blue-700">Free Trial</Badge>
+        return <Badge className="border" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent-dark)', borderColor: 'var(--accent)' }}>Free Trial</Badge>
       case 'past_due':
         return <Badge className="bg-red-100 text-red-700">Past Due</Badge>
       case 'cancelled':

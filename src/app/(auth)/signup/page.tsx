@@ -136,7 +136,7 @@ export default function SignUpPage() {
         </form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:text-blue-500">
+          <Link href="/login" className="hover:underline" style={{ color: 'var(--accent)' }}>
             Sign in
           </Link>
         </div>

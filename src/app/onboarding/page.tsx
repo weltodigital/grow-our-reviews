@@ -117,7 +117,8 @@ export default function OnboardingPage() {
                   <button
                     type="button"
                     onClick={() => setShowGuide(!showGuide)}
-                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                    className="flex items-center gap-2 text-sm hover:underline"
+                    style={{ color: 'var(--accent)' }}
                   >
                     {showGuide ? (
                       <>
@@ -161,7 +162,8 @@ export default function OnboardingPage() {
                       type="button"
                       onClick={handleSkip}
                       disabled={isLoading}
-                      className="text-sm text-blue-600 hover:text-blue-500 underline"
+                      className="text-sm hover:underline"
+                      style={{ color: 'var(--accent)' }}
                     >
                       Skip for now - I'll add this later
                     </button>
@@ -180,7 +182,8 @@ export default function OnboardingPage() {
             Having trouble finding your Google Reviews URL?{' '}
             <a
               href="mailto:support@growourreviews.com"
-              className="text-blue-600 hover:text-blue-500"
+              className="hover:underline"
+              style={{ color: 'var(--accent)' }}
             >
               Contact support
             </a>

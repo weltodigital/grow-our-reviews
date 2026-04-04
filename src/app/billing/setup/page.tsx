@@ -150,9 +150,12 @@ export default function BillingSetupPage() {
           <Card
             className={`relative cursor-pointer transition-all ${
               selectedPlan === 'starter'
-                ? 'ring-2 ring-blue-500 border-blue-500'
+                ? 'ring-2 border-2'
                 : 'hover:border-gray-300'
             }`}
+            style={selectedPlan === 'starter' ? {
+              borderColor: 'var(--accent)'
+            } : {}}
             onClick={() => setSelectedPlan('starter')}
           >
             <CardHeader>
@@ -187,9 +190,12 @@ export default function BillingSetupPage() {
           <Card
             className={`relative cursor-pointer transition-all ${
               selectedPlan === 'growth'
-                ? 'ring-2 ring-blue-500 border-blue-500'
+                ? 'ring-2 border-2'
                 : 'hover:border-gray-300'
             }`}
+            style={selectedPlan === 'growth' ? {
+              borderColor: 'var(--accent)'
+            } : {}}
             onClick={() => setSelectedPlan('growth')}
           >
             <CardHeader>
