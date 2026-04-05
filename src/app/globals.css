@@ -50,13 +50,13 @@
   --bg-secondary: #f8fafc;
   --bg-card: #ffffff;
 
-  /* Brand / Accent colour — #a5be00 */
-  --accent: #a5be00;
-  --accent-hover: #8fa300;          /* Darker for hover states */
-  --accent-dark: #7a8c00;           /* Even darker for active/pressed states */
-  --accent-light: #f4f7e4;          /* Very light tint for subtle backgrounds and badges */
-  --accent-medium: #e8efc6;         /* Medium tint for highlighted sections */
-  --accent-text: #0f172a;           /* Dark text on accent backgrounds — NOT white */
+  /* Brand / Accent colour — #80e000 */
+  --accent: #80e000;              /* New brand green */
+  --accent-hover: #6bc200;        /* Darker for hover states */
+  --accent-dark: #5aa300;         /* Even darker for active/pressed states and text on light accent backgrounds */
+  --accent-light: #f0fbe0;        /* Very light tint for subtle backgrounds and badges */
+  --accent-medium: #d4f0a0;       /* Medium tint for highlighted sections */
+  --accent-text: #0f172a;         /* Dark text on accent backgrounds — #80e000 is still too light for white text */
 
   /* Borders */
   --border-light: #e2e8f0;

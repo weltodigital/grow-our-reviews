@@ -204,13 +204,13 @@ export function NavBubble() {
           text-decoration: none;
           padding: 0.5rem 1.25rem;
           border-radius: 9999px;
-          background-color: var(--accent);     /* #a5be00 */
+          background-color: var(--accent);     /* #80e000 */
           border: none;
           transition: all 0.15s ease;
         }
 
         .nav-btn-primary:hover {
-          background-color: var(--accent-hover);  /* #8fa300 */
+          background-color: var(--accent-hover);  /* #6bc200 */
         }
 
         /* Mobile */
