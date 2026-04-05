@@ -59,7 +59,7 @@ export function FeaturesSection() {
                     <ul className="mt-4 space-y-2">
                       {feature.benefits.map((benefit, benefitIndex) => (
                         <li key={benefitIndex} className="flex items-center text-sm text-gray-500">
-                          <div className="h-1.5 w-1.5 rounded-full bg-blue-600 mr-2"></div>
+                          <div className="h-1.5 w-1.5 rounded-full mr-2" style={{ backgroundColor: 'var(--accent)' }}></div>
                           {benefit}
                         </li>
                       ))}
@@ -72,7 +72,7 @@ export function FeaturesSection() {
         </div>
 
         {/* Additional benefits */}
-        <div className="mt-16 bg-blue-600 rounded-2xl p-8 text-white">
+        <div className="mt-16 rounded-2xl p-8 text-white" style={{ backgroundColor: 'var(--accent)' }}>
           <div className="text-center">
             <h3 className="text-2xl font-bold">
               Why tradespeople choose Grow Our Reviews
@@ -80,15 +80,15 @@ export function FeaturesSection() {
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="text-3xl font-bold">Quick setup</div>
-                <div className="text-blue-100">per job</div>
+                <div className="text-white opacity-80">per job</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">Higher rankings</div>
-                <div className="text-blue-100">on Google</div>
+                <div className="text-white opacity-80">on Google</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">No spam</div>
-                <div className="text-blue-100">complaints</div>
+                <div className="text-white opacity-80">complaints</div>
               </div>
             </div>
           </div>

@@ -53,7 +53,7 @@ export function SocialProofSection() {
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl font-bold text-blue-600">{stat.value}</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--accent)' }}>{stat.value}</div>
                 <div className="text-gray-900 font-medium mt-1">{stat.label}</div>
                 <div className="text-sm text-gray-500">{stat.description}</div>
               </div>
@@ -66,7 +66,7 @@ export function SocialProofSection() {
           {testimonials.map((testimonial, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center mb-4">
-                <Quote className="h-8 w-8 text-blue-600 mr-3" />
+                <Quote className="h-8 w-8 mr-3" style={{ color: 'var(--accent)' }} />
                 <div className="flex">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
@@ -105,8 +105,8 @@ export function SocialProofSection() {
               <span className="text-sm font-medium text-gray-900">GDPR Compliant</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <div className="h-4 w-4 bg-blue-500 rounded-full"></div>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--accent-light)' }}>
+                <div className="h-4 w-4 rounded-full" style={{ backgroundColor: 'var(--accent)' }}></div>
               </div>
               <span className="text-sm font-medium text-gray-900">UK Hosted</span>
             </div>

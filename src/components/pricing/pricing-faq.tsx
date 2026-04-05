@@ -69,7 +69,8 @@ export function PricingFaq() {
                 className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
               >
                 <button
-                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-inset"
+                  style={{ '--tw-ring-color': 'var(--accent)' } as React.CSSProperties}
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 >
                   <span className="font-medium text-gray-900 pr-4">{faq.question}</span>
