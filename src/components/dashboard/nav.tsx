@@ -41,9 +41,9 @@ export function DashboardNav({ className }: DashboardNavProps) {
           <Image
             src="/grow-our-reviews-logo.png"
             alt="Grow Our Reviews"
-            width={280}
-            height={56}
-            className="h-14 w-auto"
+            width={360}
+            height={72}
+            className="h-18 w-auto"
           />
         </Link>
       </div>

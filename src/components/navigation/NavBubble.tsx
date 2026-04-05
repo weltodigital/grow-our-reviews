@@ -16,9 +16,9 @@ export function NavBubble() {
             <Image
               src="/grow-our-reviews-logo.png"
               alt="Grow Our Reviews"
-              width={240}
-              height={48}
-              className="h-12 w-auto"
+              width={320}
+              height={64}
+              className="h-16 w-auto"
               priority
             />
           </Link>
