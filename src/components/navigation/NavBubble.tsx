@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 
 export function NavBubble() {
@@ -11,7 +12,16 @@ export function NavBubble() {
     <>
       <header className="nav-wrapper">
         <nav className="nav-bubble">
-          <Link href="/" className="nav-logo">Grow Our Reviews</Link>
+          <Link href="/" className="nav-logo">
+            <Image
+              src="/grow-our-reviews-logo.png"
+              alt="Grow Our Reviews"
+              width={160}
+              height={32}
+              className="h-8 w-auto"
+              priority
+            />
+          </Link>
 
           <div className="nav-links">
             <Link href="/#how-it-works">How It Works</Link>
@@ -137,13 +147,11 @@ export function NavBubble() {
         }
 
         .nav-logo {
-          font-family: var(--font-lora, 'Lora', serif);
-          font-size: 1.125rem;
-          font-weight: 700;
-          color: var(--text-primary);
           text-decoration: none;
           white-space: nowrap;
           flex-shrink: 0;
+          display: flex;
+          align-items: center;
         }
 
         .nav-links {

@@ -1,19 +1,24 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Star, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { getAppUrl } from '@/lib/utils'
 
 export function PricingHeader() {
   return (
     <header className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--accent)' }}>
-            <Star className="h-5 w-5 text-white fill-white" />
-          </div>
-          <span className="text-xl font-bold text-gray-900">Grow Our Reviews</span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/grow-our-reviews-logo.png"
+            alt="Grow Our Reviews"
+            width={160}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
 
         <div className="flex items-center space-x-4">
