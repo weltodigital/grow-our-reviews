@@ -70,9 +70,9 @@ export function MarketingFooter() {
               <Image
                 src="/grow-our-reviews-white-logo.png"
                 alt="Grow Our Reviews"
-                width={200}
-                height={32}
-                className="h-8 w-auto"
+                width={280}
+                height={56}
+                className="h-14 w-auto"
               />
             </Link>
             <p className="text-gray-400 max-w-md leading-relaxed">

@@ -36,9 +36,9 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
             <Image
               src="/grow-our-reviews-logo.png"
               alt="Grow Our Reviews"
-              width={150}
-              height={24}
-              className="h-6 w-auto"
+              width={220}
+              height={44}
+              className="h-11 w-auto"
             />
           </Link>
 
