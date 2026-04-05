@@ -14,9 +14,9 @@ export function PricingHeader() {
           <Image
             src="/grow-our-reviews-logo.png"
             alt="Grow Our Reviews"
-            width={320}
-            height={64}
-            className="h-16 w-auto"
+            width={640}
+            height={128}
+            className="h-32 w-auto"
             priority
           />
         </Link>

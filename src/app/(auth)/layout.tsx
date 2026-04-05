@@ -13,9 +13,9 @@ export default function AuthLayout({
             <Image
               src="/grow-our-reviews-logo.png"
               alt="Grow Our Reviews"
-              width={450}
-              height={90}
-              className="h-20 w-auto"
+              width={900}
+              height={180}
+              className="h-40 w-auto"
               priority
             />
           </div>

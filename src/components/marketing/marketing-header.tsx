@@ -17,9 +17,9 @@ export function MarketingHeader() {
           <Image
             src="/grow-our-reviews-logo.png"
             alt="Grow Our Reviews"
-            width={360}
-            height={72}
-            className="h-18 w-auto"
+            width={720}
+            height={144}
+            className="h-36 w-auto"
             priority
           />
         </Link>
