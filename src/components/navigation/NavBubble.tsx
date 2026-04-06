@@ -168,15 +168,16 @@ export function NavBubble() {
           text-decoration: none;
           padding: 0.5rem 1rem;
           border-radius: 9999px;
-          border: 1px solid var(--accent);
+          border: 1.5px solid #80e000;
           transition: all 0.15s ease;
           white-space: nowrap;
+          background-color: transparent;
         }
 
         .nav-links a:hover {
           color: var(--text-primary);
-          background-color: var(--accent-light);
-          border-color: var(--accent-hover);
+          background-color: #f0fbe0;
+          border-color: #6bc200;
         }
 
         .nav-actions {
