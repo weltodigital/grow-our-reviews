@@ -72,7 +72,7 @@ export function MarketingFooter() {
                 alt="Grow Our Reviews"
                 width={720}
                 height={144}
-                className="h-36 w-auto"
+                className="h-25 w-auto"
               />
             </Link>
             <p className="text-gray-400 max-w-md leading-relaxed">

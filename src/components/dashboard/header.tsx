@@ -38,7 +38,7 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
               alt="Grow Our Reviews"
               width={560}
               height={112}
-              className="h-28 w-auto"
+              className="h-20 w-auto"
             />
           </Link>
 

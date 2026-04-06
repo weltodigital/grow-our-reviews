@@ -15,7 +15,7 @@ export default function AuthLayout({
               alt="Grow Our Reviews"
               width={900}
               height={180}
-              className="h-40 w-auto"
+              className="h-28 w-auto"
               priority
             />
           </div>
