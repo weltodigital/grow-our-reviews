@@ -43,7 +43,7 @@ export function DashboardNav({ className }: DashboardNavProps) {
             alt="Grow Our Reviews"
             width={720}
             height={144}
-            className="h-25 w-auto"
+            className="h-18 w-auto"
           />
         </Link>
       </div>

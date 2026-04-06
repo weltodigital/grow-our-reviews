@@ -16,7 +16,7 @@ export function PricingHeader() {
             alt="Grow Our Reviews"
             width={640}
             height={128}
-            className="h-22 w-auto"
+            className="h-16 w-auto"
             priority
           />
         </Link>
