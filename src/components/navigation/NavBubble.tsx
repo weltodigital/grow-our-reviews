@@ -18,7 +18,7 @@ export function NavBubble() {
               alt="Grow Our Reviews"
               width={640}
               height={128}
-              className="h-16 w-auto"
+              className="h-11 w-auto"
               priority
             />
           </Link>
