@@ -21,10 +21,7 @@ export default async function DashboardLayout({
         <div className="flex-1 lg:ml-64">
           {/* Desktop header */}
           <div className="hidden lg:block">
-            <div className="flex h-16 items-center justify-between bg-white px-6 shadow-sm border-b border-gray-200">
-              <h1 className="text-lg font-semibold text-gray-900">
-                Welcome back, {(profile as any).business_name}
-              </h1>
+            <div className="flex h-16 items-center justify-end bg-white px-6 shadow-sm border-b border-gray-200">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-600">

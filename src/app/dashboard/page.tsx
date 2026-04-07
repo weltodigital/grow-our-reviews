@@ -223,12 +223,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Welcome section */}
+      {/* Dashboard overview */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Welcome back, {(profile as any).business_name}
-          </h1>
           <div className="space-y-1">
             <p className="text-gray-600">
               Here's how your review requests are performing this period
