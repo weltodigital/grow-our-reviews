@@ -189,41 +189,41 @@ export function NavBubble() {
 
         /* Log In — green border pill */
         .nav-btn-secondary {
-          font-family: var(--font-inter, 'Inter', sans-serif);
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: #80e000;
-          text-decoration: none;
-          padding: 0.5rem 1.25rem;
-          border-radius: 9999px;
-          border: 1.5px solid #80e000;
-          background-color: transparent;
-          transition: all 0.15s ease;
+          font-family: var(--font-inter, 'Inter', sans-serif) !important;
+          font-size: 0.875rem !important;
+          font-weight: 500 !important;
+          color: #80e000 !important;
+          text-decoration: none !important;
+          padding: 0.5rem 1.25rem !important;
+          border-radius: 9999px !important;
+          border: 1.5px solid #80e000 !important;
+          background-color: transparent !important;
+          transition: all 0.15s ease !important;
         }
 
         .nav-btn-secondary:hover {
-          background-color: #f0fbe0;
-          border-color: #6bc200;
-          color: #6bc200;
+          background-color: #f0fbe0 !important;
+          border-color: #6bc200 !important;
+          color: #6bc200 !important;
         }
 
         /* Start Free Trial — solid green pill */
         .nav-btn-primary {
-          font-family: var(--font-inter, 'Inter', sans-serif);
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #0f172a;
-          text-decoration: none;
-          padding: 0.5rem 1.25rem;
-          border-radius: 9999px;
-          background-color: #80e000;
-          border: 1.5px solid #80e000;
-          transition: all 0.15s ease;
+          font-family: var(--font-inter, 'Inter', sans-serif) !important;
+          font-size: 0.875rem !important;
+          font-weight: 600 !important;
+          color: #0f172a !important;
+          text-decoration: none !important;
+          padding: 0.5rem 1.25rem !important;
+          border-radius: 9999px !important;
+          background-color: #80e000 !important;
+          border: 1.5px solid #80e000 !important;
+          transition: all 0.15s ease !important;
         }
 
         .nav-btn-primary:hover {
-          background-color: #6bc200;
-          border-color: #6bc200;
+          background-color: #6bc200 !important;
+          border-color: #6bc200 !important;
         }
 
         /* Mobile */
