@@ -43,6 +43,22 @@ async function recordWebhookEvent(
 export async function POST(request: NextRequest) {
   const correlationId = `wh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
+  // Log request details for debugging 307 redirects
+  console.log('Webhook request details:', {
+    correlationId,
+    url: request.url,
+    method: request.method,
+    headers: {
+      host: request.headers.get('host'),
+      'user-agent': request.headers.get('user-agent'),
+      'content-type': request.headers.get('content-type'),
+      'stripe-signature': request.headers.get('stripe-signature') ? 'present' : 'missing',
+      'x-forwarded-proto': request.headers.get('x-forwarded-proto'),
+      'x-forwarded-host': request.headers.get('x-forwarded-host')
+    },
+    timestamp: new Date().toISOString()
+  })
+
   try {
     const body = Buffer.from(await request.arrayBuffer())
     const signature = request.headers.get('stripe-signature')
@@ -526,3 +542,47 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
         })
     }
   }
+
+// Handle other HTTP methods to prevent 405/307 errors
+export async function GET(request: NextRequest) {
+  console.log('Webhook GET request received:', {
+    url: request.url,
+    headers: Object.fromEntries(request.headers.entries())
+  })
+
+  return NextResponse.json({
+    message: 'Stripe webhook endpoint is running',
+    method: 'GET',
+    timestamp: new Date().toISOString()
+  }, { status: 200 })
+}
+
+export async function HEAD(request: NextRequest) {
+  console.log('Webhook HEAD request received:', {
+    url: request.url,
+    headers: Object.fromEntries(request.headers.entries())
+  })
+
+  return new NextResponse(null, { status: 200 })
+}
+
+export async function OPTIONS(request: NextRequest) {
+  console.log('Webhook OPTIONS request received:', {
+    url: request.url,
+    headers: Object.fromEntries(request.headers.entries())
+  })
+
+  return NextResponse.json({
+    message: 'Stripe webhook endpoint supports POST',
+    methods: ['POST', 'GET', 'HEAD', 'OPTIONS'],
+    timestamp: new Date().toISOString()
+  }, {
+    status: 200,
+    headers: {
+      'Allow': 'POST, GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Headers': 'stripe-signature, content-type'
+    }
+  })
+}
