@@ -161,7 +161,6 @@ export default function LoginPage() {
           {error && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded">
               {error}
-              {console.log('Render: showResendOption =', showResendOption, 'email =', email)}
               {showResendOption && (
                 <div className="mt-3 pt-3 border-t border-red-200">
                   <p className="text-sm text-gray-600 mb-2">
