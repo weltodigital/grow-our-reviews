@@ -435,7 +435,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               <Button
                 onClick={handleUpgrade}
                 disabled={isLoading}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 text-white"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
