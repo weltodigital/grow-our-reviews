@@ -187,41 +187,43 @@ export function NavBubble() {
           flex-shrink: 0;
         }
 
-        /* Log In — subtle outlined pill */
+        /* Log In — green border pill */
         .nav-btn-secondary {
           font-family: var(--font-inter, 'Inter', sans-serif);
           font-size: 0.875rem;
           font-weight: 500;
-          color: var(--text-primary);
+          color: #80e000;
           text-decoration: none;
           padding: 0.5rem 1.25rem;
           border-radius: 9999px;
-          border: 1px solid var(--border-light);
+          border: 1.5px solid #80e000;
           background-color: transparent;
           transition: all 0.15s ease;
         }
 
         .nav-btn-secondary:hover {
-          background-color: var(--bg-secondary);
-          border-color: var(--text-tertiary);
+          background-color: #f0fbe0;
+          border-color: #6bc200;
+          color: #6bc200;
         }
 
-        /* Start Free Trial — brand colour pill with dark text */
+        /* Start Free Trial — solid green pill */
         .nav-btn-primary {
           font-family: var(--font-inter, 'Inter', sans-serif);
           font-size: 0.875rem;
           font-weight: 600;
-          color: var(--accent-text);           /* Dark text — #0f172a */
+          color: #0f172a;
           text-decoration: none;
           padding: 0.5rem 1.25rem;
           border-radius: 9999px;
-          background-color: var(--accent);     /* #80e000 */
-          border: none;
+          background-color: #80e000;
+          border: 1.5px solid #80e000;
           transition: all 0.15s ease;
         }
 
         .nav-btn-primary:hover {
-          background-color: var(--accent-hover);  /* #6bc200 */
+          background-color: #6bc200;
+          border-color: #6bc200;
         }
 
         /* Mobile */
