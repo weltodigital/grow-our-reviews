@@ -26,7 +26,7 @@ export function NavBubble() {
           <div className="nav-links">
             <Link href="/#how-it-works">How It Works</Link>
             <Link href="/#features">Features</Link>
-            <Link href="/pricing">Pricing</Link>
+            <Link href="/#pricing">Pricing</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/#faq">FAQ</Link>
           </div>
@@ -107,7 +107,7 @@ export function NavBubble() {
               Features
             </Link>
             <Link
-              href="/pricing"
+              href="/#pricing"
               onClick={() => setMobileMenuOpen(false)}
               className="text-lg font-medium text-slate-800 hover:text-slate-600"
             >
