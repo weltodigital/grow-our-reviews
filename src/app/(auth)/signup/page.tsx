@@ -70,31 +70,40 @@ export default function SignUpPage() {
           session: data.session,
           userCreatedAt: data.user.created_at,
           currentTime: new Date().toISOString(),
-          timeDiff: data.user.created_at ? new Date().getTime() - new Date(data.user.created_at).getTime() : 'N/A'
+          timeDiff: data.user.created_at ? new Date().getTime() - new Date(data.user.created_at).getTime() : 'N/A',
+          emailConfirmedAt: data.user.email_confirmed_at,
+          lastSignInAt: data.user.last_sign_in_at
         })
 
-        // Check if this is actually a new signup or existing user
-        // If user was created at the same time as this request, it's a new signup
-        const userCreatedRecently = data.user.created_at &&
-          new Date(data.user.created_at) > new Date(Date.now() - 30000) // Within last 30 seconds
+        // Key insight: Supabase updates created_at on duplicate signups, making timestamp unreliable
+        // Instead, check for patterns that indicate an existing user:
 
-        // Additional checks for existing user patterns
+        // Pattern 1: User has no session AND no email confirmation (likely existing unconfirmed user)
+        // Pattern 2: User has email_confirmed_at set (definitely existing confirmed user)
+        // Pattern 3: User has last_sign_in_at set (definitely existing user who signed in before)
+
+        const hasEmailConfirmation = data.user.email_confirmed_at !== null
+        const hasSignInHistory = data.user.last_sign_in_at !== null
         const hasNoSession = !data.session
-        const userCreatedAtLeastMinuteAgo = data.user.created_at &&
-          new Date(data.user.created_at) < new Date(Date.now() - 60000) // More than 1 minute ago
 
-        if (userCreatedAtLeastMinuteAgo || (!userCreatedRecently && hasNoSession)) {
-          // This is very likely an existing user
-          setError('This email is already registered. If you haven\'t confirmed your account yet, please check your email for the confirmation link. Otherwise, try signing in.')
+        // If user has confirmation or sign-in history, they're definitely existing
+        if (hasEmailConfirmation || hasSignInHistory) {
+          setError('This email is already registered. Please sign in instead, or use a different email address.')
           return
         }
 
-        // Check if user needs to confirm email (legitimate new signup)
+        // If no session and no confirmation, this is likely a duplicate of unconfirmed account
+        // But we can't be 100% sure, so we'll let it proceed but track this case
+        if (hasNoSession && !hasEmailConfirmation) {
+          console.log('Potential duplicate unconfirmed account - allowing to proceed but suspicious')
+        }
+
+        // Check if user needs to confirm email (legitimate new signup or re-send confirmation)
         if (data.session) {
           // User is immediately logged in, redirect to onboarding
           router.push('/onboarding')
         } else {
-          // User needs to confirm email first (legitimate new signup)
+          // User needs to confirm email first
           setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup. Don\'t forget to check your spam or junk folder if you don\'t see it in your inbox.')
         }
       }
