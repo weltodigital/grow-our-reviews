@@ -173,7 +173,7 @@ export default function FeedbackPage() {
               Failed to load feedback
             </h3>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => window.location.reload()} className="text-white">
               Try Again
             </Button>
           </CardContent>

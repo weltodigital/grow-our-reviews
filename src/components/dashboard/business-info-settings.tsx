@@ -252,7 +252,7 @@ export function BusinessInfoSettings({
                 <GoogleReviewGuide showTitle={false} />
               </div>
               <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
-                <Button onClick={() => setShowGuide(false)} className="w-full sm:w-auto">
+                <Button onClick={() => setShowGuide(false)} className="w-full sm:w-auto text-white">
                   Got it, thanks!
                 </Button>
               </div>

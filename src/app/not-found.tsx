@@ -14,7 +14,7 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-4">
-          <Button asChild className="w-full">
+          <Button asChild className="w-full text-white">
             <Link href="/">
               Return to Homepage
             </Link>

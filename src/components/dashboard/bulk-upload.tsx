@@ -1129,7 +1129,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             <Button variant="outline" onClick={resetUpload}>
               Upload More Customers
             </Button>
-            <Button onClick={() => router.push('/dashboard')}>
+            <Button onClick={() => router.push('/dashboard')} className="text-white">
               Back to Dashboard
             </Button>
           </div>

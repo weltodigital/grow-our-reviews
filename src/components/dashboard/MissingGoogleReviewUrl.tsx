@@ -37,7 +37,7 @@ export default function MissingGoogleReviewUrl() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button asChild>
+                <Button asChild className="text-white">
                   <Link href="/dashboard/settings">Add Google Review Link</Link>
                 </Button>
                 <Button variant="outline" onClick={() => setShowGuide(true)}>
@@ -70,7 +70,7 @@ export default function MissingGoogleReviewUrl() {
                 <Button onClick={() => setShowGuide(false)} variant="outline">
                   Close
                 </Button>
-                <Button asChild>
+                <Button asChild className="text-white">
                   <Link href="/dashboard/settings">Go to Settings</Link>
                 </Button>
               </div>

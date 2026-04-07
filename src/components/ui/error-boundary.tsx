@@ -78,7 +78,7 @@ function DefaultErrorFallback({ error, reset }: { error: Error; reset: () => voi
             <RefreshCw className="h-4 w-4 mr-2" />
             Try again
           </Button>
-          <Button onClick={() => window.location.reload()}>
+          <Button onClick={() => window.location.reload()} className="text-white">
             Refresh page
           </Button>
         </div>

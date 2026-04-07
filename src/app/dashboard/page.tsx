@@ -247,7 +247,7 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
-        <Button asChild>
+        <Button asChild className="text-white">
           <Link href="/dashboard/send" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Send Review Request
@@ -302,7 +302,7 @@ export default async function DashboardPage() {
           ) : (
             <div className="text-center py-8">
               <div className="text-gray-500 mb-2">No activity yet</div>
-              <Button asChild>
+              <Button asChild className="text-white">
                 <Link href="/dashboard/send">Send your first request</Link>
               </Button>
             </div>

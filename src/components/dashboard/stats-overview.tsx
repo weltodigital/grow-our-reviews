@@ -160,7 +160,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
                     ? 'text-yellow-600 hover:text-yellow-700'
                     : 'hover:underline'
                 }`}
-                style={stats.requestsRemaining > 25 ? { color: 'var(--accent)' } : {}}
+                style={stats.requestsRemaining > 25 ? { color: 'var(--accent-dark)' } : {}}
               >
                 Upgrade plan →
               </Link>
