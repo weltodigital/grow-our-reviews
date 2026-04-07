@@ -13,7 +13,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const [error, setError] = useState('')
+  const [showResendOption, setShowResendOption] = useState(false)
+  const [resendMessage, setResendMessage] = useState('')
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +37,20 @@ export default function LoginPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // Check for specific unconfirmed email error patterns
+        if (error.message.includes('Email not confirmed') ||
+            error.message.includes('email not confirmed') ||
+            error.message.includes('User not confirmed') ||
+            error.message.includes('Please confirm your email')) {
+          setError('Please confirm your email address before signing in. Check your inbox for the confirmation email.')
+          setShowResendOption(true)
+        } else if (error.message.includes('Invalid login credentials')) {
+          // Could be wrong password OR unconfirmed account
+          setError('Invalid email or password. If you haven\'t confirmed your email yet, please check your inbox.')
+          setShowResendOption(true)
+        } else {
+          setError(error.message)
+        }
         return
       }
 
@@ -57,6 +73,44 @@ export default function LoginPage() {
       console.error(err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setError('Please enter your email address first')
+      return
+    }
+
+    setIsResending(true)
+    setResendMessage('')
+
+    if (!supabase) {
+      setError('Service temporarily unavailable')
+      setIsResending(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/onboarding`,
+        }
+      })
+
+      if (error) {
+        setError(`Failed to resend confirmation email: ${error.message}`)
+      } else {
+        setResendMessage('Confirmation email sent! Please check your inbox and spam folder.')
+        setShowResendOption(false)
+      }
+    } catch (err) {
+      setError('Failed to resend confirmation email')
+      console.error(err)
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -93,8 +147,30 @@ export default function LoginPage() {
             />
           </div>
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded">
               {error}
+              {showResendOption && (
+                <div className="mt-3 pt-3 border-t border-red-200">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Need a new confirmation email?
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResendConfirmation}
+                    disabled={isResending || !email}
+                    className="text-sm"
+                  >
+                    {isResending ? 'Sending...' : 'Resend confirmation email'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+          {resendMessage && (
+            <div className="text-sm text-green-600 bg-green-50 border border-green-200 p-3 rounded">
+              {resendMessage}
             </div>
           )}
           <Button type="submit" className="w-full" disabled={isLoading}>
