@@ -48,7 +48,7 @@ export function MarketingHeader() {
           <Button variant="ghost" asChild>
             <a href={getAppUrl('/login')}>Log In</a>
           </Button>
-          <Button asChild className="text-white">
+          <Button asChild className="!text-white">
             <a href={getAppUrl('/signup')}>Start Free Trial</a>
           </Button>
         </div>
@@ -113,7 +113,7 @@ export function MarketingHeader() {
               <Button variant="ghost" asChild className="justify-start">
                 <a href={getAppUrl('/login')} onClick={() => setMobileMenuOpen(false)}>Log In</a>
               </Button>
-              <Button asChild className="justify-start text-white">
+              <Button asChild className="justify-start !text-white">
                 <a href={getAppUrl('/signup')} onClick={() => setMobileMenuOpen(false)}>Start Free Trial</a>
               </Button>
             </div>

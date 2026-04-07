@@ -31,7 +31,7 @@ export function PricingHeader() {
           <Button variant="ghost" asChild>
             <a href={getAppUrl('/login')}>Log In</a>
           </Button>
-          <Button asChild className="text-white">
+          <Button asChild className="!text-white">
             <a href={getAppUrl('/signup')}>Start Free Trial</a>
           </Button>
         </div>
