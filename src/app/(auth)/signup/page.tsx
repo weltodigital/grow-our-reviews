@@ -15,8 +15,10 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [showResendOption, setShowResendOption] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,10 +94,23 @@ export default function SignUpPage() {
           return
         }
 
-        // If no session and no confirmation, this is likely a duplicate of unconfirmed account
-        // But we can't be 100% sure, so we'll let it proceed but track this case
+        // If no session and no confirmation, this could be:
+        // 1. Legitimate new signup
+        // 2. Re-signup with existing unconfirmed account
+        // Check timestamp to differentiate
         if (hasNoSession && !hasEmailConfirmation) {
-          console.log('Potential duplicate unconfirmed account - allowing to proceed but suspicious')
+          // If user was created more than 1 minute ago, they probably already exist
+          const userCreatedMoreThanMinuteAgo = data.user.created_at &&
+            new Date(data.user.created_at) < new Date(Date.now() - 60000)
+
+          if (userCreatedMoreThanMinuteAgo) {
+            // This is an existing unconfirmed account
+            setError('This email has an unconfirmed account. Please check your email for the confirmation link, or use the button below to resend it.')
+            setShowResendOption(true)
+            return
+          } else {
+            console.log('Legitimate new signup detected')
+          }
         }
 
         // Check if user needs to confirm email (legitimate new signup or re-send confirmation)
@@ -112,6 +127,44 @@ export default function SignUpPage() {
       console.error(err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setError('Please enter your email address first')
+      return
+    }
+
+    setIsResending(true)
+
+    if (!supabase) {
+      setError('Service temporarily unavailable')
+      setIsResending(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/onboarding`,
+        }
+      })
+
+      if (error) {
+        setError(`Failed to resend confirmation email: ${error.message}`)
+      } else {
+        setSuccessMessage('Confirmation email sent! Please check your inbox and spam folder.')
+        setShowResendOption(false)
+        setError('')
+      }
+    } catch (err) {
+      setError('Failed to resend confirmation email')
+      console.error(err)
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -168,6 +221,23 @@ export default function SignUpPage() {
                   <Link href="/login" className="underline hover:no-underline" style={{ color: 'var(--accent)' }}>
                     Sign in here →
                   </Link>
+                </div>
+              )}
+              {showResendOption && (
+                <div className="mt-3 pt-3 border-t border-red-200">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Need a new confirmation email?
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResendConfirmation}
+                    disabled={isResending || !email}
+                    className="text-sm"
+                  >
+                    {isResending ? 'Sending...' : 'Resend confirmation email'}
+                  </Button>
                 </div>
               )}
             </div>
