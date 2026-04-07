@@ -53,17 +53,35 @@ export default function SignUpPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // Handle specific error cases for better UX
+        if (error.message.includes('already registered') ||
+            error.message.includes('already been registered') ||
+            error.message.includes('email already in use')) {
+          setError('This email is already registered. Please sign in instead, or use a different email address.')
+        } else {
+          setError(error.message)
+        }
         return
       }
 
       if (data.user) {
+        // Check if this is actually a new signup or existing user
+        // If user was created at the same time as this request, it's a new signup
+        const userCreatedRecently = data.user.created_at &&
+          new Date(data.user.created_at) > new Date(Date.now() - 10000) // Within last 10 seconds
+
+        if (!userCreatedRecently && !data.session) {
+          // This suggests the user already exists but isn't confirmed
+          setError('This email is already registered. If you haven\'t confirmed your account yet, please check your email. Otherwise, try signing in.')
+          return
+        }
+
         // Check if user needs to confirm email
         if (data.session) {
           // User is immediately logged in, redirect to onboarding
           router.push('/onboarding')
         } else {
-          // User needs to confirm email first
+          // User needs to confirm email first (legitimate new signup)
           setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup. Don\'t forget to check your spam or junk folder if you don\'t see it in your inbox.')
         }
       }
@@ -123,6 +141,13 @@ export default function SignUpPage() {
           {error && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded">
               {error}
+              {error.includes('already registered') && (
+                <div className="mt-2">
+                  <Link href="/login" className="underline hover:no-underline" style={{ color: 'var(--accent)' }}>
+                    Sign in here →
+                  </Link>
+                </div>
+              )}
             </div>
           )}
           {successMessage && (
