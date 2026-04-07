@@ -22,6 +22,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setShowResendOption(false)
+    setResendMessage('')
     setIsLoading(true)
 
     if (!supabase) {
@@ -37,19 +39,29 @@ export default function LoginPage() {
       })
 
       if (error) {
+        console.log('Login error details:', {
+          message: error.message,
+          code: error.code || 'no_code',
+          status: error.status || 'no_status'
+        })
+
         // Check for specific unconfirmed email error patterns
         if (error.message.includes('Email not confirmed') ||
             error.message.includes('email not confirmed') ||
             error.message.includes('User not confirmed') ||
-            error.message.includes('Please confirm your email')) {
+            error.message.includes('Please confirm your email') ||
+            error.message.includes('not confirmed')) {
           setError('Please confirm your email address before signing in. Check your inbox for the confirmation email.')
           setShowResendOption(true)
+          console.log('Showing resend option for unconfirmed email')
         } else if (error.message.includes('Invalid login credentials')) {
           // Could be wrong password OR unconfirmed account
           setError('Invalid email or password. If you haven\'t confirmed your email yet, please check your inbox.')
           setShowResendOption(true)
+          console.log('Showing resend option for invalid credentials (might be unconfirmed)')
         } else {
           setError(error.message)
+          console.log('Not showing resend option, error was:', error.message)
         }
         return
       }
@@ -149,6 +161,7 @@ export default function LoginPage() {
           {error && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded">
               {error}
+              {console.log('Render: showResendOption =', showResendOption, 'email =', email)}
               {showResendOption && (
                 <div className="mt-3 pt-3 border-t border-red-200">
                   <p className="text-sm text-gray-600 mb-2">
