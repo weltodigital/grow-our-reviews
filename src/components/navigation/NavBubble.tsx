@@ -32,10 +32,40 @@ export function NavBubble() {
           </div>
 
           <div className="nav-actions">
-            <Link href="https://app.growourreviews.com/login" className="nav-btn-secondary">
+            <Link
+              href="https://app.growourreviews.com/login"
+              className="nav-btn-secondary"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: '#80e000',
+                textDecoration: 'none',
+                padding: '0.5rem 1.25rem',
+                borderRadius: '9999px',
+                border: '1.5px solid #80e000',
+                backgroundColor: 'transparent',
+                transition: 'all 0.15s ease'
+              }}
+            >
               Log In
             </Link>
-            <Link href="https://app.growourreviews.com/signup" className="nav-btn-primary">
+            <Link
+              href="https://app.growourreviews.com/signup"
+              className="nav-btn-primary"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: '#0f172a',
+                textDecoration: 'none',
+                padding: '0.5rem 1.25rem',
+                borderRadius: '9999px',
+                backgroundColor: '#80e000',
+                border: '1.5px solid #80e000',
+                transition: 'all 0.15s ease'
+              }}
+            >
               Start Free Trial
             </Link>
           </div>
