@@ -82,8 +82,8 @@ export default function SignUpPage() {
         // Pattern 2: User has email_confirmed_at set (definitely existing confirmed user)
         // Pattern 3: User has last_sign_in_at set (definitely existing user who signed in before)
 
-        const hasEmailConfirmation = data.user.email_confirmed_at !== null
-        const hasSignInHistory = data.user.last_sign_in_at !== null
+        const hasEmailConfirmation = Boolean(data.user.email_confirmed_at)
+        const hasSignInHistory = Boolean(data.user.last_sign_in_at)
         const hasNoSession = !data.session
 
         // If user has confirmation or sign-in history, they're definitely existing
