@@ -33,6 +33,14 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Auth callback error:', error)
+
+      // Handle PKCE errors for cross-device authentication
+      if (error.message.includes('PKCE code verifier') || error.message.includes('code_verifier')) {
+        console.log('PKCE error detected - likely cross-device signup. Redirecting to client-side handler.')
+        // Redirect to a client-side page that can handle the code exchange
+        return NextResponse.redirect(requestUrl.origin + `/auth/confirm-signup?code=${code}&next=${encodeURIComponent(next)}`)
+      }
+
       return NextResponse.redirect(requestUrl.origin + '/login?error=auth_callback_error')
     }
 
