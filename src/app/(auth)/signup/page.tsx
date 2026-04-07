@@ -43,7 +43,7 @@ export default function SignUpPage() {
     }
 
     try {
-      // First create the user account
+      // Attempt signup and analyze the response carefully
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -65,18 +65,31 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
+        console.log('Signup response data:', {
+          user: data.user,
+          session: data.session,
+          userCreatedAt: data.user.created_at,
+          currentTime: new Date().toISOString(),
+          timeDiff: data.user.created_at ? new Date().getTime() - new Date(data.user.created_at).getTime() : 'N/A'
+        })
+
         // Check if this is actually a new signup or existing user
         // If user was created at the same time as this request, it's a new signup
         const userCreatedRecently = data.user.created_at &&
-          new Date(data.user.created_at) > new Date(Date.now() - 10000) // Within last 10 seconds
+          new Date(data.user.created_at) > new Date(Date.now() - 30000) // Within last 30 seconds
 
-        if (!userCreatedRecently && !data.session) {
-          // This suggests the user already exists but isn't confirmed
-          setError('This email is already registered. If you haven\'t confirmed your account yet, please check your email. Otherwise, try signing in.')
+        // Additional checks for existing user patterns
+        const hasNoSession = !data.session
+        const userCreatedAtLeastMinuteAgo = data.user.created_at &&
+          new Date(data.user.created_at) < new Date(Date.now() - 60000) // More than 1 minute ago
+
+        if (userCreatedAtLeastMinuteAgo || (!userCreatedRecently && hasNoSession)) {
+          // This is very likely an existing user
+          setError('This email is already registered. If you haven\'t confirmed your account yet, please check your email for the confirmation link. Otherwise, try signing in.')
           return
         }
 
-        // Check if user needs to confirm email
+        // Check if user needs to confirm email (legitimate new signup)
         if (data.session) {
           // User is immediately logged in, redirect to onboarding
           router.push('/onboarding')
