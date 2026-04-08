@@ -94,15 +94,18 @@ export async function requireUserWithProfile() {
 
   if (!profile) {
     redirect('/onboarding')
+    return // This won't be reached but helps TypeScript
   }
 
   // Check if user has completed onboarding and billing setup
   if (!profile.business_name || !profile.google_review_url) {
     redirect('/onboarding')
+    return // This won't be reached but helps TypeScript
   }
 
   if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status as string)) {
     redirect('/billing/setup')
+    return // This won't be reached but helps TypeScript
   }
 
   return { user, profile }
