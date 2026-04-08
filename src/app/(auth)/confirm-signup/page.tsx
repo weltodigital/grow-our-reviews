@@ -49,17 +49,17 @@ function ConfirmSignupForm() {
           // Check the user's profile to determine where to redirect
           const { data: profile } = await supabase
             .from('profiles')
-            .select('business_name, stripe_customer_id')
+            .select('business_name, google_review_url, stripe_customer_id, subscription_status')
             .eq('id', data.session.user.id)
-            .single() as { data: { business_name: string | null; stripe_customer_id: string | null } | null }
+            .single() as { data: { business_name: string | null; google_review_url: string | null; stripe_customer_id: string | null; subscription_status: string | null } | null }
 
-          // Determine redirect destination based on onboarding status
+          // Determine redirect destination based on completion status
           let redirectPath = next
           if (!profile) {
             redirectPath = '/onboarding'
-          } else if (!profile.business_name) {
+          } else if (!profile.business_name || !profile.google_review_url) {
             redirectPath = '/onboarding'
-          } else if (!profile.stripe_customer_id) {
+          } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
             redirectPath = '/billing/setup'
           }
 

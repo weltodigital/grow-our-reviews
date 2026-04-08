@@ -56,9 +56,9 @@ export async function GET(request: NextRequest) {
         // Regular auth flow - check onboarding/billing status
         const { data: profile } = await supabase
           .from('profiles')
-          .select('business_name, stripe_customer_id, created_at')
+          .select('business_name, google_review_url, stripe_customer_id, subscription_status, created_at')
           .eq('id', data.user.id)
-          .single() as { data: { business_name: string | null; stripe_customer_id: string | null; created_at: string } | null }
+          .single() as { data: { business_name: string | null; google_review_url: string | null; stripe_customer_id: string | null; subscription_status: string | null; created_at: string } | null }
 
         // Log for debugging
         console.log('Auth callback debug:', {
@@ -66,26 +66,25 @@ export async function GET(request: NextRequest) {
           next,
           profile: profile ? {
             hasBusinessName: !!profile.business_name,
+            hasGoogleUrl: !!profile.google_review_url,
             hasStripeId: !!profile.stripe_customer_id,
+            subscriptionStatus: profile.subscription_status,
             createdAt: profile.created_at,
           } : null
         })
 
-        // Check if the redirect is explicitly requesting billing setup (from signup flow)
-        const isBillingSetupRequest = next.includes('/billing/setup')
-
-        // New flow: Onboarding first, then billing
+        // Determine redirect based on completion status
         if (!profile) {
           // No profile at all - this is definitely a new user, start with onboarding
           console.log('No profile found - redirecting to onboarding')
           response = NextResponse.redirect(requestUrl.origin + '/onboarding')
-        } else if (!profile.business_name) {
-          // No business info - go to onboarding first
-          console.log('No business name - redirecting to onboarding')
+        } else if (!profile.business_name || !profile.google_review_url) {
+          // Incomplete onboarding - go to onboarding first
+          console.log('Incomplete onboarding - redirecting to onboarding')
           response = NextResponse.redirect(requestUrl.origin + '/onboarding')
-        } else if (!profile.stripe_customer_id) {
-          // Has business info but no billing - go to billing setup
-          console.log('No stripe customer ID - redirecting to billing setup')
+        } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
+          // Completed onboarding but no active subscription - go to billing setup
+          console.log('No active subscription - redirecting to billing setup')
           response = NextResponse.redirect(requestUrl.origin + '/billing/setup')
         }
         // Otherwise go to the requested destination (default is /dashboard)

@@ -67,17 +67,32 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Check if user has completed onboarding
+        // Check if user has completed onboarding and billing setup
         const { data: profile } = await supabase
           .from('profiles')
-          .select('business_name, google_review_url')
+          .select('business_name, google_review_url, stripe_customer_id, subscription_status')
           .eq('id', data.user.id)
-          .single() as { data: { business_name: string | null, google_review_url: string | null } | null }
+          .single() as { data: { business_name: string | null, google_review_url: string | null, stripe_customer_id: string | null, subscription_status: string | null } | null }
 
-        if (profile?.business_name && profile?.google_review_url) {
-          router.push('/dashboard')
-        } else {
+        console.log('Login redirect logic - profile status:', {
+          hasBusinessName: !!profile?.business_name,
+          hasGoogleUrl: !!profile?.google_review_url,
+          hasStripeId: !!profile?.stripe_customer_id,
+          subscriptionStatus: profile?.subscription_status
+        })
+
+        if (!profile?.business_name || !profile?.google_review_url) {
+          // Incomplete onboarding - send to onboarding
+          console.log('Incomplete onboarding - redirecting to /onboarding')
           router.push('/onboarding')
+        } else if (!profile?.stripe_customer_id || !profile?.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
+          // Completed onboarding but no active subscription - send to billing setup
+          console.log('No active subscription - redirecting to /billing/setup')
+          router.push('/billing/setup')
+        } else {
+          // Everything complete - send to dashboard
+          console.log('All complete - redirecting to /dashboard')
+          router.push('/dashboard')
         }
       }
     } catch (err) {

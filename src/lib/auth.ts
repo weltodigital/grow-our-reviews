@@ -96,5 +96,14 @@ export async function requireUserWithProfile() {
     redirect('/onboarding')
   }
 
+  // Check if user has completed onboarding and billing setup
+  if (!profile.business_name || !profile.google_review_url) {
+    redirect('/onboarding')
+  }
+
+  if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status as string)) {
+    redirect('/billing/setup')
+  }
+
   return { user, profile }
 }
