@@ -154,8 +154,7 @@ function ConfirmSignupForm() {
         </div>
       </CardContent>
     </Card>
-    )
-  }
+  )
 }
 
 export default function ConfirmSignupPage() {
