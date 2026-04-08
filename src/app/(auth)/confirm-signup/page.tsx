@@ -151,8 +151,9 @@ function ConfirmSignupForm() {
             </a>
             {' '}if you already have an account.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </CardContent>
+    </Card>
     )
   }
 }
