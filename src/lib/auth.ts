@@ -94,19 +94,22 @@ export async function requireUserWithProfile(): Promise<{ user: any; profile: an
 
   if (!profile) {
     redirect('/onboarding')
-    throw new Error('Redirected to onboarding') // This won't be reached but helps TypeScript
+    throw new Error('Redirected to onboarding')
   }
+
+  // Now TypeScript knows profile is not null, so we cast it to help with type inference
+  const validProfile = profile as NonNullable<typeof profile>
 
   // Check if user has completed onboarding and billing setup
-  if (!profile.business_name || !profile.google_review_url) {
+  if (!validProfile.business_name || !validProfile.google_review_url) {
     redirect('/onboarding')
-    throw new Error('Redirected to onboarding') // This won't be reached but helps TypeScript
+    throw new Error('Redirected to onboarding')
   }
 
-  if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status as string)) {
+  if (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string)) {
     redirect('/billing/setup')
-    throw new Error('Redirected to billing setup') // This won't be reached but helps TypeScript
+    throw new Error('Redirected to billing setup')
   }
 
-  return { user, profile }
+  return { user, profile: validProfile }
 }
