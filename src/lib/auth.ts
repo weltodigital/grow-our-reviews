@@ -97,8 +97,8 @@ export async function requireUserWithProfile(): Promise<{ user: any; profile: an
     throw new Error('Redirected to onboarding')
   }
 
-  // Now TypeScript knows profile is not null, so we cast it to help with type inference
-  const validProfile = profile as NonNullable<typeof profile>
+  // Explicit type assertion to help TypeScript understand the profile structure
+  const validProfile = profile as any
 
   // Check if user has completed onboarding and billing setup
   if (!validProfile.business_name || !validProfile.google_review_url) {
