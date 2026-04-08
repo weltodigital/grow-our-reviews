@@ -141,8 +141,15 @@ function ConfirmSignupForm() {
           </div>
           <p className="text-red-600 mb-4">{error}</p>
           <p className="text-sm text-gray-600">
-            You can try <a href="/signup" className="underline hover:no-underline" style={{ color: 'var(--accent)' }}>signing up again</a> or{' '}
-            <a href="/login" className="underline hover:no-underline" style={{ color: 'var(--accent)' }}>sign in</a> if you already have an account.
+            You can try{' '}
+            <a href="/signup" className="underline hover:no-underline" style={{ color: 'var(--accent)' }}>
+              signing up again
+            </a>
+            {' '}or{' '}
+            <a href="/login" className="underline hover:no-underline" style={{ color: 'var(--accent)' }}>
+              sign in
+            </a>
+            {' '}if you already have an account.
           </p>
         </CardContent>
       </Card>
