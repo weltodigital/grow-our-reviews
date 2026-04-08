@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { Database } from '@/types/database'
 import type { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 
 export async function createServerSupabase() {
   const cookieStore = await cookies()
@@ -71,6 +72,86 @@ export async function requireAuth() {
   return user
 }
 
+// Stripe webhook failure recovery functions
+async function getStripeSessionInfo(sessionId: string) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('STRIPE_SECRET_KEY is not configured')
+    return null
+  }
+
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2026-01-28.clover',
+    })
+
+    console.log('Checking Stripe session directly:', sessionId)
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['subscription']
+    })
+
+    if (session.payment_status !== 'paid') {
+      console.log('Session payment not completed:', session.payment_status)
+      return null
+    }
+
+    if (!session.customer || !session.subscription) {
+      console.log('Session missing customer or subscription')
+      return null
+    }
+
+    const subscription = session.subscription as Stripe.Subscription
+
+    return {
+      customerId: session.customer as string,
+      subscriptionId: subscription.id,
+      subscriptionStatus: subscription.status,
+      paymentStatus: session.payment_status,
+    }
+  } catch (error) {
+    console.error('Error retrieving Stripe session:', error)
+    return null
+  }
+}
+
+async function handleWebhookFailure(userId: string, sessionId: string): Promise<boolean> {
+  try {
+    // Get session info directly from Stripe
+    const sessionInfo = await getStripeSessionInfo(sessionId)
+
+    if (!sessionInfo) {
+      console.log('No valid session info found for:', sessionId)
+      return false
+    }
+
+    // Update user profile with subscription info
+    const supabase = await createServerSupabase()
+
+    console.log('Reconciling webhook failure for user:', userId, sessionInfo)
+
+    const { error } = await (supabase as any)
+      .from('profiles')
+      .update({
+        stripe_customer_id: sessionInfo.customerId,
+        subscription_id: sessionInfo.subscriptionId,
+        subscription_status: sessionInfo.subscriptionStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+
+    if (error) {
+      console.error('Error updating profile during reconciliation:', error)
+      return false
+    }
+
+    console.log('Successfully reconciled webhook failure for user:', userId)
+    return true
+  } catch (error) {
+    console.error('Error handling webhook failure:', error)
+    return false
+  }
+}
+
 export async function getUserProfile(userId: string) {
   const supabase = await createServerSupabase()
 
@@ -88,9 +169,9 @@ export async function getUserProfile(userId: string) {
   return profile
 }
 
-export async function requireUserWithProfile(): Promise<{ user: any; profile: any }> {
+export async function requireUserWithProfile(sessionId?: string): Promise<{ user: any; profile: any }> {
   const user = await requireAuth()
-  const profile = await getUserProfile(user.id)
+  let profile = await getUserProfile(user.id)
 
   if (!profile) {
     redirect('/onboarding')
@@ -98,7 +179,7 @@ export async function requireUserWithProfile(): Promise<{ user: any; profile: an
   }
 
   // Explicit type assertion to help TypeScript understand the profile structure
-  const validProfile = profile as any
+  let validProfile = profile as any
 
   // Check if user has completed onboarding and billing setup
   if (!validProfile.business_name || !validProfile.google_review_url) {
@@ -106,6 +187,27 @@ export async function requireUserWithProfile(): Promise<{ user: any; profile: an
     throw new Error('Redirected to onboarding')
   }
 
+  // Check for webhook failure scenario: session_id present but no subscription
+  if (sessionId && (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string))) {
+    console.log('Detected potential webhook failure - attempting reconciliation')
+
+    try {
+      const reconciled = await handleWebhookFailure(user.id, sessionId)
+
+      if (reconciled) {
+        // Re-fetch profile after reconciliation
+        profile = await getUserProfile(user.id)
+        if (profile) {
+          validProfile = profile as any
+          console.log('Profile updated after webhook reconciliation')
+        }
+      }
+    } catch (error) {
+      console.error('Error during webhook reconciliation:', error)
+    }
+  }
+
+  // Final check after potential reconciliation
   if (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string)) {
     redirect('/billing/setup')
     throw new Error('Redirected to billing setup')

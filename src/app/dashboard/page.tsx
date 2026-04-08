@@ -216,8 +216,16 @@ function formatDateTime(dateStr: string) {
   })
 }
 
-export default async function DashboardPage() {
-  const { user, profile } = await requireUserWithProfile()
+interface DashboardPageProps {
+  searchParams: Promise<{ session_id?: string }>
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const params = await searchParams
+  const sessionId = params.session_id
+
+  // Pass session_id to auth function for webhook failure detection
+  const { user, profile } = await requireUserWithProfile(sessionId)
   const stats = await getDashboardStats(user.id)
   const recentActivity = await getRecentActivity(user.id)
 
