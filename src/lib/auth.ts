@@ -155,7 +155,7 @@ async function handleWebhookFailure(userId: string, sessionId: string): Promise<
       .from('profiles')
       .update({
         stripe_customer_id: sessionInfo.customerId,
-        subscription_id: sessionInfo.subscriptionId,
+        stripe_subscription_id: sessionInfo.subscriptionId,
         subscription_status: sessionInfo.subscriptionStatus,
         updated_at: new Date().toISOString(),
       })
