@@ -79,6 +79,12 @@ async function getStripeSessionInfo(sessionId: string) {
     return null
   }
 
+  // Validate session_id format - Stripe checkout session IDs start with 'cs_'
+  if (!sessionId || !sessionId.startsWith('cs_') || sessionId.length < 10) {
+    console.log('Invalid Stripe session ID format:', sessionId)
+    return null
+  }
+
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2026-01-28.clover',
@@ -109,13 +115,32 @@ async function getStripeSessionInfo(sessionId: string) {
       paymentStatus: session.payment_status,
     }
   } catch (error) {
-    console.error('Error retrieving Stripe session:', error)
+    // Log error but don't expose details to prevent information leakage
+    console.error('Error retrieving Stripe session (details hidden from user):', (error as any)?.message || 'Unknown error')
     return null
   }
 }
 
 async function handleWebhookFailure(userId: string, sessionId: string): Promise<boolean> {
   try {
+    // First, check if this session has already been processed by checking if user already has active subscription
+    // This prevents unnecessary Stripe API calls and ensures reconciliation only happens once
+    const supabase = await createServerSupabase()
+
+    const { data: currentProfile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id, subscription_status')
+      .eq('id', userId)
+      .single()
+
+    // If user already has an active subscription, skip reconciliation
+    if ((currentProfile as any)?.stripe_customer_id &&
+        (currentProfile as any)?.subscription_status &&
+        ['active', 'trialing'].includes((currentProfile as any).subscription_status)) {
+      console.log('User already has active subscription, skipping reconciliation')
+      return true // Return true since reconciliation is not needed
+    }
+
     // Get session info directly from Stripe
     const sessionInfo = await getStripeSessionInfo(sessionId)
 
@@ -124,10 +149,7 @@ async function handleWebhookFailure(userId: string, sessionId: string): Promise<
       return false
     }
 
-    // Update user profile with subscription info
-    const supabase = await createServerSupabase()
-
-    console.log('Reconciling webhook failure for user:', userId, sessionInfo)
+    console.log('Reconciling webhook failure for user:', userId, 'session:', sessionId.substring(0, 10) + '...')
 
     const { error } = await (supabase as any)
       .from('profiles')
