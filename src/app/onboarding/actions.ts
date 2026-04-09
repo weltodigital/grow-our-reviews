@@ -36,21 +36,41 @@ export async function completeOnboarding(data: OnboardingData) {
     }
   }
 
-  // Create or update the profile
-  const { error: upsertError } = await (supabase as any)
+  // Check if profile already exists
+  const { data: existingProfile } = await (supabase as any)
     .from('profiles')
-    .upsert(
-      {
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  let upsertError;
+
+  if (existingProfile) {
+    // Update existing profile - only update onboarding fields, preserve billing data
+    const { error } = await (supabase as any)
+      .from('profiles')
+      .update({
+        business_name: data.businessName.trim(),
+        google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+
+    upsertError = error;
+  } else {
+    // Create new profile with all required fields
+    const { error } = await (supabase as any)
+      .from('profiles')
+      .insert({
         id: user.id,
         email: user.email!,
         business_name: data.businessName.trim(),
         google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
         updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: 'id',
-      }
-    )
+      })
+
+    upsertError = error;
+  }
 
   if (upsertError) {
     console.error('Error updating profile:', upsertError)
