@@ -211,21 +211,35 @@ export async function requireUserWithProfile(sessionId?: string): Promise<{ user
 
   // Check for webhook failure scenario: session_id present but no subscription
   if (sessionId && (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string))) {
-    console.log('Detected potential webhook failure - attempting reconciliation')
+    console.log('🔥 WEBHOOK FAILURE DETECTED - attempting reconciliation', {
+      userId: user.id,
+      sessionId: sessionId.substring(0, 15) + '...',
+      currentProfile: {
+        hasStripeCustomerId: !!validProfile.stripe_customer_id,
+        subscriptionStatus: validProfile.subscription_status,
+        businessName: validProfile.business_name
+      }
+    })
 
     try {
       const reconciled = await handleWebhookFailure(user.id, sessionId)
 
       if (reconciled) {
         // Re-fetch profile after reconciliation
+        console.log('🚀 Webhook reconciliation succeeded - refetching profile')
         profile = await getUserProfile(user.id)
         if (profile) {
           validProfile = profile as any
-          console.log('Profile updated after webhook reconciliation')
+          console.log('✅ Profile updated after webhook reconciliation', {
+            hasStripeCustomerId: !!validProfile.stripe_customer_id,
+            subscriptionStatus: validProfile.subscription_status
+          })
         }
+      } else {
+        console.log('❌ Webhook reconciliation failed - session invalid or incomplete')
       }
     } catch (error) {
-      console.error('Error during webhook reconciliation:', error)
+      console.error('💥 Error during webhook reconciliation:', error)
     }
   }
 
