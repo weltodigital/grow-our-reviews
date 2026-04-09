@@ -37,7 +37,7 @@ export default function BillingSetupPage() {
       // Only redirect if they have BOTH a subscription status AND a stripe customer ID
       // This prevents redirecting users who have default 'trialing' status but no actual billing setup
       if (profile && ((profile as any).subscription_status === 'active' || (profile as any).subscription_status === 'trialing') && (profile as any).stripe_customer_id) {
-        router.push('/onboarding')
+        router.push('/dashboard')
       }
     }
 
