@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
           // No profile at all - this is definitely a new user, start with onboarding
           console.log('No profile found - redirecting to onboarding')
           response = NextResponse.redirect(requestUrl.origin + '/onboarding')
-        } else if (!profile.business_name || !profile.google_review_url) {
-          // Incomplete onboarding - go to onboarding first
+        } else if (!profile.business_name) {
+          // Incomplete onboarding - go to onboarding first (google_review_url is optional)
           console.log('Incomplete onboarding - redirecting to onboarding')
           response = NextResponse.redirect(requestUrl.origin + '/onboarding')
         } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {

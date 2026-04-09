@@ -81,8 +81,8 @@ export default function LoginPage() {
           subscriptionStatus: profile?.subscription_status
         })
 
-        if (!profile?.business_name || !profile?.google_review_url) {
-          // Incomplete onboarding - send to onboarding
+        if (!profile?.business_name) {
+          // Incomplete onboarding - send to onboarding (google_review_url is optional)
           console.log('Incomplete onboarding - redirecting to /onboarding')
           router.push('/onboarding')
         } else if (!profile?.stripe_customer_id || !profile?.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {

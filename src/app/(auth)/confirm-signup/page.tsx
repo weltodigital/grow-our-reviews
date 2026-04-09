@@ -57,7 +57,7 @@ function ConfirmSignupForm() {
           let redirectPath = next
           if (!profile) {
             redirectPath = '/onboarding'
-          } else if (!profile.business_name || !profile.google_review_url) {
+          } else if (!profile.business_name) {
             redirectPath = '/onboarding'
           } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
             redirectPath = '/billing/setup'

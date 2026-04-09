@@ -203,8 +203,8 @@ export async function requireUserWithProfile(sessionId?: string): Promise<{ user
   // Explicit type assertion to help TypeScript understand the profile structure
   let validProfile = profile as any
 
-  // Check if user has completed onboarding and billing setup
-  if (!validProfile.business_name || !validProfile.google_review_url) {
+  // Check if user has completed onboarding - business_name is required, google_review_url is optional
+  if (!validProfile.business_name) {
     redirect('/onboarding')
     throw new Error('Redirected to onboarding')
   }
