@@ -295,32 +295,54 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
               if (profile?.email) {
                 console.log('Sending welcome email after successful checkout to:', profile.email)
 
-                // Send welcome email
-                await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    email: profile.email,
-                    businessName: profile.business_name,
-                  }),
-                })
+                // Send welcome email with proper error handling
+                try {
+                  const welcomeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      email: profile.email,
+                      businessName: profile.business_name,
+                    }),
+                  })
 
-                console.log('Welcome email sent, now sending subscription confirmation')
+                  if (welcomeResponse.ok) {
+                    console.log('✅ Welcome email sent successfully')
+                  } else {
+                    const errorText = await welcomeResponse.text()
+                    console.error('❌ Welcome email failed:', welcomeResponse.status, errorText)
+                  }
+                } catch (error) {
+                  console.error('💥 Welcome email request failed:', error)
+                }
 
-                // Send subscription confirmation email
-                await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-confirmation`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    email: profile.email,
+                console.log('Now sending subscription confirmation email')
+
+                // Send subscription confirmation email with proper error handling
+                try {
+                  const subscriptionResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-confirmation`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      email: profile.email,
                     businessName: profile.business_name,
                     planName: priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth',
                   }),
                 })
+
+                if (subscriptionResponse.ok) {
+                  console.log('✅ Subscription confirmation email sent successfully')
+                } else {
+                  const errorText = await subscriptionResponse.text()
+                  console.error('❌ Subscription confirmation email failed:', subscriptionResponse.status, errorText)
+                }
+              } catch (error) {
+                console.error('💥 Subscription confirmation email request failed:', error)
+              }
               }
             } catch (error) {
               logWebhookEvent(correlationId, 'error', 'Failed to send emails', {
