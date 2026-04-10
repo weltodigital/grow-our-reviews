@@ -295,54 +295,33 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
               if (profile?.email) {
                 console.log('Sending welcome email after successful checkout to:', profile.email)
 
-                // Send welcome email with proper error handling
+                // Send emails directly instead of via API calls (bypass 405 routing issues)
                 try {
-                  const welcomeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/welcome`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      email: profile.email,
-                      businessName: profile.business_name,
-                    }),
-                  })
+                  const { sendWelcomeEmail, sendSubscriptionConfirmationEmail } = await import('@/lib/resend')
 
-                  if (welcomeResponse.ok) {
+                  // Send welcome email directly
+                  const welcomeResult = await sendWelcomeEmail(profile.email, profile.business_name)
+                  if (welcomeResult.success) {
                     console.log('✅ Welcome email sent successfully')
                   } else {
-                    const errorText = await welcomeResponse.text()
-                    console.error('❌ Welcome email failed:', welcomeResponse.status, errorText)
+                    console.error('❌ Welcome email failed:', welcomeResult.error)
+                  }
+
+                  // Send subscription confirmation email directly
+                  const planName = priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth'
+                  const subscriptionResult = await sendSubscriptionConfirmationEmail(
+                    profile.email,
+                    profile.business_name,
+                    planName
+                  )
+                  if (subscriptionResult.success) {
+                    console.log('✅ Subscription confirmation email sent successfully')
+                  } else {
+                    console.error('❌ Subscription confirmation email failed:', subscriptionResult.error)
                   }
                 } catch (error) {
-                  console.error('💥 Welcome email request failed:', error)
+                  console.error('💥 Email sending failed:', error)
                 }
-
-                console.log('Now sending subscription confirmation email')
-
-                // Send subscription confirmation email with proper error handling
-                try {
-                  const subscriptionResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-confirmation`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      email: profile.email,
-                    businessName: profile.business_name,
-                    planName: priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth',
-                  }),
-                })
-
-                if (subscriptionResponse.ok) {
-                  console.log('✅ Subscription confirmation email sent successfully')
-                } else {
-                  const errorText = await subscriptionResponse.text()
-                  console.error('❌ Subscription confirmation email failed:', subscriptionResponse.status, errorText)
-                }
-              } catch (error) {
-                console.error('💥 Subscription confirmation email request failed:', error)
-              }
               }
             } catch (error) {
               logWebhookEvent(correlationId, 'error', 'Failed to send emails', {
@@ -423,6 +402,29 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
           status: subscription.status,
           limit: priceInfo?.monthlyRequestLimit
         })
+
+        // Send upgrade confirmation email if this was a plan change
+        if (priceInfo && profile?.email && subscription.status === 'active') {
+          try {
+            console.log('Sending upgrade confirmation email to:', profile.email)
+            const { sendSubscriptionConfirmationEmail } = await import('@/lib/resend')
+
+            const planName = priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth'
+            const result = await sendSubscriptionConfirmationEmail(
+              profile.email,
+              profile.business_name || 'there',
+              planName
+            )
+
+            if (result.success) {
+              console.log('✅ Upgrade confirmation email sent successfully')
+            } else {
+              console.error('❌ Upgrade confirmation email failed:', result.error)
+            }
+          } catch (error) {
+            console.error('💥 Upgrade email sending failed:', error)
+          }
+        }
         break
       }
 
