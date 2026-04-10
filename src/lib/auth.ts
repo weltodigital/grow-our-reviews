@@ -243,6 +243,32 @@ export async function requireUserWithProfile(sessionId?: string): Promise<{ user
     }
   }
 
+  // Auto-fix legacy users with old monthly_request_limit values
+  if (validProfile.monthly_request_limit === 50 &&
+      validProfile.subscription_status === 'trialing' &&
+      !validProfile.stripe_subscription_id) {
+    console.log('🔧 Auto-fixing legacy user with 50 credit limit to 150 (Starter plan default)')
+    try {
+      const supabase = await createServerSupabase()
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          monthly_request_limit: 150,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id)
+
+      if (!error) {
+        validProfile.monthly_request_limit = 150
+        console.log('✅ Successfully updated user credit limit to 150')
+      } else {
+        console.error('❌ Failed to update user credit limit:', error)
+      }
+    } catch (error) {
+      console.error('💥 Error auto-fixing user credit limit:', error)
+    }
+  }
+
   // Final check after potential reconciliation
   if (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string)) {
     redirect('/billing/setup')
