@@ -250,7 +250,7 @@ export async function requireUserWithProfile(sessionId?: string): Promise<{ user
     console.log('🔧 Auto-fixing legacy user with 50 credit limit to 150 (Starter plan default)')
     try {
       const supabase = await createServerSupabase()
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({
           monthly_request_limit: 150,
