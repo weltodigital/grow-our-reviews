@@ -297,10 +297,18 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
 
                 // Send emails directly instead of via API calls (bypass 405 routing issues)
                 try {
+                  console.log('🔧 Debug: RESEND_API_KEY configured:', !!process.env.RESEND_API_KEY)
+                  console.log('🔧 Debug: Importing email functions...')
+
                   const { sendWelcomeEmail, sendSubscriptionConfirmationEmail } = await import('@/lib/resend')
+
+                  console.log('🔧 Debug: Email functions imported successfully')
+                  console.log('🔧 Debug: Attempting to send welcome email to:', profile.email)
 
                   // Send welcome email directly
                   const welcomeResult = await sendWelcomeEmail(profile.email, profile.business_name)
+                  console.log('🔧 Debug: Welcome email result:', welcomeResult)
+
                   if (welcomeResult.success) {
                     console.log('✅ Welcome email sent successfully')
                   } else {
@@ -309,18 +317,23 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
 
                   // Send subscription confirmation email directly
                   const planName = priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth'
+                  console.log('🔧 Debug: Attempting to send subscription email for plan:', planName)
+
                   const subscriptionResult = await sendSubscriptionConfirmationEmail(
                     profile.email,
                     profile.business_name,
                     planName
                   )
+                  console.log('🔧 Debug: Subscription email result:', subscriptionResult)
+
                   if (subscriptionResult.success) {
                     console.log('✅ Subscription confirmation email sent successfully')
                   } else {
                     console.error('❌ Subscription confirmation email failed:', subscriptionResult.error)
                   }
                 } catch (error) {
-                  console.error('💥 Email sending failed:', error)
+                  console.error('💥 Email sending failed with error:', error)
+                  console.error('💥 Error stack:', (error as any)?.stack)
                 }
               }
             } catch (error) {
