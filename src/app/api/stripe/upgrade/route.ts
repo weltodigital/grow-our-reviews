@@ -178,6 +178,28 @@ export async function POST(request: NextRequest) {
             .update(profileUpdateData)
             .eq('id', user.id)
 
+          // Send upgrade confirmation email immediately (don't rely on webhook)
+          try {
+            console.log('Sending upgrade confirmation email to:', user.email)
+            const { sendSubscriptionConfirmationEmail } = await import('@/lib/resend')
+
+            const planName = 'Growth' // This is the upgrade API so it's always Growth
+            const emailResult = await sendSubscriptionConfirmationEmail(
+              user.email!,
+              (profile as any)?.business_name || 'there',
+              planName
+            )
+
+            if (emailResult.success) {
+              console.log('✅ Upgrade confirmation email sent successfully')
+            } else {
+              console.error('❌ Upgrade confirmation email failed:', emailResult.error)
+            }
+          } catch (error) {
+            console.error('💥 Upgrade email sending failed:', error)
+            // Don't fail the upgrade if email fails
+          }
+
           response = NextResponse.json({
             success: true,
             message: 'Subscription upgraded successfully',
@@ -258,6 +280,28 @@ export async function POST(request: NextRequest) {
             .eq('id', user.id)
 
           console.log('Successfully created subscription directly:', newSubscription.id)
+
+          // Send upgrade confirmation email immediately (don't rely on webhook)
+          try {
+            console.log('Sending upgrade confirmation email to:', user.email)
+            const { sendSubscriptionConfirmationEmail } = await import('@/lib/resend')
+
+            const planName = 'Growth' // This is the upgrade API so it's always Growth
+            const emailResult = await sendSubscriptionConfirmationEmail(
+              user.email!,
+              (profile as any)?.business_name || 'there',
+              planName
+            )
+
+            if (emailResult.success) {
+              console.log('✅ Upgrade confirmation email sent successfully')
+            } else {
+              console.error('❌ Upgrade confirmation email failed:', emailResult.error)
+            }
+          } catch (error) {
+            console.error('💥 Upgrade email sending failed:', error)
+            // Don't fail the upgrade if email fails
+          }
 
           return NextResponse.json({
             success: true,
