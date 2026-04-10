@@ -88,6 +88,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/twilio/webhook') ||
     pathname.startsWith('/api/debug/') ||
     pathname.startsWith('/api/feedback') ||
+    pathname.startsWith('/api/emails/') ||
+    pathname.startsWith('/api/test-') ||
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt'
 
