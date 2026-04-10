@@ -269,6 +269,50 @@ export async function requireUserWithProfile(sessionId?: string): Promise<{ user
     }
   }
 
+  // Auto-fix Growth plan users who upgraded but still show 150 credits
+  if (validProfile.stripe_subscription_id &&
+      validProfile.subscription_status === 'active' &&
+      validProfile.monthly_request_limit === 150) {
+    console.log('🔧 Checking if Growth plan user needs credit limit update...')
+    try {
+      // Check the actual subscription in Stripe to get the correct plan
+      if (process.env.STRIPE_SECRET_KEY) {
+        const Stripe = (await import('stripe')).default
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+          apiVersion: '2026-01-28.clover',
+        })
+
+        const subscription = await stripe.subscriptions.retrieve(validProfile.stripe_subscription_id)
+        const priceId = subscription.items.data[0]?.price?.id
+
+        // Import price checking function
+        const { getPriceInfo } = await import('@/lib/stripe')
+        const priceInfo = getPriceInfo(priceId)
+
+        if (priceInfo && priceInfo.monthlyRequestLimit === 300) {
+          console.log('🔧 Auto-fixing Growth plan user showing 150 credits instead of 300')
+          const supabase = await createServerSupabase()
+          const { error } = await (supabase as any)
+            .from('profiles')
+            .update({
+              monthly_request_limit: 300,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id)
+
+          if (!error) {
+            validProfile.monthly_request_limit = 300
+            console.log('✅ Successfully updated Growth plan user to 300 credits')
+          } else {
+            console.error('❌ Failed to update Growth plan user credit limit:', error)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('💥 Error checking/fixing Growth plan credit limit:', error)
+    }
+  }
+
   // Final check after potential reconciliation
   if (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string)) {
     redirect('/billing/setup')
