@@ -46,11 +46,37 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
       return
     }
 
-    // Basic phone validation for UK numbers
+    // Enhanced phone validation for UK numbers with specific error messages
     const cleanPhone = customerPhone.trim().replace(/\s+/g, '')
+
+    // Check if it's empty after cleaning
+    if (!cleanPhone) {
+      setError('Customer phone number is required')
+      return
+    }
+
+    // Check for obvious non-UK formats
+    if (!cleanPhone.match(/^(\+44|0)/)) {
+      setError('Please enter a UK phone number starting with 07, +44 7, or international format')
+      return
+    }
+
+    // Check for landlines (02, 01 prefixes)
+    if (cleanPhone.match(/^(0[12]|\+44[12])/)) {
+      setError('This appears to be a landline number. SMS only works with mobile numbers (07xxx or +44 7xxx)')
+      return
+    }
+
+    // Check length and mobile format
     const phoneRegex = /^(\+44|0)[7-9]\d{8,9}$/
     if (!phoneRegex.test(cleanPhone)) {
-      setError('Please enter a valid UK phone number (e.g., 07700 123456 or +44 7700 123456)')
+      if (cleanPhone.length < 10) {
+        setError('Phone number is too short. UK mobile numbers need 11 digits (e.g., 07700 123456)')
+      } else if (cleanPhone.length > 15) {
+        setError('Phone number is too long. Please check the number is correct')
+      } else {
+        setError('Please enter a valid UK mobile number (07xxx or +44 7xxx). Landlines cannot receive SMS')
+      }
       return
     }
 
