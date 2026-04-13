@@ -236,6 +236,13 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
               No problem — email us at hello@growourreviews.com with your business name and we'll find the link for you. We usually respond within a few hours.
             </p>
           </div>
+
+          <div>
+            <p className="font-medium text-gray-700">"Will all my customers be able to leave a review?"</p>
+            <p className="text-gray-600">
+              To leave a Google review, customers need to be signed into a Google account. Some customers (especially older customers or iPhone users who primarily use iCloud) may not have one and will see a Google login screen. This is normal - industry-wide, about 20-40% of customers who click through will complete a review. The volume approach ensures you still get plenty of reviews from willing customers.
+            </p>
+          </div>
         </div>
       </div>
     </div>

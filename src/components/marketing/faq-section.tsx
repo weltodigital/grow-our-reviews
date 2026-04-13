@@ -42,6 +42,10 @@ export function FaqSection() {
     {
       question: 'Is this allowed by Google?',
       answer: 'Yes, completely. Google allows businesses to ask customers for reviews as long as you don\'t offer incentives or try to manipulate the process. Our system simply makes it easier for happy customers to find your review page - which is exactly what Google wants.'
+    },
+    {
+      question: 'Will everyone who clicks the link leave a review?',
+      answer: 'Not everyone who clicks will complete a review - this is completely normal. Some customers may not have a Google account, others might be interrupted, and some simply prefer not to leave reviews online. Industry-wide, typical click-to-review conversion rates are 20-40%. Our system focuses on making it as easy as possible for willing customers, and the volume of requests ensures you still get plenty of reviews from those who are happy to help.'
     }
   ]
 

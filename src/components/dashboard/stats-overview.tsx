@@ -31,7 +31,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
     {
       title: 'Clicks',
       value: stats.clicksThisMonth,
-      subtitle: `${stats.clickThroughRate.toFixed(1)}% click rate`,
+      subtitle: `${stats.clickThroughRate.toFixed(1)}% click rate (good = 40%+)`,
       icon: MousePointer,
       color: 'text-green-600',
       bgColor: 'bg-green-50',

@@ -318,6 +318,28 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </CardContent>
       </Card>
 
+      {/* Review Conversion Tip */}
+      {(stats.clicksThisMonth > 0 && stats.reviewsThisMonth === 0) && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <div className="rounded-lg bg-blue-100 p-2">
+                <CheckCircle className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-blue-900 mb-1">Good click-through rate!</h3>
+                <p className="text-sm text-blue-700 mb-2">
+                  You're getting clicks but no completed reviews yet. This is normal - not everyone who clicks will leave a review.
+                </p>
+                <p className="text-xs text-blue-600">
+                  Some customers may not have a Google account, others might be interrupted. Keep sending requests - reviews will come!
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick Actions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
