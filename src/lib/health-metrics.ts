@@ -17,6 +17,8 @@ export type HealthMetricType =
   | 'trials_failed'
   | 'payment_tests_run'
   | 'payment_tests_failed'
+  | 'safety_net_recoveries'
+  | 'first_user_failures_caught'
 
 export class HealthMetrics {
   private supabase: any
@@ -128,7 +130,9 @@ export class HealthMetrics {
       trials_converted: 0,
       trials_failed: 0,
       payment_tests_run: 0,
-      payment_tests_failed: 0
+      payment_tests_failed: 0,
+      safety_net_recoveries: 0,
+      first_user_failures_caught: 0
     }
   }
 }

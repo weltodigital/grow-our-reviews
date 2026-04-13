@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const [todayMetrics, yesterdayMetrics, weeklyTrend, queueDepth] = await Promise.all([
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+
+    const [todayMetrics, yesterdayMetrics, weeklyTrend, queueDepth, overdueRequests] = await Promise.all([
       healthMetrics.getDailyMetrics(today),
       healthMetrics.getDailyMetrics(yesterdayStr),
       healthMetrics.getWeeklyTrend(),
@@ -37,12 +39,37 @@ export async function GET(request: NextRequest) {
         .from('review_requests')
         .select('id', { count: 'exact', head: true })
         .in('status', ['scheduled', 'queued'])
-        .lte('scheduled_for', now)
+        .lte('scheduled_for', now),
+      // Check for overdue requests (>2 hours past scheduled_for)
+      supabase
+        .from('review_requests')
+        .select('id, user_id', { count: 'exact' })
+        .eq('status', 'scheduled')
+        .lt('scheduled_for', twoHoursAgo)
     ])
 
     // SMS queue metrics for scalability monitoring
     const SMS_BATCH_SIZE = parseInt(process.env.SMS_BATCH_SIZE || '50')
     const currentQueueDepth = queueDepth.count || 0
+    const overdueCount = overdueRequests.count || 0
+
+    // Check for first-time users in overdue requests (critical for retention)
+    let firstTimeUsersAffected = 0
+    if (overdueCount > 0 && overdueRequests.data) {
+      const userIds = [...new Set(overdueRequests.data.map((req: any) => req.user_id))]
+      for (const userId of userIds) {
+        const { data: successfulRequests } = await supabase
+          .from('review_requests')
+          .select('id')
+          .eq('user_id', userId)
+          .in('status', ['sent', 'clicked', 'reviewed', 'feedback_given'])
+          .limit(1)
+
+        if (!successfulRequests || successfulRequests.length === 0) {
+          firstTimeUsersAffected++
+        }
+      }
+    }
 
     // Quick health status indicators
     const status = {
@@ -50,9 +77,12 @@ export async function GET(request: NextRequest) {
         today: todayMetrics.sms_sent,
         failed: todayMetrics.sms_failed,
         queueDepth: currentQueueDepth,
+        overdueCount: overdueCount,
+        firstTimeUsersAffected: firstTimeUsersAffected,
         queueHealth: currentQueueDepth > SMS_BATCH_SIZE * 6 ? 'critical' :
                      currentQueueDepth > SMS_BATCH_SIZE * 3 ? 'warning' : 'healthy',
-        status: currentQueueDepth > SMS_BATCH_SIZE * 6 ? 'critical' :
+        status: overdueCount > 10 || firstTimeUsersAffected > 0 ? 'critical' :
+                overdueCount > 0 || currentQueueDepth > SMS_BATCH_SIZE * 6 ? 'warning' :
                 currentQueueDepth > SMS_BATCH_SIZE * 3 ? 'warning' :
                 todayMetrics.sms_failed > todayMetrics.sms_sent * 0.1 ? 'warning' : 'healthy'
       },
