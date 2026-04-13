@@ -96,7 +96,7 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
   return messageParts.join('\n')
 }
 
-export async function sendSMS(to: string, message: string, userId?: string): Promise<{
+export async function sendSMS(to: string, message: string, userId?: string, force: boolean = false): Promise<{
   success: boolean
   messageSid?: string
   error?: string
@@ -104,25 +104,27 @@ export async function sendSMS(to: string, message: string, userId?: string): Pro
   queuedReason?: string
 }> {
   try {
-    // Check SMS rate limits before sending (include userId for per-user limits)
-    const rateLimitCheck = await smsRateLimiter.canSendSMS(userId)
+    // Check SMS rate limits before sending (skip if force is true)
+    if (!force) {
+      const rateLimitCheck = await smsRateLimiter.canSendSMS(userId)
 
-    if (!rateLimitCheck.allowed) {
-      console.warn(`SMS rate limit exceeded: ${rateLimitCheck.message}`)
+      if (!rateLimitCheck.allowed) {
+        console.warn(`SMS rate limit exceeded: ${rateLimitCheck.message}`)
 
-      // Send alert if we haven't already
-      await smsRateLimiter.checkAndAlert()
+        // Send alert if we haven't already
+        await smsRateLimiter.checkAndAlert()
 
-      return {
-        success: false,
-        rateLimited: true,
-        queuedReason: rateLimitCheck.queuedReason,
-        error: `Rate limit exceeded: ${rateLimitCheck.message}`,
+        return {
+          success: false,
+          rateLimited: true,
+          queuedReason: rateLimitCheck.queuedReason,
+          error: `Rate limit exceeded: ${rateLimitCheck.message}`,
+        }
       }
-    }
 
-    // Log usage info for monitoring
-    console.log(`SMS rate limiter: ${rateLimitCheck.message} (${Math.round(rateLimitCheck.percentage)}%)`)
+      // Log usage info for monitoring
+      console.log(`SMS rate limiter: ${rateLimitCheck.message} (${Math.round(rateLimitCheck.percentage)}%)`)
+    }
 
     const twilioResponse = await twilioClient.messages.create({
       body: message,

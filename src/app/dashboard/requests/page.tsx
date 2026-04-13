@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { RequestsTable } from '@/components/dashboard/requests-table'
 import { RequestFilters } from '@/components/dashboard/request-filters'
 import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
+import { QueuedStatusInfo } from '@/components/dashboard/queued-status-info'
 import { ArrowLeft, Search, Plus, Download } from 'lucide-react'
 import Link from 'next/link'
 
@@ -26,6 +27,7 @@ export interface ReviewRequest {
   sms_error_message?: string | null
   sms_failed_at?: string | null
   retry_count?: number
+  queued_reason?: string | null
 }
 
 export default function RequestsPage() {
@@ -225,6 +227,12 @@ export default function RequestsPage() {
 
       {/* SMS Failure Alert */}
       <SmsFailureAlert />
+
+      {/* Queue Status Info */}
+      <QueuedStatusInfo
+        queuedCount={statusCounts.queued}
+        queuedReasons={requests.filter(r => r.status === 'queued' && r.queued_reason).map(r => r.queued_reason!)}
+      />
 
       {/* Filters and Search */}
       <Card>

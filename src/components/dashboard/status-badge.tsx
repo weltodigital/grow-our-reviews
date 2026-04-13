@@ -13,25 +13,57 @@ import {
 interface StatusBadgeProps {
   status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed' | 'suppressed'
   showIcon?: boolean
+  scheduledFor?: string
+  queuedReason?: string
 }
 
-export function StatusBadge({ status, showIcon = true }: StatusBadgeProps) {
+export function StatusBadge({ status, showIcon = true, scheduledFor, queuedReason }: StatusBadgeProps) {
+
+  const getDelayDuration = (scheduledTime: string) => {
+    const now = new Date()
+    const scheduled = new Date(scheduledTime)
+    const diffMs = now.getTime() - scheduled.getTime()
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    if (diffMs < 0) return null // Future scheduled time
+    if (diffHours >= 24) return `${Math.floor(diffHours / 24)}d ago`
+    if (diffHours >= 1) return `${diffHours}h ago`
+    if (diffMinutes >= 1) return `${diffMinutes}m ago`
+    return 'just now'
+  }
+
+  const getQueuedReasonText = (reason?: string) => {
+    switch (reason) {
+      case 'platform_hourly_limit': return 'platform limit'
+      case 'platform_daily_limit': return 'daily limit'
+      case 'per_user_hourly_limit': return 'user limit'
+      case 'rate_limited': return 'rate limited'
+      default: return 'queued'
+    }
+  }
+
   const getStatusConfig = (status: string) => {
+    const delayDuration = scheduledFor ? getDelayDuration(scheduledFor) : null
+
     switch (status) {
       case 'scheduled':
+        const scheduledLabel = delayDuration ? `Scheduled ${delayDuration}` : 'Scheduled'
+        const isOverdue = scheduledFor && new Date() > new Date(scheduledFor)
         return {
-          label: 'Scheduled',
+          label: scheduledLabel,
           icon: Calendar,
-          className: 'border',
-          style: {
+          className: isOverdue ? 'bg-orange-100 text-orange-700 border-orange-200' : 'border',
+          style: isOverdue ? {} : {
             backgroundColor: 'var(--accent-light)',
             color: 'var(--accent-dark)',
             borderColor: 'var(--accent)'
           },
         }
       case 'queued':
+        const queuedLabel = queuedReason ? `Queued (${getQueuedReasonText(queuedReason)})` : 'Queued'
         return {
-          label: 'Queued',
+          label: queuedLabel,
           icon: Timer,
           className: 'bg-amber-100 text-amber-700 border-amber-200',
         }

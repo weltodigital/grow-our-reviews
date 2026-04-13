@@ -10,7 +10,8 @@ import {
   ChevronRightIcon,
   EyeIcon,
   RefreshCwIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  SendIcon
 } from 'lucide-react'
 import type { ReviewRequest } from '@/app/dashboard/requests/page'
 
@@ -72,7 +73,7 @@ export function RequestsTable({
 
       if (response.ok) {
         // Success - refresh the page to show updated status
-        window.location.reload()
+        onRequestsChange?.()
       } else {
         // Show error message
         alert(`Failed to retry request: ${data.error}`)
@@ -83,7 +84,38 @@ export function RequestsTable({
     }
   }
 
+  const handleSendNow = async (request: ReviewRequest) => {
+    try {
+      const response = await fetch('/api/send-now', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestId: request.id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Success - refresh the page to show updated status
+        onRequestsChange?.()
+      } else {
+        // Show error message
+        alert(`Failed to send SMS: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error sending SMS now:', error)
+      alert('Failed to send SMS. Please try again.')
+    }
+  }
+
   const getActionButton = (request: ReviewRequest) => {
+    const now = new Date()
+    const scheduledFor = new Date(request.scheduled_for)
+    const isOverdue = now > scheduledFor
+
     switch (request.status) {
       case 'failed':
         return (
@@ -95,6 +127,19 @@ export function RequestsTable({
           >
             <RefreshCwIcon className="h-3 w-3 mr-1" />
             Retry
+          </Button>
+        )
+      case 'scheduled':
+      case 'queued':
+        return (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleSendNow(request)}
+            className={isOverdue ? "text-orange-600 hover:text-orange-700" : "text-blue-600 hover:text-blue-700"}
+          >
+            <SendIcon className="h-3 w-3 mr-1" />
+            Send Now
           </Button>
         )
       case 'clicked':
@@ -178,7 +223,11 @@ export function RequestsTable({
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
-                          <StatusBadge status={request.status} />
+                          <StatusBadge
+                            status={request.status}
+                            scheduledFor={request.scheduled_for}
+                            queuedReason={request.queued_reason || undefined}
+                          />
                           {request.status === 'failed' && request.sms_error_message && (
                             <div className="text-xs text-red-600 max-w-xs">
                               {request.sms_error_code && (
@@ -240,7 +289,11 @@ export function RequestsTable({
                     </div>
                   </div>
                   <div className="text-right">
-                    <StatusBadge status={request.status} />
+                    <StatusBadge
+                      status={request.status}
+                      scheduledFor={request.scheduled_for}
+                      queuedReason={request.queued_reason || undefined}
+                    />
                     {request.status === 'failed' && request.sms_error_message && (
                       <div className="text-xs text-red-600 mt-1 max-w-xs">
                         {request.sms_error_code && (

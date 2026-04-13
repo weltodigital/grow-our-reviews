@@ -72,14 +72,15 @@ export async function GET(request: NextRequest) {
       totalRequestsAllTime,
       totalReviewsAllTime
     ] = await Promise.all([
-      // Requests sent this billing period
+      // Requests sent this billing period (exclude failed deliveries)
       supabase
         .from('review_requests')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
         .gte('sent_at', startOfPeriod.toISOString())
         .lte('sent_at', endOfPeriod.toISOString())
-        .not('sent_at', 'is', null),
+        .not('sent_at', 'is', null)
+        .not('status', 'eq', 'failed'),
 
       // Clicks this billing period
       supabase
@@ -107,12 +108,13 @@ export async function GET(request: NextRequest) {
         .gte('created_at', startOfPeriod.toISOString())
         .lte('created_at', endOfPeriod.toISOString()),
 
-      // Total requests all time
+      // Total requests all time (exclude failed deliveries)
       supabase
         .from('review_requests')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-        .not('sent_at', 'is', null),
+        .not('sent_at', 'is', null)
+        .not('status', 'eq', 'failed'),
 
       // Total reviews all time
       supabase
