@@ -282,6 +282,39 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
     window.URL.revokeObjectURL(url)
   }
 
+  // Download rejected rows for fixing
+  const downloadRejectedRows = () => {
+    const rejectedRows = csvData.filter(row => row.status === 'error' || row.status === 'critical')
+
+    if (rejectedRows.length === 0) {
+      alert('No rejected rows to download')
+      return
+    }
+
+    // Create CSV with original data plus error information
+    const rejectedData = rejectedRows.map(row => ({
+      name: row.name,
+      phone: row.phone,
+      issues: row.errors.join('; '),
+      fix_needed: row.status === 'error' ? 'Fix data errors' : 'Cannot process - duplicate/blocked'
+    }))
+
+    const csvContent = Papa.unparse(rejectedData, {
+      header: true,
+      quotes: true
+    })
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `rejected-customers-${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
+  }
+
   // Handle file upload
   const handleFileUpload = async (uploadedFile: File) => {
     if (!uploadedFile.name.toLowerCase().endsWith('.csv')) {
@@ -1115,9 +1148,26 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 {/* Selection Stats */}
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>Selected customers:</span>
-                    <span className="font-medium">{selectedRows.length}</span>
+                    <span>Total uploaded:</span>
+                    <span className="font-medium">{csvData.length}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Selected (valid):</span>
+                    <span className="font-medium text-green-600">{selectedRows.length}</span>
+                  </div>
+                  {errorCount > 0 && (
+                    <div className="flex justify-between text-red-600">
+                      <span>Errors (skipped):</span>
+                      <span className="font-medium">{errorCount}</span>
+                    </div>
+                  )}
+                  {criticalCount > 0 && (
+                    <div className="flex justify-between text-red-600">
+                      <span>Blocked (skipped):</span>
+                      <span className="font-medium">{criticalCount}</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-2"></div>
                   <div className="flex justify-between">
                     <span>Your remaining credits:</span>
                     <span className="font-medium">{userStats.requestsRemaining}</span>
@@ -1153,11 +1203,21 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                     <div className="flex items-start gap-2">
                       <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm">
+                      <div className="flex-1 text-sm">
                         <p className="font-medium text-red-800">Blocked Customers</p>
                         <p className="text-red-700 mt-1">
                           {criticalCount} {criticalCount === 1 ? 'customer is' : 'customers are'} blocked due to duplicate protection (already reviewed, gave feedback, or recent requests).
+                          These <strong>will NOT be sent</strong>.
                         </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={downloadRejectedRows}
+                          className="mt-2 border-red-300 text-red-700 hover:bg-red-100"
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          Download Blocked Customers
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -1167,11 +1227,21 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                     <div className="flex items-start gap-2">
                       <XCircle className="h-5 w-5 text-gray-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm">
+                      <div className="flex-1 text-sm">
                         <p className="font-medium text-gray-800">Data Errors Found</p>
                         <p className="text-gray-700 mt-1">
-                          {errorCount} {errorCount === 1 ? 'row has' : 'rows have'} data errors (invalid names/phones) and will be skipped.
+                          {errorCount} {errorCount === 1 ? 'row has' : 'rows have'} data errors (invalid names/phones) and <strong>will be skipped</strong>.
+                          Only valid rows will be sent.
                         </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={downloadRejectedRows}
+                          className="mt-2"
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          Download Rejected Rows
+                        </Button>
                       </div>
                     </div>
                   </div>
