@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Mark processed pending customers as processed
-        const processedIds = customersToProcess.map(c => c.id)
+        const processedIds = customersToProcess.map((c: any) => c.id)
         const { error: updateError } = await supabase
           .from('pending_customers')
           .update({
