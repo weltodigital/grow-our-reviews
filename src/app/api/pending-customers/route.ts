@@ -68,7 +68,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('pending_customers')
       .update({ status: 'cancelled' })
       .eq('id', customerId)
