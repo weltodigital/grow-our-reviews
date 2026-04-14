@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { customers } = await request.json()
+    const { customers, pendingCustomers = [], savePendingCustomers = false } = await request.json()
 
     if (!customers || !Array.isArray(customers) || customers.length === 0) {
       return NextResponse.json(
@@ -55,8 +55,35 @@ export async function POST(request: NextRequest) {
     const monthlyLimit = (profile as any)?.monthly_request_limit || 150
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 
-    // Limit customers to remaining requests
+    // Process customers based on selection and remaining requests
     const customersToProcess = customers.slice(0, requestsRemaining)
+
+    // Handle pending customers for future processing
+    let pendingSavedCount = 0
+    if (savePendingCustomers && pendingCustomers.length > 0) {
+      try {
+        // Save pending customers for next month's allocation
+        const pendingInserts = pendingCustomers.map((customer: any) => ({
+          user_id: user.id,
+          name: customer.name,
+          phone: customer.normalizedPhone,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        }))
+
+        const { data: pendingData, error: pendingError } = await (supabase as any)
+          .from('pending_customers')
+          .insert(pendingInserts)
+          .select('id')
+
+        if (!pendingError && pendingData) {
+          pendingSavedCount = pendingData.length
+        }
+      } catch (pendingErr) {
+        console.error('Failed to save pending customers:', pendingErr)
+        // Don't fail the whole upload if pending save fails
+      }
+    }
 
     if (customersToProcess.length === 0) {
       // Send plan limit reached email if user has hit their monthly limit
@@ -150,6 +177,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       processed: customersToProcess.length,
+      pendingSaved: pendingSavedCount,
       batches,
       batchSize,
       batchDelayMinutes,

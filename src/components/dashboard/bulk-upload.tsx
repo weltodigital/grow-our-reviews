@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Download, Upload, CheckCircle, AlertCircle, XCircle, Users } from 'lucide-react'
+import { ArrowLeft, Download, Upload, CheckCircle, AlertCircle, XCircle, Users, GripVertical, ArrowUp, ArrowDown, Check, Square, CheckSquare } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import type { User } from '@supabase/supabase-js'
@@ -39,6 +39,8 @@ interface ValidatedRow extends CsvRow {
   errors: string[]
   normalizedPhone: string
   duplicateAnalysis?: DuplicateAnalysis
+  selected: boolean
+  priority: number
 }
 
 interface UploadHistory {
@@ -68,6 +70,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
   const [uploadResults, setUploadResults] = useState<any>(null)
   const [uploadHistory, setUploadHistory] = useState<UploadBatch[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
+  const [savePendingCustomers, setSavePendingCustomers] = useState(true)
   const router = useRouter()
 
   // Fetch upload history
@@ -184,7 +187,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
               status,
               errors,
               normalizedPhone: normalized,
-              duplicateAnalysis: duplicateInfo
+              duplicateAnalysis: duplicateInfo,
+              selected: status === 'valid' || status === 'warning',
+              priority: index + 1
             })
             return
           }
@@ -194,7 +199,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             rowIndex: index + 1,
             status,
             errors,
-            normalizedPhone: normalized
+            normalizedPhone: normalized,
+            selected: status === 'valid' || status === 'warning',
+            priority: index + 1
           })
           return
         }
@@ -205,7 +212,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
         rowIndex: index + 1,
         status,
         errors,
-        normalizedPhone: ''
+        normalizedPhone: '',
+        selected: false,
+        priority: index + 1
       })
     })
 
@@ -367,17 +376,77 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
     setUploadResults(null)
   }
 
+  // Customer selection helpers
+  const toggleCustomerSelection = (index: number) => {
+    setCsvData(prevData =>
+      prevData.map((row, i) =>
+        i === index ? { ...row, selected: !row.selected } : row
+      )
+    )
+  }
+
+  const selectAll = (selectValid = true) => {
+    setCsvData(prevData =>
+      prevData.map(row => ({
+        ...row,
+        selected: selectValid ? (row.status === 'valid' || row.status === 'warning') : false
+      }))
+    )
+  }
+
+  const moveCustomer = (fromIndex: number, toIndex: number) => {
+    setCsvData(prevData => {
+      const newData = [...prevData]
+      const [movedItem] = newData.splice(fromIndex, 1)
+      newData.splice(toIndex, 0, movedItem)
+
+      // Update priorities
+      return newData.map((row, index) => ({
+        ...row,
+        priority: index + 1
+      }))
+    })
+  }
+
+  const smartSelectCustomers = () => {
+    // Auto-select the best customers up to the limit
+    const sortedCustomers = [...csvData]
+      .filter(row => row.status === 'valid' || row.status === 'warning')
+      .sort((a, b) => {
+        // Priority: valid > warning, then by original order
+        if (a.status === 'valid' && b.status === 'warning') return -1
+        if (a.status === 'warning' && b.status === 'valid') return 1
+        return a.rowIndex - b.rowIndex
+      })
+
+    setCsvData(prevData =>
+      prevData.map(row => {
+        const shouldSelect = sortedCustomers.indexOf(row) < userStats.requestsRemaining
+        return { ...row, selected: shouldSelect && (row.status === 'valid' || row.status === 'warning') }
+      })
+    )
+  }
+
   // Handle sending requests
   const handleSendRequests = async () => {
     setIsProcessing(true)
     setUploadStep('processing')
 
     try {
+      // Get selected customers
+      const selectedCustomers = csvData.filter(row => row.selected && (row.status === 'valid' || row.status === 'warning'))
+      const unselectedCustomers = csvData.filter(row => !row.selected && (row.status === 'valid' || row.status === 'warning'))
+
       // Prepare customers data for API
-      const customersToSend = validRows.slice(0, canSend).map(row => ({
+      const customersToSend = selectedCustomers.map(row => ({
         name: row.name,
         normalizedPhone: row.normalizedPhone
       }))
+
+      const pendingCustomers = savePendingCustomers ? unselectedCustomers.map(row => ({
+        name: row.name,
+        normalizedPhone: row.normalizedPhone
+      })) : []
 
       const response = await fetch('/api/bulk-upload', {
         method: 'POST',
@@ -385,7 +454,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          customers: customersToSend
+          customers: customersToSend,
+          pendingCustomers: pendingCustomers,
+          savePendingCustomers: savePendingCustomers
         })
       })
 
@@ -407,7 +478,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
   // Get valid rows for sending (exclude critical duplicates)
   const validRows = csvData.filter(row => row.status === 'valid' || row.status === 'warning')
-  const canSend = Math.min(validRows.length, userStats.requestsRemaining)
+  const selectedRows = csvData.filter(row => row.selected && (row.status === 'valid' || row.status === 'warning'))
+  const unselectedValidRows = csvData.filter(row => !row.selected && (row.status === 'valid' || row.status === 'warning'))
+  const canSend = Math.min(selectedRows.length, userStats.requestsRemaining)
   const errorCount = csvData.filter(row => row.status === 'error').length
   const warningCount = csvData.filter(row => row.status === 'warning').length
   const criticalCount = csvData.filter(row => row.status === 'critical').length
@@ -846,90 +919,179 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
               </Card>
             )}
 
-            {/* Preview Table */}
+            {/* Customer Selection Controls */}
             <Card>
               <CardHeader>
-                <CardTitle>Customer Data Preview</CardTitle>
+                <CardTitle>Customer Selection & Priority</CardTitle>
                 <CardDescription>
-                  Review each row for validation issues before proceeding
+                  Choose which customers to send requests to and set their priority order
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-2 font-medium text-gray-700">Row</th>
-                        <th className="text-left py-3 px-2 font-medium text-gray-700">Status</th>
-                        <th className="text-left py-3 px-2 font-medium text-gray-700">Name</th>
-                        <th className="text-left py-3 px-2 font-medium text-gray-700">Phone</th>
-                        <th className="text-left py-3 px-2 font-medium text-gray-700">Normalized</th>
-                        <th className="text-left py-3 px-2 font-medium text-gray-700">Issues</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {csvData.map((row, index) => (
-                        <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-2 text-gray-600">{row.rowIndex}</td>
-                          <td className="py-3 px-2">
-                            {row.status === 'valid' && (
-                              <div className="flex items-center gap-1 text-green-600">
-                                <CheckCircle className="h-4 w-4" />
-                                <span className="text-xs">Valid</span>
-                              </div>
-                            )}
-                            {row.status === 'warning' && (
-                              <div className="flex items-center gap-1 text-yellow-600">
-                                <AlertCircle className="h-4 w-4" />
-                                <span className="text-xs">Warning</span>
-                              </div>
-                            )}
-                            {row.status === 'critical' && (
-                              <div className="flex items-center gap-1 text-red-600">
-                                <XCircle className="h-4 w-4" />
-                                <span className="text-xs">Blocked</span>
-                              </div>
-                            )}
-                            {row.status === 'error' && (
-                              <div className="flex items-center gap-1 text-gray-600">
-                                <XCircle className="h-4 w-4" />
-                                <span className="text-xs">Error</span>
-                              </div>
-                            )}
-                          </td>
-                          <td className="py-3 px-2 font-medium">{row.name || '—'}</td>
-                          <td className="py-3 px-2 font-mono text-sm">{row.phone || '—'}</td>
-                          <td className="py-3 px-2 font-mono text-sm text-gray-600">
-                            {row.normalizedPhone || '—'}
-                          </td>
-                          <td className="py-3 px-2">
-                            {row.errors.length > 0 ? (
-                              <div className="space-y-1">
-                                {row.errors.map((error, errorIndex) => {
-                                  const isBlocked = error.includes('🚫')
-                                  const isWarning = error.includes('⚠️')
-                                  const isInfo = error.includes('ℹ️')
+              <CardContent className="space-y-4">
+                {/* Selection Controls */}
+                <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
+                  <Button size="sm" variant="outline" onClick={() => selectAll(true)}>
+                    <CheckSquare className="h-4 w-4 mr-1" />
+                    Select All Valid
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => selectAll(false)}>
+                    <Square className="h-4 w-4 mr-1" />
+                    Deselect All
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={smartSelectCustomers}>
+                    <Check className="h-4 w-4 mr-1" />
+                    Smart Select ({userStats.requestsRemaining})
+                  </Button>
+                </div>
 
-                                  return (
-                                    <div key={errorIndex} className={`text-xs px-2 py-1 rounded ${
-                                      isBlocked ? 'text-red-700 bg-red-100 border border-red-200' :
-                                      isWarning ? 'text-yellow-700 bg-yellow-100 border border-yellow-200' :
-                                      isInfo ? 'text-blue-700 bg-blue-100 border border-blue-200' :
-                                      'text-gray-600 bg-gray-50'
-                                    }`}>
-                                      {error}
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            ) : (
-                              <span className="text-xs text-gray-400">No issues</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {/* Credit Limit Info */}
+                {selectedRows.length > userStats.requestsRemaining && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-yellow-800">Selection Exceeds Credit Limit</p>
+                        <p className="text-yellow-700 mt-1">
+                          You've selected {selectedRows.length} customers but only have {userStats.requestsRemaining} credits remaining.
+                          Only the first {userStats.requestsRemaining} selected will be sent this month.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pending Customers Option */}
+                {unselectedValidRows.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-blue-800">Save Remaining Customers</p>
+                        <p className="text-blue-700 text-sm mt-1">
+                          {unselectedValidRows.length} unselected valid customers. Save them to send automatically when your plan resets next month?
+                        </p>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={savePendingCustomers}
+                          onChange={(e) => setSavePendingCustomers(e.target.checked)}
+                          className="rounded"
+                        />
+                        <span className="text-sm text-blue-800">Save for next month</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* Customer List */}
+                <div className="space-y-2">
+                  {csvData.map((row, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center gap-3 p-3 border rounded-lg ${
+                        row.selected ? 'bg-green-50 border-green-200' :
+                        row.status === 'valid' || row.status === 'warning' ? 'bg-gray-50 border-gray-200' :
+                        'bg-red-50 border-red-200 opacity-60'
+                      }`}
+                    >
+                      {/* Drag Handle */}
+                      <div className="cursor-grab hover:cursor-grabbing">
+                        <GripVertical className="h-4 w-4 text-gray-400" />
+                      </div>
+
+                      {/* Selection Checkbox */}
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={row.selected}
+                          disabled={row.status === 'error' || row.status === 'critical'}
+                          onChange={() => toggleCustomerSelection(index)}
+                          className="rounded"
+                        />
+                      </label>
+
+                      {/* Priority Controls */}
+                      <div className="flex flex-col gap-1">
+                        <button
+                          onClick={() => index > 0 && moveCustomer(index, index - 1)}
+                          disabled={index === 0}
+                          className="p-1 hover:bg-gray-200 rounded disabled:opacity-50"
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </button>
+                        <button
+                          onClick={() => index < csvData.length - 1 && moveCustomer(index, index + 1)}
+                          disabled={index === csvData.length - 1}
+                          className="p-1 hover:bg-gray-200 rounded disabled:opacity-50"
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </button>
+                      </div>
+
+                      {/* Customer Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{row.name}</span>
+                          <span className="font-mono text-sm text-gray-600">{row.phone}</span>
+
+                          {/* Status Badge */}
+                          {row.status === 'valid' && (
+                            <div className="flex items-center gap-1 text-green-600">
+                              <CheckCircle className="h-4 w-4" />
+                              <span className="text-xs">Valid</span>
+                            </div>
+                          )}
+                          {row.status === 'warning' && (
+                            <div className="flex items-center gap-1 text-yellow-600">
+                              <AlertCircle className="h-4 w-4" />
+                              <span className="text-xs">Warning</span>
+                            </div>
+                          )}
+                          {row.status === 'critical' && (
+                            <div className="flex items-center gap-1 text-red-600">
+                              <XCircle className="h-4 w-4" />
+                              <span className="text-xs">Blocked</span>
+                            </div>
+                          )}
+                          {row.status === 'error' && (
+                            <div className="flex items-center gap-1 text-gray-600">
+                              <XCircle className="h-4 w-4" />
+                              <span className="text-xs">Error</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Error Messages */}
+                        {row.errors.length > 0 && (
+                          <div className="mt-1 space-y-1">
+                            {row.errors.map((error, errorIndex) => {
+                              const isBlocked = error.includes('🚫')
+                              const isWarning = error.includes('⚠️')
+                              const isInfo = error.includes('ℹ️')
+
+                              return (
+                                <div key={errorIndex} className={`text-xs px-2 py-1 rounded ${
+                                  isBlocked ? 'text-red-700 bg-red-100 border border-red-200' :
+                                  isWarning ? 'text-yellow-700 bg-yellow-100 border border-yellow-200' :
+                                  isInfo ? 'text-blue-700 bg-blue-100 border border-blue-200' :
+                                  'text-gray-600 bg-gray-50'
+                                }`}>
+                                  {error}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Selection Order */}
+                      {row.selected && (
+                        <div className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded">
+                          #{csvData.filter((r, i) => i <= index && r.selected).length}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -940,24 +1102,47 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             {/* Send Summary */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Ready to Send</CardTitle>
+                <CardTitle className="text-lg">Send Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600">{canSend}</div>
                   <div className="text-sm text-gray-500">
-                    {canSend === 1 ? 'request' : 'requests'} will be sent
+                    selected {canSend === 1 ? 'customer' : 'customers'} will be sent
                   </div>
                 </div>
 
-                {validRows.length > canSend && (
+                {/* Selection Stats */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Selected customers:</span>
+                    <span className="font-medium">{selectedRows.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Your remaining credits:</span>
+                    <span className="font-medium">{userStats.requestsRemaining}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Will be sent this month:</span>
+                    <span className="font-medium text-green-600">{canSend}</span>
+                  </div>
+                  {selectedRows.length > userStats.requestsRemaining && (
+                    <div className="flex justify-between text-yellow-600">
+                      <span>Excess (next month):</span>
+                      <span className="font-medium">{selectedRows.length - userStats.requestsRemaining}</span>
+                    </div>
+                  )}
+                </div>
+
+                {selectedRows.length > userStats.requestsRemaining && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                     <div className="flex items-start gap-2">
                       <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                       <div className="text-sm">
-                        <p className="font-medium text-yellow-800">Plan Limit Reached</p>
+                        <p className="font-medium text-yellow-800">Selection Exceeds Credits</p>
                         <p className="text-yellow-700 mt-1">
-                          You have {validRows.length} valid customers but only {userStats.requestsRemaining} requests remaining this month.
+                          Only the first {userStats.requestsRemaining} selected customers will be sent this month.
+                          The remaining {selectedRows.length - userStats.requestsRemaining} will be processed next month.
                         </p>
                       </div>
                     </div>
@@ -1018,7 +1203,14 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                         Processing...
                       </>
                     ) : (
-                      `Send ${canSend} Review ${canSend === 1 ? 'Request' : 'Requests'}`
+                      <>
+                        Send {canSend} Selected {canSend === 1 ? 'Customer' : 'Customers'}
+                        {unselectedValidRows.length > 0 && savePendingCustomers && (
+                          <span className="block text-xs opacity-90 mt-1">
+                            + Save {unselectedValidRows.length} for next month
+                          </span>
+                        )}
+                      </>
                     )}
                   </Button>
                 </div>
@@ -1092,14 +1284,18 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
               <CardTitle className="text-center">Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-3xl font-bold text-green-600">{uploadResults?.processed || 0}</div>
-                  <div className="text-sm text-gray-500">Customers Added</div>
+                  <div className="text-sm text-gray-500">Sent This Month</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-blue-600">{uploadResults?.batches || 0}</div>
                   <div className="text-sm text-gray-500">Sending Batches</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-purple-600">{uploadResults?.pendingSaved || 0}</div>
+                  <div className="text-sm text-gray-500">Saved for Next Month</div>
                 </div>
               </div>
 
