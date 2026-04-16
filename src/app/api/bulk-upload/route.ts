@@ -1,5 +1,6 @@
 import { createServerSupabase } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Get user's profile and current usage
     const { data: profile } = await supabase
       .from('profiles')
-      .select('monthly_request_limit')
+      .select('monthly_request_limit, billing_cycle_date')
       .eq('id', user.id)
       .single()
 
@@ -38,22 +39,37 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check current month usage
-    const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+    // Check current billing period usage using personalized billing cycle
+    let billingStart: Date
+    let billingEnd: Date
+
+    if ((profile as any).billing_cycle_date) {
+      const billingPeriod = getCurrentBillingPeriod((profile as any).billing_cycle_date)
+      billingStart = billingPeriod.start
+      billingEnd = billingPeriod.end
+    } else {
+      // Fallback to calendar month if billing_cycle_date is not set
+      const now = new Date()
+      billingStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      billingEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+    }
 
     const { data: requestsThisMonth } = await supabase
       .from('review_requests')
       .select('id', { count: 'exact' })
       .eq('user_id', user.id)
-      .gte('sent_at', startOfMonth.toISOString())
-      .lte('sent_at', endOfMonth.toISOString())
+      .gte('sent_at', billingStart.toISOString())
+      .lte('sent_at', billingEnd.toISOString())
       .not('sent_at', 'is', null)
 
     const requestsSent = requestsThisMonth?.length || 0
     const monthlyLimit = (profile as any)?.monthly_request_limit || 150
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
+
+    // Calculate next reset date for error messaging
+    const nextResetDate = (profile as any).billing_cycle_date
+      ? getNextBillingDate((profile as any).billing_cycle_date)
+      : new Date(billingStart.getFullYear(), billingStart.getMonth() + 1, 1)
 
     // Process customers based on selection and remaining requests
     const customersToProcess = customers.slice(0, requestsRemaining)
@@ -107,7 +123,7 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json(
-        { error: 'No requests remaining in your plan this month' },
+        { error: `No requests remaining in your plan. Your credits reset on ${nextResetDate.toLocaleDateString('en-GB')}.` },
         { status: 400 }
       )
     }

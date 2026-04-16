@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Clock, X, Users, CalendarDays } from 'lucide-react'
+import { getNextBillingDate } from '@/lib/billing-cycle'
 
 interface PendingCustomer {
   id: string
@@ -14,9 +15,10 @@ interface PendingCustomer {
 
 interface PendingCustomersProps {
   className?: string
+  billingCycleDate?: number
 }
 
-export function PendingCustomers({ className }: PendingCustomersProps) {
+export function PendingCustomers({ className, billingCycleDate }: PendingCustomersProps) {
   const [pendingCustomers, setPendingCustomers] = useState<PendingCustomer[]>([])
   const [loading, setLoading] = useState(true)
   const [removing, setRemoving] = useState<string | null>(null)
@@ -82,10 +84,12 @@ export function PendingCustomers({ className }: PendingCustomersProps) {
     return null // Don't show the card if there are no pending customers
   }
 
-  // Calculate next billing cycle date (1st of next month)
-  const today = new Date()
-  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
-  const nextBillingDate = nextMonth.toLocaleDateString('en-GB', {
+  // Calculate next billing cycle date using personalized billing cycle
+  const nextBillingDate = billingCycleDate
+    ? getNextBillingDate(billingCycleDate)
+    : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1) // fallback to 1st of next month
+
+  const formattedDate = nextBillingDate.toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
@@ -102,7 +106,7 @@ export function PendingCustomers({ className }: PendingCustomersProps) {
           </span>
         </CardTitle>
         <CardDescription>
-          Customers saved for next month when your plan resets on {nextBillingDate}
+          Customers saved for next month when your plan resets on {formattedDate}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -112,7 +116,7 @@ export function PendingCustomers({ className }: PendingCustomersProps) {
             <div className="text-sm">
               <p className="font-medium text-blue-800">Automatic Processing</p>
               <p className="text-blue-700">
-                These customers will be automatically converted to review requests when your monthly plan resets on {nextBillingDate}.
+                These customers will be automatically converted to review requests when your monthly plan resets on {formattedDate}.
               </p>
             </div>
           </div>

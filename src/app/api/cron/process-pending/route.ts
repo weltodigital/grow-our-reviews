@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 
 // Cron job to process pending customers at the start of each billing cycle
-// Runs on the 1st of each month to convert pending customers to review requests
+// Runs daily to check for users whose billing cycle reset date is today
 
 function validateCronRequest(request: NextRequest): boolean {
   // Check for Vercel cron header
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  console.log('🔄 Processing pending customers for new billing cycle...')
+  console.log('🔄 Processing pending customers for users with billing cycle reset today...')
 
   try {
     const supabase = createServerClient<Database>(
@@ -40,7 +41,11 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    // Get all pending customers grouped by user
+    // Get today's date to check for billing cycle resets
+    const today = new Date()
+    const todayDayOfMonth = today.getDate()
+
+    // Get pending customers for users whose billing cycle resets today
     const { data: pendingCustomers, error: fetchError } = await (supabase as any)
       .from('pending_customers')
       .select(`
@@ -53,10 +58,12 @@ export async function GET(request: NextRequest) {
           id,
           monthly_request_limit,
           business_name,
-          email
+          email,
+          billing_cycle_date
         )
       `)
       .eq('status', 'pending')
+      .eq('profiles.billing_cycle_date', todayDayOfMonth)
       .order('created_at', { ascending: true })
 
     if (fetchError) {
@@ -65,14 +72,14 @@ export async function GET(request: NextRequest) {
     }
 
     if (!pendingCustomers || pendingCustomers.length === 0) {
-      console.log('✅ No pending customers to process')
+      console.log(`✅ No pending customers to process for billing cycle reset on day ${todayDayOfMonth}`)
       return NextResponse.json({
-        message: 'No pending customers to process',
+        message: `No pending customers to process for billing cycle reset on day ${todayDayOfMonth}`,
         processed: 0
       })
     }
 
-    console.log(`📋 Found ${pendingCustomers.length} pending customers across multiple users`)
+    console.log(`📋 Found ${pendingCustomers.length} pending customers for users with billing cycle reset on day ${todayDayOfMonth}`)
 
     // Group pending customers by user_id
     const customersByUser = pendingCustomers.reduce((acc: any, customer: any) => {
@@ -92,17 +99,16 @@ export async function GET(request: NextRequest) {
 
     for (const [userId, userData] of Object.entries(customersByUser) as any[]) {
       try {
-        // Check user's current usage for this month
-        const now = new Date()
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+        // Check user's current usage for their personalized billing period
+        const billingCycleDate = userData.profile.billing_cycle_date
+        const billingPeriod = getCurrentBillingPeriod(billingCycleDate)
 
         const { data: requestsThisMonth } = await supabase
           .from('review_requests')
           .select('id', { count: 'exact' })
           .eq('user_id', userId)
-          .gte('sent_at', startOfMonth.toISOString())
-          .lte('sent_at', endOfMonth.toISOString())
+          .gte('sent_at', billingPeriod.start.toISOString())
+          .lte('sent_at', billingPeriod.end.toISOString())
           .not('sent_at', 'is', null)
           .not('status', 'eq', 'failed')
 
@@ -224,9 +230,11 @@ export async function GET(request: NextRequest) {
       try {
         const { sendInternalAlert } = await import('@/lib/resend')
 
-        const subject = `📊 Monthly Pending Customer Processing Complete`
+        const subject = `📊 Daily Pending Customer Processing Complete (Day ${todayDayOfMonth})`
         const message = `
-Monthly billing cycle reset - pending customer processing results:
+Daily billing cycle reset check - pending customer processing results:
+
+PROCESSING DATE: Day ${todayDayOfMonth} of month (users with billing cycle reset today)
 
 SUMMARY:
 - Total processed: ${totalProcessed} customers
@@ -241,10 +249,10 @@ ${userResults.map(user =>
 ${totalRemaining > 0 ? `
 REMAINING CUSTOMERS:
 ${totalRemaining} customers could not be processed due to credit limits.
-They will remain pending for the next billing cycle.
+They will remain pending for their next personalized billing cycle reset.
 ` : ''}
 
-Next processing: First day of next month
+Next processing: Tomorrow (checking for users with billing cycle reset on day ${todayDayOfMonth + 1})
         `
 
         await sendInternalAlert('Pending Customer Processing', subject, message)
@@ -254,7 +262,7 @@ Next processing: First day of next month
       }
     }
 
-    console.log(`✅ Pending customer processing complete: ${totalProcessed} processed, ${totalRemaining} remaining`)
+    console.log(`✅ Pending customer processing complete for day ${todayDayOfMonth}: ${totalProcessed} processed, ${totalRemaining} remaining`)
 
     return NextResponse.json({
       success: true,

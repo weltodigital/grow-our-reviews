@@ -7,8 +7,8 @@ export async function GET(request: NextRequest) {
     const result = await sendPlanLimitReachedEmail(
       'ed@weltodigital.com',
       'Welto Digital',
-      50, // Starter plan limit
-      50  // Used all requests
+      150, // Starter plan limit
+      150  // Used all requests
     )
 
     if (!result.success) {
@@ -39,13 +39,13 @@ export async function POST(request: NextRequest) {
     // Different test data based on plan type
     const testData = planType === 'growth'
       ? {
-          limit: 150,
-          used: 150,
+          limit: 300,
+          used: 300,
           businessName: 'Welto Digital (Growth Plan)'
         }
       : {
-          limit: 50,
-          used: 50,
+          limit: 150,
+          used: 150,
           businessName: 'Welto Digital (Starter Plan)'
         }
 

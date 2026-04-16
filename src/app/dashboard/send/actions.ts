@@ -2,6 +2,7 @@
 
 import { createServerSupabase } from '@/lib/auth'
 import { randomBytes } from 'crypto'
+import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 
 interface CreateReviewRequestData {
@@ -103,16 +104,31 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
     }
   }
 
-  // Check monthly limit
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
+  // Check monthly limit using personalized billing cycle
+  let billingStart: Date
+  let billingEnd: Date
+  let nextResetDate: Date
+
+  if ((profile as any).billing_cycle_date) {
+    const billingPeriod = getCurrentBillingPeriod((profile as any).billing_cycle_date)
+    billingStart = billingPeriod.start
+    billingEnd = billingPeriod.end
+    nextResetDate = getNextBillingDate((profile as any).billing_cycle_date)
+  } else {
+    // Fallback to calendar month if billing_cycle_date is not set
+    billingStart = new Date()
+    billingStart.setDate(1)
+    billingStart.setHours(0, 0, 0, 0)
+    billingEnd = new Date(billingStart.getFullYear(), billingStart.getMonth() + 1, 0, 23, 59, 59)
+    nextResetDate = new Date(billingStart.getFullYear(), billingStart.getMonth() + 1, 1)
+  }
 
   const { count: requestsThisMonth } = await (supabase as any)
     .from('review_requests')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .gte('created_at', startOfMonth.toISOString())
+    .gte('created_at', billingStart.toISOString())
+    .lte('created_at', billingEnd.toISOString())
 
   if (requestsThisMonth && requestsThisMonth >= (profile as any).monthly_request_limit) {
     // Send plan limit reached email (don't wait for it to complete)
@@ -134,7 +150,7 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
       // Don't fail the request if email fails
     }
 
-    return { error: `You've reached your monthly limit of ${(profile as any).monthly_request_limit} requests. Upgrade your plan to send more.` }
+    return { error: `You've reached your monthly limit of ${(profile as any).monthly_request_limit} requests. Your credits reset on ${nextResetDate.toLocaleDateString('en-GB')}. Upgrade your plan to send more now.` }
   }
 
   try {
