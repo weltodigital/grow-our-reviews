@@ -59,6 +59,13 @@ export function SentimentGate({
     // Low rating (1-3) - show feedback form (handled by component state)
   }
 
+  const handleRatingChange = async (newRating: number) => {
+    // Reset redirecting state in case user was previously in redirect mode
+    setIsRedirecting(false)
+    // Use the same logic as initial rating selection
+    await handleRatingSelect(newRating)
+  }
+
   if (isRedirecting) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -88,6 +95,7 @@ export function SentimentGate({
         businessName={businessName}
         customerName={customerName}
         rating={selectedRating}
+        onRatingChange={handleRatingChange}
       />
     )
   }

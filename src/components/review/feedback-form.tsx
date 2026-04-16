@@ -11,18 +11,35 @@ interface FeedbackFormProps {
   businessName: string
   customerName: string
   rating: number
+  onRatingChange?: (rating: number) => void
 }
 
 export function FeedbackForm({
   token,
   businessName,
   customerName,
-  rating
+  rating,
+  onRatingChange
 }: FeedbackFormProps) {
   const [comment, setComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const [hoveredRating, setHoveredRating] = useState<number | null>(null)
+
+  const handleStarClick = (newRating: number) => {
+    if (onRatingChange) {
+      onRatingChange(newRating)
+    }
+  }
+
+  const handleStarHover = (starRating: number) => {
+    setHoveredRating(starRating)
+  }
+
+  const handleStarLeave = () => {
+    setHoveredRating(null)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -90,17 +107,40 @@ export function FeedbackForm({
           </div>
 
           <div className="flex justify-center mb-4">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`w-6 h-6 mx-1 ${
-                  star <= rating
-                    ? 'text-yellow-400 fill-current'
-                    : 'text-gray-300'
-                }`}
-              />
-            ))}
+            {[1, 2, 3, 4, 5].map((star) => {
+              const isActive = hoveredRating
+                ? star <= hoveredRating
+                : star <= rating
+
+              return (
+                <button
+                  key={star}
+                  onClick={() => handleStarClick(star)}
+                  onMouseEnter={() => handleStarHover(star)}
+                  onMouseLeave={handleStarLeave}
+                  className={`
+                    p-1 mx-1 rounded transition-all duration-200 transform
+                    hover:scale-110 active:scale-95
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                    ${isActive ? 'text-yellow-400' : 'text-gray-300'}
+                  `}
+                  aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
+                  title="Click to change your rating"
+                >
+                  <Star
+                    className={`w-6 h-6 transition-all duration-200 ${
+                      isActive ? 'fill-current' : 'fill-none'
+                    }`}
+                    strokeWidth={2}
+                  />
+                </button>
+              )
+            })}
           </div>
+
+          <p className="text-xs text-gray-500 mb-3">
+            Click the stars above to change your rating
+          </p>
 
           <CardTitle className="text-lg text-gray-900 mb-2">
             We're sorry to hear that, {customerName}
@@ -139,12 +179,12 @@ export function FeedbackForm({
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                    Sending...
+                    Sharing...
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Send Feedback
+                    Share Feedback
                   </>
                 )}
               </Button>
