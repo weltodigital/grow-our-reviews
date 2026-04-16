@@ -391,3 +391,86 @@ export async function sendSubscriptionCancelledEmail(to: string, businessName: s
     return { success: false, error: 'Failed to send email' }
   }
 }
+
+export async function sendPaymentSuspendedEmail(to: string, businessName: string, cancellationReason: string) {
+  if (!resend) {
+    console.warn('Resend not configured - skipping payment suspended email')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
+      to: [to],
+      subject: 'Payment failed - Subscription suspended',
+      html: `
+        <h1>Payment Issue - Your Subscription Has Been Suspended</h1>
+
+        <p>Hi ${businessName},</p>
+
+        <p>I'm reaching out because there was an issue with your payment method, and your Grow Our Reviews subscription has been temporarily suspended.</p>
+
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 16px; margin: 20px 0;">
+          <h2 style="color: #dc2626; margin-top: 0;">What happened:</h2>
+          <ul style="margin-bottom: 0; color: #dc2626;">
+            <li>Your payment method was declined multiple times over the past week</li>
+            <li>Stripe automatically suspended your subscription after several retry attempts</li>
+            <li><strong>Your data is completely safe</strong> - all your customers, reviews, and analytics are preserved</li>
+          </ul>
+        </div>
+
+        <div style="background: #f0f9ff; border: 1px solid #0284c7; border-radius: 6px; padding: 16px; margin: 20px 0;">
+          <h2 style="color: #0284c7; margin-top: 0;">How to fix this:</h2>
+          <ol style="margin-bottom: 0; color: #0284c7;">
+            <li><strong>Update your payment method</strong> in your billing portal</li>
+            <li>Once your payment succeeds, your subscription will reactivate immediately</li>
+            <li>You'll regain full access to sending review requests right away</li>
+          </ol>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing"
+             style="background: #2563eb; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+            Update Payment Method →
+          </a>
+        </div>
+
+        <p>In the meantime, you can still access your dashboard to view all your historical data and analytics. Nothing has been lost!</p>
+
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 16px; margin: 20px 0;">
+          <h3 style="color: #92400e; margin-top: 0;">Common causes:</h3>
+          <ul style="margin-bottom: 0; color: #92400e; font-size: 14px;">
+            <li>Expired or cancelled credit/debit card</li>
+            <li>Insufficient funds in the account</li>
+            <li>Bank blocking the transaction (try calling your bank)</li>
+            <li>Card details changed (new card number, expiry, etc.)</li>
+          </ul>
+        </div>
+
+        <p>If you're having trouble updating your payment method or have any questions, just reply to this email and I'll personally help you get this sorted.</p>
+
+        <p>Thanks for being a valued customer, and I look forward to getting you back up and running!</p>
+
+        <p>Best regards,<br>
+        Ed at Grow Our Reviews</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="color: #6b7280; font-size: 14px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard">Access your dashboard</a> |
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/billing">Update payment method</a> |
+          <a href="mailto:ed@growourreviews.com">Get help</a>
+        </p>
+      `
+    })
+
+    if (error) {
+      console.error('Failed to send payment suspended email:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data, messageId: data?.id }
+  } catch (error) {
+    console.error('Error sending payment suspended email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}

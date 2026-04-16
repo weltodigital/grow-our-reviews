@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, CreditCard, Shield, Clock } from 'lucide-react'
+import { CheckCircle, CreditCard, Shield, Clock, XCircle } from 'lucide-react'
 import { PRICING_PLANS } from '@/lib/pricing'
 import { createClient } from '@/lib/supabase'
 
@@ -32,7 +32,7 @@ export default function BillingSetupPage() {
       // Check if user already has a subscription
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_status, stripe_customer_id, business_name, created_at')
+        .select('subscription_status, stripe_customer_id, business_name, created_at, cancellation_reason')
         .eq('id', session.user.id)
         .single()
 
@@ -146,12 +146,42 @@ export default function BillingSetupPage() {
         <div className="text-center mb-8">
           {userProfile?.subscription_status === 'cancelled' ? (
             <>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome back, {userProfile.business_name}! 👋
-              </h1>
-              <p className="text-gray-600 mb-4">
-                Your data is safe and ready to go. Reactivate your subscription to continue where you left off.
-              </p>
+              {(userProfile as any).cancellation_reason === 'payment_failed' ? (
+                <>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    Payment Issue - Let's Fix This 🔧
+                  </h1>
+                  <p className="text-gray-600 mb-4">
+                    Your payment method was declined, but your data is completely safe. Update your payment method or choose a new plan to restore access.
+                  </p>
+
+                  {/* Payment Failed Info */}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+                    <div className="flex items-center justify-center gap-2 text-red-700 font-medium mb-2">
+                      <XCircle className="h-5 w-5" />
+                      Subscription Suspended Due to Payment Failure
+                    </div>
+                    <div className="text-sm text-red-600 text-center">
+                      <p>Your payment was declined multiple times. This commonly happens due to:</p>
+                      <div className="grid md:grid-cols-2 gap-2 mt-2">
+                        <div>• Expired or cancelled card</div>
+                        <div>• Insufficient funds</div>
+                        <div>• Bank blocking the transaction</div>
+                        <div>• Updated card details</div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    Welcome back, {userProfile.business_name}! 👋
+                  </h1>
+                  <p className="text-gray-600 mb-4">
+                    Your data is safe and ready to go. Reactivate your subscription to continue where you left off.
+                  </p>
+                </>
+              )}
 
               {/* Data Preview for Returning Customers */}
               {dataStats && (
@@ -312,17 +342,27 @@ export default function BillingSetupPage() {
               </>
             ) : (
               userProfile?.subscription_status === 'cancelled'
-                ? `Reactivate ${selectedPlan === 'starter' ? 'Starter' : 'Growth'} Plan`
+                ? ((userProfile as any).cancellation_reason === 'payment_failed'
+                   ? `Fix Payment & Restore ${selectedPlan === 'starter' ? 'Starter' : 'Growth'}`
+                   : `Reactivate ${selectedPlan === 'starter' ? 'Starter' : 'Growth'} Plan`)
                 : `Start ${selectedPlan === 'starter' ? 'Starter' : 'Growth'} Trial`
             )}
           </Button>
 
           {userProfile?.subscription_status === 'cancelled' ? (
-            <p className="text-sm text-gray-500 mt-4">
-              Your subscription will reactivate immediately and billing will begin.
-              <br />
-              All your data and settings will be restored instantly.
-            </p>
+            (userProfile as any).cancellation_reason === 'payment_failed' ? (
+              <p className="text-sm text-gray-500 mt-4">
+                This will update your payment method and restore your subscription immediately.
+                <br />
+                Your access will return instantly once payment succeeds.
+              </p>
+            ) : (
+              <p className="text-sm text-gray-500 mt-4">
+                Your subscription will reactivate immediately and billing will begin.
+                <br />
+                All your data and settings will be restored instantly.
+              </p>
+            )
           ) : (
             <p className="text-sm text-gray-500 mt-4">
               Your 14-day free trial starts now. You'll only be charged after the trial ends.

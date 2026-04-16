@@ -464,6 +464,15 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
           subscriptionId: subscription.id
         })
 
+        // Determine cancellation reason from Stripe subscription object
+        const cancellationReason = (subscription as any).cancellation_details?.reason || 'unknown'
+
+        logWebhookEvent(correlationId, 'info', 'Subscription cancellation reason detected', {
+          subscriptionId: subscription.id,
+          reason: cancellationReason,
+          cancellationDetails: (subscription as any).cancellation_details
+        })
+
         // Update profile to cancelled status - this is final termination
         // Data is preserved, but access to new requests is cut off
         const { data: profile, error: updateError } = await (supabase as any)
@@ -473,6 +482,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
             monthly_request_limit: 0, // No more requests allowed
             cancelled_at_period_end: false, // No longer applies
             current_period_end: null, // Period has ended
+            cancellation_reason: cancellationReason, // Track why it was cancelled
             updated_at: new Date().toISOString(),
           })
           .eq('stripe_subscription_id', subscription.id)
@@ -487,10 +497,14 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
           subscriptionId: subscription.id
         })
 
-        // Send subscription cancellation confirmation email
+        // Send appropriate cancellation email based on reason
         if (profile?.email) {
           try {
-            await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-cancelled`, {
+            const emailEndpoint = cancellationReason === 'payment_failed'
+              ? '/api/emails/payment-suspended'
+              : '/api/emails/subscription-cancelled'
+
+            await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${emailEndpoint}`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -498,6 +512,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
               body: JSON.stringify({
                 email: profile.email,
                 businessName: profile.business_name || 'there',
+                cancellationReason: cancellationReason,
               }),
             })
           } catch (error) {

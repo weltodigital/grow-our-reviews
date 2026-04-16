@@ -231,34 +231,60 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div className="space-y-8">
-      {/* Cancelled Subscription Banner */}
+      {/* Payment Failed / Cancelled Subscription Banner */}
       {(profile as any).subscription_status === 'cancelled' && (
-        <Card className="border-2 border-orange-200 bg-orange-50">
+        <Card className={`border-2 ${(profile as any).cancellation_reason === 'payment_failed' ? 'border-red-200 bg-red-50' : 'border-orange-200 bg-orange-50'}`}>
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
-              <div className="rounded-full p-2 bg-orange-100">
-                <XCircle className="h-5 w-5 text-orange-600" />
+              <div className={`rounded-full p-2 ${(profile as any).cancellation_reason === 'payment_failed' ? 'bg-red-100' : 'bg-orange-100'}`}>
+                <XCircle className={`h-5 w-5 ${(profile as any).cancellation_reason === 'payment_failed' ? 'text-red-600' : 'text-orange-600'}`} />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-orange-900 mb-2">
-                  Subscription Cancelled - Read-Only Mode
-                </h3>
-                <p className="text-sm text-orange-700 mb-3">
-                  Your account data is preserved and accessible, but you can't send new review requests.
-                  Reactivate your subscription to continue growing your online reputation.
-                </p>
-                <div className="flex gap-3">
-                  <Button asChild size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
-                    <Link href="/billing/setup">
-                      Reactivate Subscription
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/dashboard/billing">
-                      View Billing
-                    </Link>
-                  </Button>
-                </div>
+                {(profile as any).cancellation_reason === 'payment_failed' ? (
+                  <>
+                    <h3 className="font-semibold text-red-900 mb-2">
+                      Payment Failed - Subscription Suspended
+                    </h3>
+                    <p className="text-sm text-red-700 mb-3">
+                      Your payment method was declined after multiple retry attempts. Update your payment method to restore access immediately.
+                      All your data remains safe and accessible.
+                    </p>
+                    <div className="flex gap-3">
+                      <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white">
+                        <Link href="/dashboard/billing">
+                          Update Payment Method
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href="/billing/setup">
+                          Change Plan
+                        </Link>
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold text-orange-900 mb-2">
+                      Subscription Cancelled - Read-Only Mode
+                    </h3>
+                    <p className="text-sm text-orange-700 mb-3">
+                      Your account data is preserved and accessible, but you can't send new review requests.
+                      Reactivate your subscription to continue growing your online reputation.
+                    </p>
+                    <div className="flex gap-3">
+                      <Button asChild size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
+                        <Link href="/billing/setup">
+                          Reactivate Subscription
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href="/dashboard/billing">
+                          View Billing
+                        </Link>
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>
