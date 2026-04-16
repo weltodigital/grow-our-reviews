@@ -21,7 +21,7 @@ export function PricingFaq() {
     },
     {
       question: 'Can I change or cancel my plan anytime?',
-      answer: 'Absolutely. You can upgrade, downgrade, or cancel your subscription anytime through your billing dashboard. Plan changes take effect at your next billing cycle. Cancellations are immediate and you won\'t be charged again.'
+      answer: 'Absolutely. You can upgrade, downgrade, or cancel your subscription anytime through your billing dashboard. Plan changes take effect at your next billing cycle. When you cancel, you keep full access until the end of your current billing period, then you won\'t be charged again.'
     },
     {
       question: 'Do you offer refunds?',

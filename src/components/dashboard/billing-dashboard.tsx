@@ -268,6 +268,48 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
         </Card>
       )}
 
+      {/* Cancelled Subscription Banner */}
+      {profile.subscription_status === 'active' && (profile as any).cancelled_at_period_end && (profile as any).current_period_end && (
+        <Card className="border-2 border-orange-200 bg-orange-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="rounded-full p-2 bg-orange-100">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-orange-900">
+                  Subscription Cancelled
+                </h3>
+                <div className="space-y-2">
+                  <p className="text-sm text-orange-700">
+                    Your subscription has been cancelled, but you have full access until the end of your current billing period on{' '}
+                    <strong>{new Date((profile as any).current_period_end).toLocaleDateString('en-GB')}</strong>.
+                  </p>
+                  <p className="text-sm text-orange-700">
+                    You can continue sending review requests and accessing all features until then. Your data will remain safe.
+                  </p>
+                </div>
+                <div className="flex gap-3 mt-3">
+                  <Button
+                    onClick={handleManageSubscription}
+                    disabled={isLoading}
+                    size="sm"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    {isLoading ? (
+                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent mr-2" />
+                    ) : (
+                      <ExternalLink className="h-3 w-3 mr-2" />
+                    )}
+                    Reactivate Subscription
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Current Plan */}
       <Card>
         <CardHeader>

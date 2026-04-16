@@ -85,12 +85,12 @@ export default function LoginPage() {
           // Incomplete onboarding - send to onboarding (google_review_url is optional)
           console.log('Incomplete onboarding - redirecting to /onboarding')
           router.push('/onboarding')
-        } else if (!profile?.stripe_customer_id || !profile?.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
+        } else if (!profile?.stripe_customer_id || !profile?.subscription_status || !['active', 'trialing', 'cancelled'].includes(profile.subscription_status)) {
           // Completed onboarding but no active subscription - send to billing setup
           console.log('No active subscription - redirecting to /billing/setup')
           router.push('/billing/setup')
         } else {
-          // Everything complete - send to dashboard
+          // Everything complete - send to dashboard (including cancelled users for read-only access)
           console.log('All complete - redirecting to /dashboard')
           router.push('/dashboard')
         }

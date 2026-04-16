@@ -104,6 +104,17 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
     }
   }
 
+  // If subscription is cancelled but period hasn't ended, allow access
+  if ((profile as any).subscription_status === 'active' &&
+      (profile as any).cancelled_at_period_end &&
+      (profile as any).current_period_end) {
+    const periodEnd = new Date((profile as any).current_period_end)
+    if (periodEnd < new Date()) {
+      return { error: 'Your subscription has ended. Please resubscribe to continue sending review requests.' }
+    }
+    // Otherwise allow access until period end
+  }
+
   // Check monthly limit using personalized billing cycle
   let billingStart: Date
   let billingEnd: Date

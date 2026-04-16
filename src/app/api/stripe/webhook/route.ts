@@ -400,6 +400,22 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
           updateData.trial_ends_at = new Date(subscription.trial_end * 1000).toISOString()
         }
 
+        // Handle subscription period end and cancellation logic
+        if (subscription.current_period_end) {
+          updateData.current_period_end = new Date(subscription.current_period_end * 1000).toISOString()
+        }
+
+        // Track if subscription is cancelled but access continues until period end
+        if (subscription.cancel_at_period_end) {
+          updateData.cancelled_at_period_end = true
+          logWebhookEvent(correlationId, 'info', 'Subscription cancelled at period end', {
+            subscriptionId: subscription.id,
+            periodEnd: subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null
+          })
+        } else {
+          updateData.cancelled_at_period_end = false
+        }
+
         // Update profile
         const { error: updateError } = await (supabase as any)
           .from('profiles')
@@ -448,15 +464,20 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
           subscriptionId: subscription.id
         })
 
-        // Update profile to cancelled status
-        const { error: updateError } = await (supabase as any)
+        // Update profile to cancelled status - this is final termination
+        // Data is preserved, but access to new requests is cut off
+        const { data: profile, error: updateError } = await (supabase as any)
           .from('profiles')
           .update({
             subscription_status: 'cancelled',
             monthly_request_limit: 0, // No more requests allowed
+            cancelled_at_period_end: false, // No longer applies
+            current_period_end: null, // Period has ended
             updated_at: new Date().toISOString(),
           })
           .eq('stripe_subscription_id', subscription.id)
+          .select('email, business_name')
+          .single()
 
         if (updateError) {
           throw new Error(`Failed to update cancelled subscription: ${updateError.message}`)
@@ -465,6 +486,28 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
         logWebhookEvent(correlationId, 'info', 'Subscription cancelled successfully', {
           subscriptionId: subscription.id
         })
+
+        // Send subscription cancellation confirmation email
+        if (profile?.email) {
+          try {
+            await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/subscription-cancelled`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: profile.email,
+                businessName: profile.business_name || 'there',
+              }),
+            })
+          } catch (error) {
+            logWebhookEvent(correlationId, 'error', 'Failed to send cancellation email', {
+              subscriptionId: subscription.id,
+              error: (error as any).message
+            })
+            // Don't throw - email failures shouldn't fail the webhook
+          }
+        }
         break
       }
 

@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
           // Incomplete onboarding - go to onboarding first (google_review_url is optional)
           console.log('Incomplete onboarding - redirecting to onboarding')
           response = NextResponse.redirect(requestUrl.origin + '/onboarding')
-        } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
+        } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing', 'cancelled'].includes(profile.subscription_status)) {
           // Completed onboarding but no active subscription - go to billing setup
           console.log('No active subscription - redirecting to billing setup')
           response = NextResponse.redirect(requestUrl.origin + '/billing/setup')

@@ -231,6 +231,40 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div className="space-y-8">
+      {/* Cancelled Subscription Banner */}
+      {(profile as any).subscription_status === 'cancelled' && (
+        <Card className="border-2 border-orange-200 bg-orange-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="rounded-full p-2 bg-orange-100">
+                <XCircle className="h-5 w-5 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-orange-900 mb-2">
+                  Subscription Cancelled - Read-Only Mode
+                </h3>
+                <p className="text-sm text-orange-700 mb-3">
+                  Your account data is preserved and accessible, but you can't send new review requests.
+                  Reactivate your subscription to continue growing your online reputation.
+                </p>
+                <div className="flex gap-3">
+                  <Button asChild size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
+                    <Link href="/billing/setup">
+                      Reactivate Subscription
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/dashboard/billing">
+                      View Billing
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Dashboard overview */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -255,12 +289,19 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             )}
           </div>
         </div>
-        <Button asChild className="!text-white">
-          <Link href="/dashboard/send" className="flex items-center gap-2">
+        {(profile as any).subscription_status === 'cancelled' ? (
+          <Button disabled className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Send Review Request
-          </Link>
-        </Button>
+            Send Review Request (Reactivate Required)
+          </Button>
+        ) : (
+          <Button asChild className="!text-white">
+            <Link href="/dashboard/send" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Send Review Request
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* SMS Failure Alert */}
@@ -310,9 +351,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           ) : (
             <div className="text-center py-8">
               <div className="text-gray-500 mb-2">No activity yet</div>
-              <Button asChild className="!text-white">
-                <Link href="/dashboard/send">Send your first request</Link>
-              </Button>
+              {(profile as any).subscription_status === 'cancelled' ? (
+                <Button disabled>
+                  Send your first request (Reactivate Required)
+                </Button>
+              ) : (
+                <Button asChild className="!text-white">
+                  <Link href="/dashboard/send">Send your first request</Link>
+                </Button>
+              )}
             </div>
           )}
         </CardContent>
@@ -342,21 +389,37 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
       {/* Quick Actions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="hover:shadow-md transition-shadow cursor-pointer">
-          <Link href="/dashboard/send">
+        {(profile as any).subscription_status === 'cancelled' ? (
+          <Card className="opacity-50 cursor-not-allowed">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--accent-light)' }}>
-                  <Plus className="h-6 w-6" style={{ color: 'var(--accent)' }} />
+                <div className="rounded-lg p-3 bg-gray-200">
+                  <Plus className="h-6 w-6 text-gray-400" />
                 </div>
                 <div>
-                  <div className="font-medium text-gray-900">Send Request</div>
-                  <div className="text-sm text-gray-500">Add a new customer</div>
+                  <div className="font-medium text-gray-500">Send Request</div>
+                  <div className="text-sm text-gray-400">Reactivate subscription</div>
                 </div>
               </div>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        ) : (
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Link href="/dashboard/send">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--accent-light)' }}>
+                    <Plus className="h-6 w-6" style={{ color: 'var(--accent)' }} />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">Send Request</div>
+                    <div className="text-sm text-gray-500">Add a new customer</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+        )}
 
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <Link href="/dashboard/feedback">

@@ -332,3 +332,62 @@ export async function sendInternalAlert(type: string, subject: string, message: 
     return { success: false, error: 'Failed to send alert' }
   }
 }
+
+export async function sendSubscriptionCancelledEmail(to: string, businessName: string) {
+  if (!resend) {
+    console.warn('Resend not configured - skipping subscription cancelled email')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
+      to: [to],
+      subject: 'Subscription cancelled - Your data remains safe',
+      html: `
+        <h1>Your Grow Our Reviews subscription has been cancelled</h1>
+
+        <p>Hi ${businessName},</p>
+
+        <p>Your Grow Our Reviews subscription has been successfully cancelled. I wanted to personally reach out to confirm this and let you know what happens next.</p>
+
+        <div style="background: #f0f9ff; border: 1px solid #0284c7; border-radius: 6px; padding: 16px; margin: 20px 0;">
+          <h2 style="color: #0284c7; margin-top: 0;">What this means:</h2>
+          <ul style="margin-bottom: 0;">
+            <li><strong>Your data is safe:</strong> All your review requests, responses, and analytics remain accessible in your dashboard</li>
+            <li><strong>No further charges:</strong> Your card will not be charged for future billing periods</li>
+            <li><strong>Account remains active:</strong> You can still log in to view your historical data anytime</li>
+          </ul>
+        </div>
+
+        <p>If you cancelled because something wasn't working as expected, or if you have feedback on how we could improve, I'd love to hear from you. Just reply to this email.</p>
+
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 16px; margin: 20px 0;">
+          <h3 style="color: #92400e; margin-top: 0;">Changed your mind?</h3>
+          <p style="margin-bottom: 0;">You can reactivate your subscription at any time by logging into your dashboard and visiting the billing section. Your data and settings will be exactly as you left them.</p>
+        </div>
+
+        <p>Thank you for giving Grow Our Reviews a try. If you decide to come back in the future, we'll be here to help you grow your online reputation.</p>
+
+        <p>Best regards,<br>
+        Ed at Grow Our Reviews</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="color: #6b7280; font-size: 14px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard">Access your dashboard</a> |
+          <a href="mailto:ed@growourreviews.com">Reply with feedback</a>
+        </p>
+      `
+    })
+
+    if (error) {
+      console.error('Failed to send subscription cancelled email:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data, messageId: data?.id }
+  } catch (error) {
+    console.error('Error sending subscription cancelled email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}
