@@ -401,16 +401,16 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
         }
 
         // Handle subscription period end and cancellation logic
-        if (subscription.current_period_end) {
-          updateData.current_period_end = new Date(subscription.current_period_end * 1000).toISOString()
+        if ((subscription as any).current_period_end) {
+          updateData.current_period_end = new Date((subscription as any).current_period_end * 1000).toISOString()
         }
 
         // Track if subscription is cancelled but access continues until period end
-        if (subscription.cancel_at_period_end) {
+        if ((subscription as any).cancel_at_period_end) {
           updateData.cancelled_at_period_end = true
           logWebhookEvent(correlationId, 'info', 'Subscription cancelled at period end', {
             subscriptionId: subscription.id,
-            periodEnd: subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null
+            periodEnd: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000).toISOString() : null
           })
         } else {
           updateData.cancelled_at_period_end = false
