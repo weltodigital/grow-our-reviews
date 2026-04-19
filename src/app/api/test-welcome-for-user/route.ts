@@ -39,26 +39,26 @@ async function handleWelcomeEmailTest(request: NextRequest) {
 
     console.log('🔧 Manual welcome email test for user:', {
       userId: user.id,
-      email: profile.email,
-      businessName: profile.business_name
+      email: (profile as any).email,
+      businessName: (profile as any).business_name
     })
 
     // Check if Resend is configured
     console.log('🔧 RESEND_API_KEY configured:', !!process.env.RESEND_API_KEY)
 
     // Send welcome email
-    const result = await sendWelcomeEmail(profile.email, profile.business_name)
+    const result = await sendWelcomeEmail((profile as any).email, (profile as any).business_name)
 
     console.log('🔧 Welcome email result:', result)
 
     return NextResponse.json({
       success: result.success,
       message: result.success
-        ? `Welcome email sent successfully to ${profile.email}`
+        ? `Welcome email sent successfully to ${(profile as any).email}`
         : `Failed to send welcome email: ${result.error}`,
       userInfo: {
-        email: profile.email,
-        businessName: profile.business_name
+        email: (profile as any).email,
+        businessName: (profile as any).business_name
       },
       emailResult: result,
       timestamp: new Date().toISOString()

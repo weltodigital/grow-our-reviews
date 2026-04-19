@@ -45,11 +45,11 @@ async function handleWebhookTest(request: NextRequest) {
     }
 
     console.log('🔧 Profile found:', {
-      email: profile.email,
-      businessName: profile.business_name
+      email: (profile as any).email,
+      businessName: (profile as any).business_name
     })
 
-    if (!profile.email) {
+    if (!(profile as any).email) {
       return NextResponse.json({
         success: false,
         error: 'No email in profile',
@@ -71,7 +71,7 @@ async function handleWebhookTest(request: NextRequest) {
 
     // Send welcome email (same as webhook does)
     console.log('🔧 Attempting to send welcome email...')
-    const welcomeResult = await sendWelcomeEmail(profile.email, profile.business_name)
+    const welcomeResult = await sendWelcomeEmail((profile as any).email, (profile as any).business_name)
     console.log('🔧 Welcome email result:', welcomeResult)
 
     return NextResponse.json({
@@ -82,8 +82,8 @@ async function handleWebhookTest(request: NextRequest) {
       debug: {
         userId: user.id,
         profile: {
-          email: profile.email,
-          businessName: profile.business_name
+          email: (profile as any).email,
+          businessName: (profile as any).business_name
         },
         environment: {
           hasResendKey,
