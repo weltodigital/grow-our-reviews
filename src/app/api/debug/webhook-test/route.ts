@@ -1,6 +1,7 @@
-import { createServerSupabase } from '@/lib/auth'
+import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendWelcomeEmail } from '@/lib/resend'
+import type { Database } from '@/types/database'
 
 export async function GET(request: NextRequest) {
   return await handleWebhookTest(request)
@@ -12,7 +13,25 @@ export async function POST(request: NextRequest) {
 
 async function handleWebhookTest(request: NextRequest) {
   try {
-    const supabase = await createServerSupabase()
+    let response = NextResponse.json({ temp: true })
+
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set({ name, value, ...options })
+              response.cookies.set({ name, value, ...options })
+            })
+          },
+        },
+      }
+    )
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
