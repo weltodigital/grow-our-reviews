@@ -20,6 +20,7 @@ const GOOGLE_PATTERNS = {
     /maps\.google\.com\/.*\/reviews\/.*\/write/,
     /google\.com\/maps\/.*\/reviews\/.*\/write/,
     /maps\.google\.com\/.*\/@.*\/.*\/reviews\/.*\/write/,
+    /g\.page\/r\/.*\/review$/,  // Google's shortened review URLs like g.page/r/XXX/review
   ],
 
   // Business profile URLs (wrong - shows business info, not review form)
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if it's a Google domain
-    const googleDomains = ['google.com', 'maps.google.com', 'search.google.com', 'goo.gl']
+    const googleDomains = ['google.com', 'maps.google.com', 'search.google.com', 'goo.gl', 'g.page']
     const isGoogleDomain = googleDomains.some(domain =>
       parsedUrl.hostname === domain || parsedUrl.hostname.endsWith('.' + domain)
     )
@@ -246,7 +247,8 @@ function analyzeUrlStructure(url: string, parsedUrl: URL): ValidationResult {
 
   // Look for positive indicators
   if (path.includes('writereview') ||
-      path.includes('/reviews/') && path.includes('/write')) {
+      path.includes('/reviews/') && path.includes('/write') ||
+      parsedUrl.hostname === 'g.page' && path.match(/\/r\/.*\/review$/)) {
     return {
       isValid: true,
       urlType: 'review_form',
