@@ -2,7 +2,15 @@ import { createServerSupabase } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendWelcomeEmail } from '@/lib/resend'
 
+export async function GET(request: NextRequest) {
+  return await handleWelcomeEmailTest(request)
+}
+
 export async function POST(request: NextRequest) {
+  return await handleWelcomeEmailTest(request)
+}
+
+async function handleWelcomeEmailTest(request: NextRequest) {
   try {
     const supabase = await createServerSupabase()
 
