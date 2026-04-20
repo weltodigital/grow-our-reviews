@@ -69,7 +69,7 @@ export function GoogleUrlValidator({ url, onValidationChange, autoValidate = fal
 
   const getStatusIcon = () => {
     if (isValidating) {
-      return <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+      return <Loader2 className="h-4 w-4 animate-spin text-green-600" />
     }
 
     if (!validationResult) {
@@ -168,7 +168,7 @@ export function GoogleUrlValidator({ url, onValidationChange, autoValidate = fal
                   <ul className="space-y-1">
                     {validationResult.suggestions.map((suggestion, index) => (
                       <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                        <span className="text-blue-600 mt-1">•</span>
+                        <span className="text-green-600 mt-1">•</span>
                         {suggestion}
                       </li>
                     ))}
@@ -182,12 +182,12 @@ export function GoogleUrlValidator({ url, onValidationChange, autoValidate = fal
 
       {/* Preview */}
       {showPreview && validationResult?.preview && (
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className="border-green-200 bg-green-50">
           <CardContent className="pt-4">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-blue-900">Customer Preview</span>
+                <Eye className="h-4 w-4 text-green-600" />
+                <span className="font-medium text-green-900">Customer Preview</span>
               </div>
 
               <div className="bg-white border rounded-lg p-4 space-y-3">
@@ -214,7 +214,7 @@ export function GoogleUrlValidator({ url, onValidationChange, autoValidate = fal
                 </div>
               </div>
 
-              <div className="text-xs text-blue-700">
+              <div className="text-xs text-green-700">
                 💡 <strong>Pro tip:</strong> Click "Test This Link" to see exactly what your customers will experience
               </div>
             </div>
