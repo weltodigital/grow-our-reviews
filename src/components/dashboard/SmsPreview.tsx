@@ -69,7 +69,7 @@ export default function SmsPreview({
         {/* SMS Bubble */}
         <div className="flex justify-end">
           <div className="max-w-sm bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl rounded-br-sm px-4 py-3">
-            <div className="text-sm font-medium whitespace-pre-wrap break-words text-white">
+            <div className="text-sm font-medium whitespace-pre-wrap break-words !text-white">
               {message}
             </div>
           </div>
