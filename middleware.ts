@@ -86,7 +86,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/cron/') ||
     pathname.startsWith('/api/stripe/webhook') ||
     pathname.startsWith('/api/twilio/webhook') ||
-    pathname.startsWith('/api/debug/') ||
+    pathname.startsWith('/api/debug') ||
     pathname.startsWith('/api/feedback') ||
     pathname.startsWith('/api/emails/') ||
     pathname.startsWith('/api/test-') ||
