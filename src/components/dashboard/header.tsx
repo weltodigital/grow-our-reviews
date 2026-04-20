@@ -75,7 +75,7 @@ export function DashboardHeader({ user, profile }: DashboardHeaderProps) {
             <div className="absolute bottom-0 left-0 right-0 w-64 bg-white border-t border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-sm font-medium text-green-600">
                     {profile.business_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex flex-col">

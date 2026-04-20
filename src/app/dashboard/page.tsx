@@ -393,18 +393,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
       {/* Click-through Success Tip */}
       {(stats.clicksThisMonth > 0 && stats.feedbackThisMonth === 0) && (
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-green-50 border-green-200">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-blue-100 p-2">
-                <CheckCircle className="h-5 w-5 text-blue-600" />
+              <div className="rounded-lg bg-green-100 p-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
               <div className="flex-1">
-                <h3 className="font-medium text-blue-900 mb-1">Good click-through rate!</h3>
-                <p className="text-sm text-blue-700 mb-2">
+                <h3 className="font-medium text-green-900 mb-1">Good click-through rate!</h3>
+                <p className="text-sm text-green-700 mb-2">
                   Great job! People are clicking your review links. Not everyone who clicks will leave a review, and that's completely normal.
                 </p>
-                <p className="text-xs text-blue-600">
+                <p className="text-xs text-green-600">
                   Some customers may not have a Google account, others might be interrupted. Keep sending requests - reviews will come!
                 </p>
               </div>
