@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const [status, setStatus] = useState<'checking' | 'success' | 'timeout' | 'error'>('checking')
   const [profile, setProfile] = useState<any>(null)
   const [countdown, setCountdown] = useState(30) // 30 second timeout
@@ -169,5 +169,29 @@ export default function CheckoutSuccessPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <Card>
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-blue-600 animate-spin" />
+              </div>
+              <CardTitle>Loading...</CardTitle>
+              <CardDescription>
+                Please wait while we process your subscription
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    }>
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }
