@@ -53,7 +53,7 @@ async function handleProfileDebug(request: NextRequest) {
     console.log('🔧 Profile query result:', { profile, profileError })
 
     // Test the exact condition used in webhook
-    const hasEmailForWelcome = profile?.email
+    const hasEmailForWelcome = (profile as any)?.email
     const hasBusinessName = (profile as any)?.business_name
 
     // Check if business_name exists but is empty/null
