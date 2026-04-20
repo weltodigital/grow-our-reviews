@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     // Step 3: Get price info (same as webhook does)
     let priceInfo
     try {
-      const { getPriceInfo } = await import('@/app/api/stripe/webhook/route')
+      const { getPriceInfo } = await import('@/lib/stripe')
       const priceId = subscription.items.data[0]?.price.id
       priceInfo = getPriceInfo(priceId)
       console.log('✅ Step 3: Price info determined:', { priceId, priceInfo })
