@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Try to get recent Stripe events
-    let stripeEvents = []
+    let stripeEvents: any[] = []
     try {
       const { stripe } = await import('@/lib/stripe')
       if (stripe) {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
           id: event.id,
           type: event.type,
           created: new Date(event.created * 1000).toISOString(),
-          object: event.data.object.id
+          object: (event.data.object as any)?.id || 'no-id'
         }))
       }
     } catch (e) {
