@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Send, MousePointer, Star, MessageSquare } from 'lucide-react'
+import { Send, MousePointer, MessageSquare } from 'lucide-react'
 import { getNextBillingDate } from '@/lib/billing-cycle'
 import Link from 'next/link'
 
@@ -37,14 +37,6 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
       bgColor: 'bg-green-50',
     },
     {
-      title: 'Reviews',
-      value: stats.reviewsThisMonth,
-      subtitle: 'Public reviews',
-      icon: Star,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    {
       title: 'Private Feedback',
       value: stats.feedbackThisMonth,
       subtitle: 'Internal only',
@@ -57,7 +49,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
   return (
     <div className="space-y-6">
       {/* Main stats grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
