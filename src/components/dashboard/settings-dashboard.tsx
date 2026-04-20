@@ -122,7 +122,7 @@ export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashb
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-blue-600" />
+              <Settings className="h-5 w-5 text-green-600" />
               Need Help?
             </CardTitle>
           </CardHeader>
@@ -152,7 +152,7 @@ export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashb
               <strong>Questions?</strong> Contact us at{' '}
               <a
                 href="mailto:support@growourreviews.com"
-                className="text-blue-600 hover:text-blue-700"
+                className="text-green-600 hover:text-green-700"
               >
                 support@growourreviews.com
               </a>

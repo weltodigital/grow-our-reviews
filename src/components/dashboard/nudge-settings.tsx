@@ -78,7 +78,7 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5 text-blue-600" />
+          <MessageSquare className="h-5 w-5 text-green-600" />
           Follow-up Nudges
         </CardTitle>
         <CardDescription>
@@ -144,9 +144,9 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
             </div>
 
             {/* Preview */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">Nudge Message Preview:</h4>
-              <p className="text-sm text-blue-700 italic">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-medium text-green-900 mb-2">Nudge Message Preview:</h4>
+              <p className="text-sm text-green-700 italic">
                 "Hi [Customer], just a quick reminder — would you mind leaving us a review: [link]"
               </p>
             </div>

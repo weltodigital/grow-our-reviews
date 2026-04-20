@@ -151,7 +151,7 @@ export default function SmsTemplateEditor({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5 text-blue-600" />
+          <MessageSquare className="h-5 w-5 text-green-600" />
           Customise Your Messages
         </CardTitle>
         <CardDescription>
@@ -235,7 +235,7 @@ export default function SmsTemplateEditor({
                   <button
                     type="button"
                     onClick={resetInitialTemplate}
-                    className="text-sm text-blue-600 hover:text-blue-700 underline"
+                    className="text-sm text-green-600 hover:text-green-700 underline"
                   >
                     Reset to default
                   </button>
@@ -343,7 +343,7 @@ export default function SmsTemplateEditor({
                   <button
                     type="button"
                     onClick={resetNudgeTemplate}
-                    className="text-sm text-blue-600 hover:text-blue-700 underline"
+                    className="text-sm text-green-600 hover:text-green-700 underline"
                   >
                     Reset to default
                   </button>
