@@ -47,7 +47,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
               <div className="space-y-3">
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">1</span>
+                    <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">1</span>
                     <span className="font-medium">Search for your business</span>
                   </div>
                   <p className="text-sm text-gray-600 ml-8">
@@ -56,7 +56,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
                   <div className="ml-8 mt-2">
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 max-w-sm">
                       <div className="flex items-center space-x-2 mb-2">
-                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                           <span className="text-white text-xs font-bold">G</span>
                         </div>
                         <div className="flex-1 bg-white border border-gray-300 rounded-full px-3 py-1.5">
@@ -69,7 +69,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
 
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">2</span>
+                    <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">2</span>
                     <span className="font-medium">Find your business profile</span>
                   </div>
                   <p className="text-sm text-gray-600 ml-8">
@@ -84,9 +84,9 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
                       </div>
                       <p className="text-xs text-gray-500 mt-1">Plumber • Bristol</p>
                       <div className="flex space-x-2 mt-3">
-                        <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded">Call</div>
+                        <div className="bg-green-600 text-white text-xs px-2 py-1 rounded">Call</div>
                         <div className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">Directions</div>
-                        <div className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded border-2 border-blue-500">Ask for reviews</div>
+                        <div className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded border-2 border-green-500">Ask for reviews</div>
                       </div>
                     </div>
                   </div>
@@ -94,7 +94,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
 
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">3</span>
+                    <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">3</span>
                     <span className="font-medium">Click "Ask for reviews"</span>
                   </div>
                   <p className="text-sm text-gray-600 ml-8">
@@ -104,7 +104,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
 
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">4</span>
+                    <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">4</span>
                     <span className="font-medium">Copy the review link</span>
                   </div>
                   <p className="text-sm text-gray-600 ml-8">
@@ -118,7 +118,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
                           https://search.google.com/local/writereview?placeid=ChIJxxxxxxxxxxxxx
                         </p>
                       </div>
-                      <button className="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700">
+                      <button className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700">
                         Copy link
                       </button>
                     </div>
@@ -127,7 +127,7 @@ export default function GoogleReviewGuide({ className = '', showTitle = true }: 
 
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">5</span>
+                    <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">5</span>
                     <span className="font-medium">Paste into Grow Our Reviews</span>
                   </div>
                   <p className="text-sm text-gray-600 ml-8">

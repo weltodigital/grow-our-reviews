@@ -23,8 +23,8 @@ export default function GoogleReviewLinkHelpPage() {
             </Button>
           </div>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Home className="h-5 w-5 text-blue-600" />
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <Home className="h-5 w-5 text-green-600" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Grow Our Reviews</h1>
@@ -48,23 +48,23 @@ export default function GoogleReviewLinkHelpPage() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-          <h3 className="font-semibold text-blue-900 mb-2">Still Need Help?</h3>
-          <p className="text-blue-700 text-sm mb-4">
+        <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+          <h3 className="font-semibold text-green-900 mb-2">Still Need Help?</h3>
+          <p className="text-green-700 text-sm mb-4">
             If you're still having trouble finding your Google Review link, we're here to help!
           </p>
           <div className="space-y-2">
-            <p className="text-blue-700 text-sm">
+            <p className="text-green-700 text-sm">
               Email us at{' '}
               <a
                 href="mailto:hello@growourreviews.com"
-                className="font-medium text-blue-800 hover:text-blue-900"
+                className="font-medium text-green-800 hover:text-green-900"
               >
                 hello@growourreviews.com
               </a>{' '}
               with your business name and we'll find the link for you.
             </p>
-            <p className="text-xs text-blue-600">We usually respond within a few hours.</p>
+            <p className="text-xs text-green-600">We usually respond within a few hours.</p>
           </div>
         </div>
       </div>
