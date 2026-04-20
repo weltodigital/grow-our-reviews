@@ -111,7 +111,7 @@ function formatDate(dateString: string) {
 function getCategoryColor(category: string) {
   const colors = {
     "Getting More Work": "bg-green-100 text-green-800",
-    "Google Reviews": "bg-blue-100 text-blue-800",
+    "Google Reviews": "bg-green-100 text-green-800",
     "Local SEO": "bg-purple-100 text-purple-800",
     "Reputation Management": "bg-orange-100 text-orange-800",
     "Case Studies": "bg-indigo-100 text-indigo-800",

@@ -33,7 +33,7 @@ function formatDate(dateString: string) {
 function getCategoryColor(category: string) {
   const colors = {
     "Getting More Work": "bg-green-100 text-green-800",
-    "Google Reviews": "bg-blue-100 text-blue-800",
+    "Google Reviews": "bg-green-100 text-green-800",
     "Local SEO": "bg-purple-100 text-purple-800",
     "Reputation Management": "bg-orange-100 text-orange-800",
     "Case Studies": "bg-indigo-100 text-indigo-800",
@@ -98,7 +98,7 @@ function TableOfContents({ headings }: { headings: { id: string; text: string; l
                   href={`#${id}`}
                   onClick={() => setIsOpen(false)}
                   className={`block text-sm hover:text-gray-600 ${
-                    activeId === id ? 'text-blue-600 font-medium' : 'text-gray-600'
+                    activeId === id ? 'text-green-600 font-medium' : 'text-gray-600'
                   }`}
                 >
                   {text}
@@ -175,7 +175,7 @@ function ShareButtons({ title, url }: { title: string; url: string }) {
           href={shareUrls.facebook}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          className="px-3 py-2 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
         >
           Facebook
         </a>
@@ -191,7 +191,7 @@ function ShareButtons({ title, url }: { title: string; url: string }) {
           href={shareUrls.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-2 text-xs bg-blue-700 hover:bg-blue-800 text-white rounded-md transition-colors"
+          className="px-3 py-2 text-xs bg-green-700 hover:bg-green-800 text-white rounded-md transition-colors"
         >
           LinkedIn
         </a>
@@ -273,7 +273,7 @@ export function ArticleLayout({
                   {description}
                 </p>
                 <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium mr-3">
+                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-medium mr-3">
                     E
                   </div>
                   By <span className="font-medium text-gray-900 ml-1">Ed at Grow Our Reviews</span>
