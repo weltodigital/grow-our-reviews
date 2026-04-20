@@ -66,6 +66,7 @@ export async function completeOnboarding(data: OnboardingData) {
         email: user.email!,
         business_name: data.businessName.trim(),
         google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
+        billing_cycle_date: new Date().getDate(), // Set to current day of month
         updated_at: new Date().toISOString(),
       })
 
