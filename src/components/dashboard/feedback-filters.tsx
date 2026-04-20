@@ -59,7 +59,7 @@ export function FeedbackFilters({
 
   const getDateButtonStyle = (isActive: boolean) => {
     return isActive
-      ? 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200'
+      ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200'
       : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
   }
 

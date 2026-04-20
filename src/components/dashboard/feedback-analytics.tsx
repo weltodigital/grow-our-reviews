@@ -32,8 +32,8 @@ export function FeedbackAnalytics({ feedback }: FeedbackAnalyticsProps) {
       value: totalFeedback,
       subtitle: 'Private feedback received',
       icon: MessageSquare,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
     },
     {
       title: 'Average Rating',
@@ -135,9 +135,9 @@ export function FeedbackAnalytics({ feedback }: FeedbackAnalyticsProps) {
               })}
             </div>
 
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">💡 Improvement Opportunities</h4>
-              <div className="text-sm text-blue-700 space-y-1">
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h4 className="font-medium text-green-900 mb-2">💡 Improvement Opportunities</h4>
+              <div className="text-sm text-green-700 space-y-1">
                 {ratingDistribution[1] > 0 && (
                   <p>• {ratingDistribution[1]} customer{ratingDistribution[1] !== 1 ? 's' : ''} gave 1 star - these need immediate attention</p>
                 )}
