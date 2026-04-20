@@ -240,13 +240,13 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                       </div>
                       <div className="w-full bg-green-200 rounded-full h-2">
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-green-600 h-2 rounded-full transition-all duration-300"
                           style={{
                             width: `${Math.min(100, (trialDaysUsed / totalTrialDays) * 100)}%`
                           }}
                         />
                       </div>
-                      <div className="text-xs text-blue-500">
+                      <div className="text-xs text-green-600">
                         {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} remaining
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-green-600 h-2 rounded-full transition-all duration-300"
                 style={{
                   width: `${Math.min(100, (usage.requestsSent / profile.monthly_request_limit) * 100)}%`
                 }}
