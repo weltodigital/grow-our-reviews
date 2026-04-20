@@ -201,7 +201,7 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
         </Card>
 
         <div className="flex gap-3">
-          <Button onClick={() => setSuccess(null)} className="!text-white">
+          <Button onClick={() => setSuccess(null)}>
             Send Another Request
           </Button>
           <Button variant="outline" asChild>
