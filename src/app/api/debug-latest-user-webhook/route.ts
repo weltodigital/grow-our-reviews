@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Try to find recent checkout sessions for this user's email
-    let recentSessions = []
+    let recentSessions: any[] = []
     try {
       const { stripe } = await import('@/lib/stripe')
       if (stripe) {
