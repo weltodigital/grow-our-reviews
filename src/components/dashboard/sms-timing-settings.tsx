@@ -95,7 +95,7 @@ export function SmsTimingSettings({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-blue-600" />
+          <Clock className="h-5 w-5 text-green-600" />
           SMS Timing
         </CardTitle>
         <CardDescription>
@@ -143,16 +143,16 @@ export function SmsTimingSettings({
         </div>
 
         {/* Current Setting Preview */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h4 className="font-medium text-green-900 mb-2 flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             Current Setting
           </h4>
-          <p className="text-sm text-blue-700">
+          <p className="text-sm text-green-700">
             {getDelayDescription(smsDelayHours)}
           </p>
           {smsDelayHours > 0 && (
-            <p className="text-xs text-blue-600 mt-1">
+            <p className="text-xs text-green-600 mt-1">
               Perfect for giving you time to complete the job and customers time to settle before requesting a review.
             </p>
           )}

@@ -203,22 +203,22 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
       {/* Trial Banner */}
       {isTrialing && (
-        <Card className={`border-2 ${trialHasEnded ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}`}>
+        <Card className={`border-2 ${trialHasEnded ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}`}>
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
-              <div className={`rounded-full p-2 ${trialHasEnded ? 'bg-red-100' : 'bg-blue-100'}`}>
+              <div className={`rounded-full p-2 ${trialHasEnded ? 'bg-red-100' : 'bg-green-100'}`}>
                 {trialHasEnded ? (
                   <AlertTriangle className="h-5 w-5 text-red-600" />
                 ) : (
-                  <Zap className="h-5 w-5 text-blue-600" />
+                  <Zap className="h-5 w-5 text-green-600" />
                 )}
               </div>
               <div className="flex-1">
-                <h3 className={`font-semibold ${trialHasEnded ? 'text-red-900' : 'text-blue-900'}`}>
+                <h3 className={`font-semibold ${trialHasEnded ? 'text-red-900' : 'text-green-900'}`}>
                   {trialHasEnded ? 'Free Trial Ended' : 'Free Trial Active'}
                 </h3>
                 <div className="space-y-2">
-                  <p className={`text-sm ${trialHasEnded ? 'text-red-700' : 'text-blue-700'}`}>
+                  <p className={`text-sm ${trialHasEnded ? 'text-red-700' : 'text-green-700'}`}>
                     {trialHasEnded ? (
                       <>Your free trial ended on {trialEndsAt?.toLocaleDateString('en-GB')}. Billing has now started automatically.</>
                     ) : (
@@ -234,11 +234,11 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                   {/* Trial Progress Bar */}
                   {!trialHasEnded && trialEndsAt && (
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-blue-600">
+                      <div className="flex justify-between text-xs text-green-600">
                         <span>Trial progress</span>
                         <span>{trialDaysUsed} of {totalTrialDays} days used</span>
                       </div>
-                      <div className="w-full bg-blue-200 rounded-full h-2">
+                      <div className="w-full bg-green-200 rounded-full h-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                           style={{
@@ -253,12 +253,12 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                   )}
                 </div>
                 {!trialHasEnded && trialDaysRemaining <= 3 && (
-                  <p className="text-blue-800 text-sm mt-2 font-medium">
+                  <p className="text-green-800 text-sm mt-2 font-medium">
                     Your subscription will automatically start when your trial ends. You can cancel anytime through your billing portal.
                   </p>
                 )}
                 {trialHasEnded && (
-                  <p className="text-blue-800 text-sm mt-2 font-medium">
+                  <p className="text-green-800 text-sm mt-2 font-medium">
                     Your subscription is now active. Use the "Manage Billing" button below to modify your plan or payment method.
                   </p>
                 )}
@@ -358,12 +358,12 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
           {/* Credit Reset Information - More Prominent */}
           {profile.billing_cycle_date && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-blue-900">Credit Reset Schedule</span>
+                <Calendar className="h-4 w-4 text-green-600" />
+                <span className="font-medium text-green-900">Credit Reset Schedule</span>
               </div>
-              <div className="text-sm text-blue-700 space-y-1">
+              <div className="text-sm text-green-700 space-y-1">
                 <div><strong>Next reset:</strong> {getNextBillingDate(profile.billing_cycle_date).toLocaleDateString('en-GB')}</div>
                 <div><strong>Reset day:</strong> {profile.billing_cycle_date}{getOrdinalSuffix(profile.billing_cycle_date)} of each month</div>
                 {billingStats.daysUntilReset && (
@@ -491,23 +491,22 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
       {/* Growth Plan - Need More Credits */}
       {currentPlan === 'growth' && (
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className="border-green-200 bg-green-50">
           <CardHeader>
-            <CardTitle className="text-blue-900">Need More Than {PRICING_PLANS.growth.monthlyRequestLimit} Message Credits?</CardTitle>
+            <CardTitle className="text-green-900">Need More Than {PRICING_PLANS.growth.monthlyRequestLimit} Message Credits?</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-800 mb-2">
+                <p className="text-green-800 mb-2">
                   Looking for a custom plan with higher limits? We can help create a solution that fits your business needs.
                 </p>
-                <p className="text-sm text-blue-700">
+                <p className="text-sm text-green-700">
                   Contact our team to discuss custom pricing and limits for high-volume businesses.
                 </p>
               </div>
               <Button
                 asChild
-                className="bg-blue-600 hover:bg-blue-700"
               >
                 <a href="mailto:support@growourreviews.com?subject=Custom Plan Request&body=Hi, I'm currently on the Growth plan and would like to discuss increasing my monthly message credit limit. Please get in touch to discuss custom options.">
                   Contact Support
@@ -533,7 +532,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               <strong>Technical support:</strong> Contact us at{' '}
               <a
                 href="mailto:support@growourreviews.com"
-                className="text-blue-600 hover:text-blue-700"
+                className="text-green-600 hover:text-green-700"
               >
                 support@growourreviews.com
               </a>

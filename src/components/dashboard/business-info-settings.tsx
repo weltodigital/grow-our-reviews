@@ -116,7 +116,7 @@ export function BusinessInfoSettings({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Building className="h-5 w-5 text-blue-600" />
+          <Building className="h-5 w-5 text-green-600" />
           Business Information
         </CardTitle>
         <CardDescription>
@@ -163,7 +163,7 @@ export function BusinessInfoSettings({
               variant="ghost"
               size="sm"
               onClick={() => setShowGuide(true)}
-              className="text-blue-600 hover:text-blue-700 p-1"
+              className="text-green-600 hover:text-green-700 p-1"
             >
               <HelpCircle className="h-4 w-4" />
             </Button>

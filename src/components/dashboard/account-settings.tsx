@@ -119,7 +119,7 @@ export function AccountSettings({
       case 'active':
         return <Badge className="bg-green-100 text-green-700">Active</Badge>
       case 'trialing':
-        return <Badge className="bg-blue-100 text-blue-700">Free Trial</Badge>
+        return <Badge className="bg-green-100 text-green-700">Free Trial</Badge>
       case 'past_due':
         return <Badge className="bg-red-100 text-red-700">Past Due</Badge>
       case 'cancelled':
@@ -139,7 +139,7 @@ export function AccountSettings({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5 text-blue-600" />
+          <User className="h-5 w-5 text-green-600" />
           Account Settings
         </CardTitle>
         <CardDescription>
@@ -216,12 +216,12 @@ export function AccountSettings({
             </div>
 
             {isTrialing && trialEndsAt && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 text-blue-800 font-medium text-sm">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 text-green-800 font-medium text-sm">
                   <AlertTriangle className="h-4 w-4" />
                   Trial Period
                 </div>
-                <p className="text-blue-700 text-sm mt-1">
+                <p className="text-green-700 text-sm mt-1">
                   {trialDaysRemaining > 0
                     ? `${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining`
                     : 'Trial has ended'
