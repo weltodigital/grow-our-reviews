@@ -531,7 +531,108 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   Step 1: Complete CSV File
                 </CardTitle>
                 <CardDescription>
-                  Upload your CSV with customer names and phone numbers (we accept phone numbers with or without the leading zero)
+                  Create a CSV file with customer names and phone numbers - phone numbers work with or without leading zero
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium mb-3">Format Requirements:</h4>
+                  <ul className="text-sm text-gray-600 space-y-2">
+                    <li>• Two columns: <strong>name</strong> and <strong>phone</strong></li>
+                    <li>• Phone numbers: UK mobile numbers (with or without leading zero)</li>
+                    <li>• Save as .csv (comma separated values)</li>
+                    <li>• Maximum 200 rows per upload</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-3">📱 Phone Number Format (REQUIRED):</h4>
+                  <div className="bg-white border border-green-300 rounded p-3 mb-3">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-green-900 mb-1">Phone number formats (both work):</p>
+                      <div className="space-y-2">
+                        <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded block">7868287177</code>
+                        <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded block">07868287177</code>
+                      </div>
+                      <p className="text-sm text-green-700 mt-1">(With or without leading zero)</p>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-green-800 space-y-2">
+                    <li><strong>✅ Easy option (recommended):</strong></li>
+                    <li className="ml-4">• Just enter the number: <code>7868287177</code></li>
+                    <li className="ml-4">• Excel removes the zero? No problem - we add it back automatically</li>
+                    <li><strong>✅ Alternative option:</strong></li>
+                    <li className="ml-4">• Type the full number: <code>07868287177</code></li>
+                  </ul>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left font-medium">name</th>
+                        <th className="px-4 py-2 text-left font-medium">phone</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {EXAMPLE_DATA.map((row, index) => (
+                        <tr key={index} className="border-t border-gray-100">
+                          <td className="px-4 py-2">{row.name}</td>
+                          <td className="px-4 py-2">{row.phone}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* How It Works */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  How Bulk Sending Works
+                </CardTitle>
+                <CardDescription>
+                  Understanding our smart delivery system
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-3">📱 Smart Rate Limiting</h4>
+                  <ul className="text-sm text-green-800 space-y-2">
+                    <li><strong>• Batch Size:</strong> Messages are sent in groups of 20 customers</li>
+                    <li><strong>• Timing:</strong> Each batch is sent 15 minutes apart</li>
+                    <li><strong>• Why:</strong> This prevents your messages from being flagged as spam</li>
+                    <li><strong>• Monitoring:</strong> Track progress in real-time on your dashboard</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-3">🕒 Example Timeline</h4>
+                  <div className="text-sm text-green-800 space-y-1">
+                    <p><strong>Upload 100 customers:</strong></p>
+                    <p>• Batch 1 (customers 1-20): Sent immediately</p>
+                    <p>• Batch 2 (customers 21-40): Sent after 15 minutes</p>
+                    <p>• Batch 3 (customers 41-60): Sent after 30 minutes</p>
+                    <p>• Batch 4 (customers 61-80): Sent after 45 minutes</p>
+                    <p>• Batch 5 (customers 81-100): Sent after 60 minutes</p>
+                    <p className="font-medium mt-2">Total time: ~65 minutes for 100 customers</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Step 2: Upload File */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5 text-green-600" />
+                  Step 2: Upload Your File
+                </CardTitle>
+                <CardDescription>
+                  Upload your completed CSV file
                 </CardDescription>
               </CardHeader>
               <CardContent>
