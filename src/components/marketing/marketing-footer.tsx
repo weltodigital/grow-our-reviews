@@ -12,7 +12,7 @@ export function MarketingFooter() {
       <div className="border-b border-gray-800">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center">
-            <h2 className="text-3xl font-bold mb-4 text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white !text-white">
               Your competitors are getting reviewed. Are you?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
