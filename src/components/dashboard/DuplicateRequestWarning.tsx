@@ -93,7 +93,7 @@ export function DuplicateRequestWarning({
 
   const getIcon = () => {
     if (isChecking) {
-      return <Clock className="h-5 w-5 animate-spin text-blue-600" />
+      return <Clock className="h-5 w-5 animate-spin text-green-600" />
     }
 
     if (!duplicateCheck) return null
@@ -104,7 +104,7 @@ export function DuplicateRequestWarning({
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-orange-600" />
       case 'info':
-        return <Info className="h-5 w-5 text-blue-600" />
+        return <Info className="h-5 w-5 text-green-600" />
       default:
         return <CheckCircle className="h-5 w-5 text-green-600" />
     }
@@ -119,7 +119,7 @@ export function DuplicateRequestWarning({
       case 'warning':
         return 'border-orange-200 bg-orange-50'
       case 'info':
-        return 'border-blue-200 bg-blue-50'
+        return 'border-green-200 bg-green-50'
       default:
         return 'border-green-200 bg-green-50'
     }
@@ -132,7 +132,7 @@ export function DuplicateRequestWarning({
       case 'feedback_given':
         return <Badge className="bg-red-100 text-red-800">Gave Feedback</Badge>
       case 'clicked':
-        return <Badge className="bg-blue-100 text-blue-800">Clicked Link</Badge>
+        return <Badge className="bg-green-100 text-green-800">Clicked Link</Badge>
       case 'sent':
         return <Badge className="bg-gray-100 text-gray-800">SMS Sent</Badge>
       case 'failed':

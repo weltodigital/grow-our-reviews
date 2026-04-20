@@ -544,7 +544,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Download className="h-5 w-5 text-blue-600" />
+                  <Download className="h-5 w-5 text-green-600" />
                   Step 1: Download CSV Template
                 </CardTitle>
                 <CardDescription>
@@ -567,19 +567,19 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   </ul>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-3">📱 Phone Number Format (REQUIRED):</h4>
-                  <div className="bg-white border border-blue-300 rounded p-3 mb-3">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-3">📱 Phone Number Format (REQUIRED):</h4>
+                  <div className="bg-white border border-green-300 rounded p-3 mb-3">
                     <div className="text-center">
-                      <p className="text-lg font-bold text-blue-900 mb-1">Phone number formats (both work):</p>
+                      <p className="text-lg font-bold text-green-900 mb-1">Phone number formats (both work):</p>
                       <div className="space-y-2">
                         <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded block">7868287177</code>
                         <code className="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded block">07868287177</code>
                       </div>
-                      <p className="text-sm text-blue-700 mt-1">(With or without leading zero)</p>
+                      <p className="text-sm text-green-700 mt-1">(With or without leading zero)</p>
                     </div>
                   </div>
-                  <ul className="text-sm text-blue-800 space-y-2">
+                  <ul className="text-sm text-green-800 space-y-2">
                     <li><strong>✅ Easy option (recommended):</strong></li>
                     <li className="ml-4">• Just enter the number: <code>7868287177</code></li>
                     <li className="ml-4">• Excel removes the zero? No problem - we add it back automatically</li>
@@ -613,7 +613,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                  <CheckCircle className="h-5 w-5 text-green-600" />
                   How Bulk Sending Works
                 </CardTitle>
                 <CardDescription>
@@ -621,9 +621,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-3">📱 Smart Rate Limiting</h4>
-                  <ul className="text-sm text-blue-800 space-y-2">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-3">📱 Smart Rate Limiting</h4>
+                  <ul className="text-sm text-green-800 space-y-2">
                     <li><strong>• Batch Size:</strong> Messages are sent in groups of 20 customers</li>
                     <li><strong>• Timing:</strong> Each batch is sent 15 minutes apart</li>
                     <li><strong>• Why:</strong> This prevents your messages from being flagged as spam</li>
@@ -661,7 +661,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                     dragActive
-                      ? 'border-blue-400 bg-blue-50'
+                      ? 'border-green-400 bg-green-50'
                       : 'border-gray-300 hover:border-gray-400'
                   } ${isProcessing ? 'opacity-50 pointer-events-none' : ''}`}
                   onDragEnter={handleDrag}
@@ -671,7 +671,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 >
                   {isProcessing ? (
                     <div className="space-y-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-500 border-t-transparent mx-auto"></div>
                       <p className="text-gray-600">Processing file...</p>
                     </div>
                   ) : (
@@ -722,7 +722,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-500 h-2 rounded-full"
+                      className="bg-green-500 h-2 rounded-full"
                       style={{
                         width: `${Math.min(100, (userStats.requestsSent / userStats.monthlyLimit) * 100)}%`
                       }}
@@ -754,7 +754,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <p className="font-medium text-gray-700">Questions?</p>
                   <p className="text-gray-600">
                     Email us at{' '}
-                    <a href="mailto:hello@growourreviews.com" className="text-blue-600 hover:text-blue-700">
+                    <a href="mailto:hello@growourreviews.com" className="text-green-600 hover:text-green-700">
                       hello@growourreviews.com
                     </a>
                   </p>
@@ -792,7 +792,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                             {upload.requests_sent} sent
                           </p>
                           {upload.requests_completed > 0 && (
-                            <p className="text-xs text-blue-600">
+                            <p className="text-xs text-green-600">
                               {upload.requests_completed} completed
                             </p>
                           )}
@@ -808,7 +808,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
                     {loadingHistory && (
                       <div className="flex items-center justify-center py-4">
-                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-green-500 border-t-transparent"></div>
                       </div>
                     )}
                   </div>
@@ -848,7 +848,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-600" />
+                    <Users className="h-5 w-5 text-green-600" />
                     <div>
                       <p className="text-sm text-gray-600">Total Rows</p>
                       <p className="text-xl font-semibold">{csvData.length}</p>
@@ -995,11 +995,11 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
                 {/* Pending Customers Option */}
                 {unselectedValidRows.length > 0 && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                     <div className="flex items-start gap-3">
                       <div className="flex-1">
-                        <p className="font-medium text-blue-800">Save Remaining Customers</p>
-                        <p className="text-blue-700 text-sm mt-1">
+                        <p className="font-medium text-green-800">Save Remaining Customers</p>
+                        <p className="text-green-700 text-sm mt-1">
                           {unselectedValidRows.length} unselected valid customers. Save them to send automatically when your plan resets next month?
                         </p>
                       </div>
@@ -1010,7 +1010,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                           onChange={(e) => setSavePendingCustomers(e.target.checked)}
                           className="rounded"
                         />
-                        <span className="text-sm text-blue-800">Save for next month</span>
+                        <span className="text-sm text-green-800">Save for next month</span>
                       </label>
                     </div>
                   </div>
@@ -1106,7 +1106,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                                 <div key={errorIndex} className={`text-xs px-2 py-1 rounded ${
                                   isBlocked ? 'text-red-700 bg-red-100 border border-red-200' :
                                   isWarning ? 'text-yellow-700 bg-yellow-100 border border-yellow-200' :
-                                  isInfo ? 'text-blue-700 bg-blue-100 border border-blue-200' :
+                                  isInfo ? 'text-green-700 bg-blue-100 border border-blue-200' :
                                   'text-gray-600 bg-gray-50'
                                 }`}>
                                   {error}
@@ -1320,7 +1320,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-500 border-t-transparent mx-auto"></div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Your Upload</h2>
             <p className="text-gray-600">
@@ -1360,7 +1360,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                   <div className="text-sm text-gray-500">Sent This Month</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-blue-600">{uploadResults?.batches || 0}</div>
+                  <div className="text-3xl font-bold text-green-600">{uploadResults?.batches || 0}</div>
                   <div className="text-sm text-gray-500">Sending Batches</div>
                 </div>
                 <div>
@@ -1369,9 +1369,9 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-blue-900 mb-2">How it works:</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 className="font-medium text-green-900 mb-2">How it works:</h3>
+                <ul className="text-sm text-green-800 space-y-1">
                   <li>• Messages will be sent in batches of {uploadResults?.batchSize || 20} every {uploadResults?.batchDelayMinutes || 15} minutes</li>
                   <li>• This prevents your messages from being flagged as spam</li>
                   <li>• All messages should be sent within {uploadResults?.estimatedCompletionMinutes || 0} minutes</li>

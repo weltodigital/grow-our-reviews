@@ -188,7 +188,7 @@ export function RequestDetailsModal({
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <UserIcon className="h-5 w-5 text-blue-600" />
+            <UserIcon className="h-5 w-5 text-green-600" />
             Request Details
           </DialogTitle>
           <DialogDescription>
@@ -240,11 +240,11 @@ export function RequestDetailsModal({
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                <ClockIcon className="h-4 w-4 text-blue-600 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                <ClockIcon className="h-4 w-4 text-green-600 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-blue-900">SMS Scheduled For</div>
-                  <div className="text-sm text-blue-700">
+                  <div className="text-sm font-medium text-green-900">SMS Scheduled For</div>
+                  <div className="text-sm text-green-700">
                     {formatDateTime(request.scheduled_for)}
                   </div>
                 </div>
@@ -294,10 +294,10 @@ export function RequestDetailsModal({
               <MessageCircleIcon className="h-4 w-4" />
               SMS Message Sent
             </div>
-            <div className="border rounded-lg p-4 bg-blue-50">
+            <div className="border rounded-lg p-4 bg-green-50">
               {isLoadingMessage ? (
                 <div className="flex items-center gap-2 text-gray-500">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-green-600"></div>
                   Loading message...
                 </div>
               ) : smsMessage ? (
