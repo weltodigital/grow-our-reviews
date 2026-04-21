@@ -79,11 +79,14 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
     return createNudgeMessage({ customerName, businessName, sentimentGateUrl })
   }
 
-  // Build nudge message
+  // Replace {business_name} placeholder in request line
+  const processedRequestLine = template.request_line.replace(/\{business_name\}/g, businessName)
+
+  // Build nudge message using user's custom request line
   const messageParts = []
 
-  // Format: {greeting} {customer_name}, just a quick reminder — would you mind leaving us a review:
-  messageParts.push(`${template.greeting} ${customerName}, just a quick reminder — would you mind leaving us a review:`)
+  // Format: {greeting} {customer_name}, {request_line}:
+  messageParts.push(`${template.greeting} ${customerName}, ${processedRequestLine}`)
   messageParts.push('')
   messageParts.push(sentimentGateUrl)
 
