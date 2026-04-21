@@ -25,11 +25,9 @@ export default function SmsPreview({
   // Assemble the message based on template type
   const assembleMessage = () => {
     if (templateType === 'nudge') {
-      // Nudge format: {greeting} {customer_name}, {openingLine} {requestLine}
+      // Nudge format: {greeting} {customer_name}, {requestLine}: {link}
       const messageLines = []
-      messageLines.push(`${greeting} ${customerName}, ${processedOpeningLine} ${requestLine}`)
-      messageLines.push('')
-      messageLines.push('https://growourreviews.com/review/a1b2c3d4e5f6')
+      messageLines.push(`${greeting} ${customerName}, ${requestLine}: https://growourreviews.com/review/a1b2c3d4e5f6`)
 
       if (signOff && signOff.trim()) {
         messageLines.push('')

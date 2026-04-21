@@ -28,8 +28,8 @@ const DEFAULT_TEMPLATES = {
   },
   nudge: {
     greeting: 'Hi',
-    opening_line: 'just a quick reminder —',
-    request_line: 'would you mind leaving us a review:',
+    opening_line: '',
+    request_line: 'just a quick reminder - would you mind leaving us a review',
     sign_off: null
   }
 }
