@@ -160,6 +160,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
+              autoComplete="username"
             />
           </div>
           <div>
@@ -171,6 +172,8 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
+              autoComplete="current-password"
+              spellCheck="false"
             />
           </div>
           {error && (

@@ -159,6 +159,8 @@ function ConfirmResetPasswordForm() {
               required
               disabled={isLoading}
               minLength={6}
+              autoComplete="new-password"
+              spellCheck="false"
             />
           </div>
           <div>
@@ -171,6 +173,8 @@ function ConfirmResetPasswordForm() {
               required
               disabled={isLoading}
               minLength={6}
+              autoComplete="new-password"
+              spellCheck="false"
             />
           </div>
           {error && (

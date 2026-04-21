@@ -187,6 +187,7 @@ export default function SignUpPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
+              autoComplete="username"
             />
           </div>
           <div>
@@ -199,6 +200,8 @@ export default function SignUpPage() {
               required
               disabled={isLoading}
               minLength={6}
+              autoComplete="new-password"
+              spellCheck="false"
             />
           </div>
           <div>
@@ -211,6 +214,8 @@ export default function SignUpPage() {
               required
               disabled={isLoading}
               minLength={6}
+              autoComplete="new-password"
+              spellCheck="false"
             />
           </div>
           {error && (
