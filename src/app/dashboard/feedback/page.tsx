@@ -270,7 +270,7 @@ export default function FeedbackPage() {
               }
             </p>
             {total === 0 ? (
-              <Button asChild>
+              <Button asChild className="!text-black">
                 <Link href="/dashboard/send">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Send Review Request

@@ -433,7 +433,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               <Button
                 onClick={handleManageSubscription}
                 disabled={isLoading}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 !text-black"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -477,7 +477,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               <Button
                 onClick={handleUpgrade}
                 disabled={isLoading}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-white !text-black"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
@@ -507,6 +507,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               </div>
               <Button
                 asChild
+                className="!text-black"
               >
                 <a href="mailto:support@growourreviews.com?subject=Custom Plan Request&body=Hi, I'm currently on the Growth plan and would like to discuss increasing my monthly message credit limit. Please get in touch to discuss custom options.">
                   Contact Support

@@ -216,7 +216,7 @@ export default function RequestsPage() {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button asChild>
+          <Button asChild className="!text-black">
             <Link href="/dashboard/send">
               <Plus className="h-4 w-4 mr-2" />
               New Request
@@ -285,7 +285,7 @@ export default function RequestsPage() {
                 : 'Try adjusting your filters or search terms.'}
             </p>
             {statusFilter === 'all' && !searchTerm && (
-              <Button asChild>
+              <Button asChild className="!text-black">
                 <Link href="/dashboard/send">
                   <Plus className="h-4 w-4 mr-2" />
                   Send First Request
