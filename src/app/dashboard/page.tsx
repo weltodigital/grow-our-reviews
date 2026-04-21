@@ -321,7 +321,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             Send Review Request (Reactivate Required)
           </Button>
         ) : (
-          <Button asChild>
+          <Button asChild className="!text-black">
             <Link href="/dashboard/send" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               Send Review Request
@@ -382,7 +382,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   Send your first request (Reactivate Required)
                 </Button>
               ) : (
-                <Button asChild>
+                <Button asChild className="!text-black">
                   <Link href="/dashboard/send">Send your first request</Link>
                 </Button>
               )}
