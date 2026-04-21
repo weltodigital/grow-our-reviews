@@ -1241,7 +1241,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
 
                 <div className="pt-4 border-t border-gray-200">
                   <Button
-                    className="w-full"
+                    className="w-full !text-black"
                     disabled={canSend === 0 || isProcessing}
                     onClick={handleSendRequests}
                   >
@@ -1373,7 +1373,7 @@ export function BulkUpload({ user, profile, userStats }: BulkUploadProps) {
             <Button variant="outline" onClick={resetUpload}>
               Upload More Customers
             </Button>
-            <Button onClick={() => router.push('/dashboard')} className="text-white">
+            <Button onClick={() => router.push('/dashboard')} className="!text-black">
               Back to Dashboard
             </Button>
           </div>

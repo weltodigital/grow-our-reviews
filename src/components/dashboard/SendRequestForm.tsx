@@ -201,7 +201,7 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
         </Card>
 
         <div className="flex gap-3">
-          <Button onClick={() => setSuccess(null)}>
+          <Button onClick={() => setSuccess(null)} className="!text-black">
             Send Another Request
           </Button>
           <Button variant="outline" asChild>
@@ -305,7 +305,7 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
                 type="submit"
                 size="lg"
                 disabled={isLoading || !customerName.trim() || !customerPhone.trim()}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto !text-black"
               >
                 {isLoading ? (
                   <>
