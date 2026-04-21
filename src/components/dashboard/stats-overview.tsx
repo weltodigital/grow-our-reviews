@@ -21,7 +21,7 @@ interface StatsOverviewProps {
 export function StatsOverview({ stats }: StatsOverviewProps) {
   const statCards = [
     {
-      title: 'Requests Sent',
+      title: 'SMS Credits Used',
       value: stats.requestsSentThisMonth,
       subtitle: 'This period',
       icon: Send,

@@ -72,15 +72,36 @@ export async function GET(request: NextRequest) {
       totalRequestsAllTime,
       totalReviewsAllTime
     ] = await Promise.all([
-      // Requests sent this billing period (exclude failed deliveries)
+      // SMS credits used this billing period (initial messages + nudges, exclude failed deliveries)
       supabase
         .from('review_requests')
-        .select('id', { count: 'exact' })
+        .select('sent_at, nudge_sent_at')
         .eq('user_id', user.id)
-        .gte('sent_at', startOfPeriod.toISOString())
-        .lte('sent_at', endOfPeriod.toISOString())
-        .not('sent_at', 'is', null)
-        .not('status', 'eq', 'failed'),
+        .not('status', 'eq', 'failed')
+        .then(({ data, error }: { data: { sent_at: string | null; nudge_sent_at: string | null }[] | null; error: any }) => {
+          if (error) throw error
+          let count = 0
+
+          data?.forEach(request => {
+            // Count initial message if sent in this period
+            if (request.sent_at) {
+              const sentDate = new Date(request.sent_at)
+              if (sentDate >= startOfPeriod && sentDate <= endOfPeriod) {
+                count++
+              }
+            }
+
+            // Count nudge message if sent in this period
+            if (request.nudge_sent_at) {
+              const nudgeDate = new Date(request.nudge_sent_at)
+              if (nudgeDate >= startOfPeriod && nudgeDate <= endOfPeriod) {
+                count++
+              }
+            }
+          })
+
+          return { count }
+        }),
 
       // Clicks this billing period
       supabase
@@ -108,13 +129,30 @@ export async function GET(request: NextRequest) {
         .gte('created_at', startOfPeriod.toISOString())
         .lte('created_at', endOfPeriod.toISOString()),
 
-      // Total requests all time (exclude failed deliveries)
+      // Total SMS credits used all time (initial messages + nudges, exclude failed deliveries)
       supabase
         .from('review_requests')
-        .select('id', { count: 'exact' })
+        .select('sent_at, nudge_sent_at')
         .eq('user_id', user.id)
-        .not('sent_at', 'is', null)
-        .not('status', 'eq', 'failed'),
+        .not('status', 'eq', 'failed')
+        .then(({ data, error }: { data: { sent_at: string | null; nudge_sent_at: string | null }[] | null; error: any }) => {
+          if (error) throw error
+          let count = 0
+
+          data?.forEach(request => {
+            // Count initial message if sent
+            if (request.sent_at) {
+              count++
+            }
+
+            // Count nudge message if sent
+            if (request.nudge_sent_at) {
+              count++
+            }
+          })
+
+          return { count }
+        }),
 
       // Total reviews all time
       supabase
