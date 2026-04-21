@@ -40,9 +40,7 @@ ${sentimentGateUrl}`
 }
 
 export function createNudgeMessage({ customerName, businessName, sentimentGateUrl }: SMSTemplate): string {
-  return `Hi ${customerName}, just a quick reminder — would you mind leaving us a review:
-
-${sentimentGateUrl}`
+  return `Hi ${customerName}, just a quick reminder - would you mind leaving us a review: ${sentimentGateUrl}`
 }
 
 export function createCustomInitialMessage({ customerName, businessName, sentimentGateUrl, template }: MessageData): string {
@@ -74,29 +72,8 @@ export function createCustomInitialMessage({ customerName, businessName, sentime
 }
 
 export function createCustomNudgeMessage({ customerName, businessName, sentimentGateUrl, template }: MessageData): string {
-  // Use custom template if provided, otherwise fall back to default
-  if (!template) {
-    return createNudgeMessage({ customerName, businessName, sentimentGateUrl })
-  }
-
-  // Replace {business_name} placeholder in request line
-  const processedRequestLine = template.request_line.replace(/\{business_name\}/g, businessName)
-
-  // Build nudge message using user's custom request line
-  const messageParts = []
-
-  // Format: {greeting} {customer_name}, {request_line}:
-  messageParts.push(`${template.greeting} ${customerName}, ${processedRequestLine}`)
-  messageParts.push('')
-  messageParts.push(sentimentGateUrl)
-
-  // Add sign-off if provided
-  if (template.sign_off && template.sign_off.trim()) {
-    messageParts.push('')
-    messageParts.push(template.sign_off)
-  }
-
-  return messageParts.join('\n')
+  // Always use standardized nudge format regardless of custom template
+  return `Hi ${customerName}, just a quick reminder - would you mind leaving us a review: ${sentimentGateUrl}`
 }
 
 export async function sendSMS(to: string, message: string, userId?: string, force: boolean = false): Promise<{
