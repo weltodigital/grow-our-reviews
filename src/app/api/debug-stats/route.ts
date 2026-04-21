@@ -28,6 +28,15 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(20)
 
+    type RequestData = {
+      id: string
+      sent_at: string | null
+      nudge_sent_at: string | null
+      nudge_sent: boolean | null
+      status: string
+      created_at: string
+    }
+
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
@@ -38,7 +47,7 @@ export async function GET(request: NextRequest) {
     const now = new Date()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
-    const details = allRequests.map(req => {
+    const details = (allRequests as RequestData[] || []).map(req => {
       let credits = 0
       const isThisMonth = (date: string) => new Date(date) >= startOfMonth
 
@@ -76,9 +85,9 @@ export async function GET(request: NextRequest) {
       creditsThisMonth: thisMonthCredits,
       requestDetails: details,
       summary: {
-        totalRequests: allRequests.length,
-        requestsWithNudges: allRequests.filter(r => r.nudge_sent_at).length,
-        requestsWithInitial: allRequests.filter(r => r.sent_at && r.status !== 'failed').length
+        totalRequests: (allRequests as RequestData[] || []).length,
+        requestsWithNudges: (allRequests as RequestData[] || []).filter(r => r.nudge_sent_at).length,
+        requestsWithInitial: (allRequests as RequestData[] || []).filter(r => r.sent_at && r.status !== 'failed').length
       }
     })
 
