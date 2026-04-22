@@ -165,6 +165,10 @@ export function BusinessInfoSettings({
             required
             showTestLink={true}
             currentGoogleUrl={currentGoogleUrl}
+            onManualEntry={() => {
+              setShowManualUrlInput(true)
+              setManualGoogleUrl('')
+            }}
           />
 
           {/* Current Google Review URL Status */}

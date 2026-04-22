@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Search, MapPin, Star, Users, Check, ExternalLink, X } from 'lucide-react'
+import { Search, MapPin, Star, Users, Check, ExternalLink, X, Plus } from 'lucide-react'
 
 interface Business {
   placeId: string
@@ -27,6 +27,7 @@ interface BusinessSearchProps {
   disabled?: boolean
   showTestLink?: boolean
   currentGoogleUrl?: string | null
+  onManualEntry?: () => void
 }
 
 export default function BusinessSearch({
@@ -39,7 +40,8 @@ export default function BusinessSearch({
   required = false,
   disabled = false,
   showTestLink = false,
-  currentGoogleUrl = null
+  currentGoogleUrl = null,
+  onManualEntry
 }: BusinessSearchProps) {
   const [query, setQuery] = useState(value)
   const [businesses, setBusinesses] = useState<Business[]>([])
@@ -374,7 +376,7 @@ export default function BusinessSearch({
               key={business.placeId}
               type="button"
               onClick={() => handleBusinessSelect(business)}
-              className="w-full text-left p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:outline-none focus:bg-gray-50"
+              className="w-full text-left p-3 hover:bg-gray-50 border-b border-gray-100 focus:outline-none focus:bg-gray-50"
             >
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -411,6 +413,36 @@ export default function BusinessSearch({
               </div>
             </button>
           ))}
+
+          {/* Manual entry option at bottom of results */}
+          <div className="border-t border-gray-200 p-3 bg-gray-50">
+            <p className="text-xs text-gray-600 mb-2">
+              Don't see your business? This is common for service-area businesses and tradesmen.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setShowDropdown(false)
+                // Trigger manual entry callback if provided
+                if (onManualEntry) {
+                  onManualEntry()
+                }
+                // Keep the typed business name
+                inputRef.current?.focus()
+              }}
+              className="w-full text-left p-2 rounded bg-white border border-green-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+            >
+              <div className="flex items-center gap-2">
+                <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                  <Plus className="h-3 w-3 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-green-800">Continue with "{query.trim()}"</p>
+                  <p className="text-xs text-green-600">Add Google Reviews URL manually in next step</p>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
       )}
 
