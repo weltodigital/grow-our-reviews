@@ -80,9 +80,10 @@ export default function OnboardingPage() {
                 onBusinessNameChange={handleBusinessNameChange}
                 placeholder="e.g. Smith Plumbing Services, Bristol"
                 label="Find Your Business"
-                helperText="Search for your business to automatically set up Google Reviews. This will appear in your SMS messages."
+                helperText="Search for your business to automatically set up Google Reviews. You can edit how your business name appears in SMS messages."
                 required
                 disabled={isLoading}
+                showTestLink={true}
               />
 
               {/* Show manual entry option if no business selected */}

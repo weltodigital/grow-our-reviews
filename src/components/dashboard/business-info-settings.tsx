@@ -152,8 +152,10 @@ export function BusinessInfoSettings({
             onBusinessNameChange={handleBusinessNameChange}
             placeholder="Search for your business to update Google Reviews URL..."
             label="Business Information"
-            helperText="Update your business name and automatically configure Google Reviews. This appears in SMS messages to customers."
+            helperText="Search for your business to automatically configure Google Reviews. You can edit the business name that appears in SMS messages."
             required
+            showTestLink={true}
+            currentGoogleUrl={currentGoogleUrl}
           />
 
           {/* Current Google Review URL Status */}

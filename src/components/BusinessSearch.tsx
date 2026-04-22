@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Search, MapPin, Star, Users, Check } from 'lucide-react'
+import { Search, MapPin, Star, Users, Check, ExternalLink, X } from 'lucide-react'
 
 interface Business {
   placeId: string
@@ -25,6 +25,8 @@ interface BusinessSearchProps {
   helperText?: string
   required?: boolean
   disabled?: boolean
+  showTestLink?: boolean
+  currentGoogleUrl?: string | null
 }
 
 export default function BusinessSearch({
@@ -35,7 +37,9 @@ export default function BusinessSearch({
   label = "Business Name",
   helperText,
   required = false,
-  disabled = false
+  disabled = false,
+  showTestLink = false,
+  currentGoogleUrl = null
 }: BusinessSearchProps) {
   const [query, setQuery] = useState(value)
   const [businesses, setBusinesses] = useState<Business[]>([])
@@ -43,6 +47,8 @@ export default function BusinessSearch({
   const [showDropdown, setShowDropdown] = useState(false)
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [error, setError] = useState('')
+  const [editableBusinessName, setEditableBusinessName] = useState(value)
+  const [isEditingName, setIsEditingName] = useState(false)
 
   const debounceTimer = useRef<NodeJS.Timeout | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -134,9 +140,37 @@ export default function BusinessSearch({
   const handleBusinessSelect = (business: Business) => {
     setSelectedBusiness(business)
     setQuery(business.name)
+    setEditableBusinessName(business.name)
     setShowDropdown(false)
     onBusinessNameChange(business.name)
     onBusinessSelect(business)
+  }
+
+  // Handle business name editing
+  const handleBusinessNameEdit = (newName: string) => {
+    setEditableBusinessName(newName)
+    onBusinessNameChange(newName)
+  }
+
+  // Handle saving edited business name
+  const handleSaveEditedName = () => {
+    setQuery(editableBusinessName)
+    setIsEditingName(false)
+  }
+
+  // Handle canceling business name edit
+  const handleCancelEdit = () => {
+    setEditableBusinessName(selectedBusiness?.name || '')
+    setIsEditingName(false)
+  }
+
+  // Clear selected business
+  const handleClearSelection = () => {
+    setSelectedBusiness(null)
+    setQuery('')
+    setEditableBusinessName('')
+    onBusinessSelect(null)
+    onBusinessNameChange('')
   }
 
   // Handle manual entry (when user types business name but doesn't select from dropdown)
@@ -200,26 +234,134 @@ export default function BusinessSearch({
         <p className="text-xs text-red-600 mt-1">{error}</p>
       )}
 
-      {/* Selected business confirmation */}
+      {/* Selected business confirmation with editable name */}
       {selectedBusiness && (
         <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-start gap-3">
-            <MapPin className="h-4 w-4 text-green-600 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-green-900">{selectedBusiness.name}</p>
-              <p className="text-xs text-green-700">{selectedBusiness.address}</p>
-              {selectedBusiness.rating && (
-                <div className="flex items-center gap-1 mt-1">
-                  <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                  <span className="text-xs text-green-700">
-                    {selectedBusiness.rating.toFixed(1)} ({selectedBusiness.userRatingsTotal} reviews)
-                  </span>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3 flex-1">
+              <MapPin className="h-4 w-4 text-green-600 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-medium text-green-900">Selected: {selectedBusiness.name}</p>
                 </div>
-              )}
-              <p className="text-xs text-green-600 mt-1">
-                ✓ Google Reviews URL configured automatically
+                <p className="text-xs text-green-700">{selectedBusiness.address}</p>
+                {selectedBusiness.rating && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                    <span className="text-xs text-green-700">
+                      {selectedBusiness.rating.toFixed(1)} ({selectedBusiness.userRatingsTotal} reviews)
+                    </span>
+                  </div>
+                )}
+
+                {/* Editable Business Name Section */}
+                <div className="mt-3 p-2 bg-white border border-green-200 rounded">
+                  <div className="flex items-center justify-between mb-1">
+                    <Label className="text-xs font-medium text-green-800">Business name for SMS messages:</Label>
+                    {!isEditingName && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsEditingName(true)}
+                        className="h-6 px-2 text-xs text-green-600 hover:text-green-800"
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+
+                  {isEditingName ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={editableBusinessName}
+                        onChange={(e) => handleBusinessNameEdit(e.target.value)}
+                        className="text-sm"
+                        placeholder="Enter business name for SMS"
+                      />
+                      <div className="flex gap-1">
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleSaveEditedName}
+                          className="h-8 px-2 text-xs"
+                        >
+                          <Check className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleCancelEdit}
+                          className="h-8 px-2 text-xs"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-green-900 font-medium bg-green-50 px-2 py-1 rounded">
+                      "{editableBusinessName}"
+                    </p>
+                  )}
+                  <p className="text-xs text-green-600 mt-1">
+                    This is how your business name will appear in SMS messages to customers.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-green-600">
+                    ✓ Google Reviews URL configured automatically
+                  </p>
+                  {showTestLink && selectedBusiness.reviewUrl && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(selectedBusiness.reviewUrl, '_blank')}
+                      className="h-6 px-2 text-xs text-green-600 border-green-300 hover:bg-green-50"
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      Test Link
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleClearSelection}
+              className="h-6 w-6 p-0 text-green-600 hover:text-green-800 hover:bg-green-100"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Test current Google URL if no business selected but URL exists */}
+      {!selectedBusiness && showTestLink && currentGoogleUrl && (
+        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-blue-800 font-medium">Current Google Reviews URL</p>
+              <p className="text-xs text-blue-600 mt-1">
+                Test your current review link to make sure it works correctly.
               </p>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(currentGoogleUrl, '_blank')}
+              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Test Current Link
+            </Button>
           </div>
         </div>
       )}
