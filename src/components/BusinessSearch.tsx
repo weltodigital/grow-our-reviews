@@ -427,8 +427,7 @@ export default function BusinessSearch({
                 if (onManualEntry) {
                   onManualEntry()
                 }
-                // Keep the typed business name
-                inputRef.current?.focus()
+                // Don't refocus the input as it might interfere with manual URL input state
               }}
               className="w-full text-left p-2 rounded bg-white border border-green-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
             >

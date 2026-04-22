@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -41,6 +41,18 @@ export function BusinessInfoSettings({
   const [success, setSuccess] = useState('')
   const [showManualUrlInput, setShowManualUrlInput] = useState(false)
   const [manualGoogleUrl, setManualGoogleUrl] = useState(profile.google_review_url || '')
+
+  // Auto-focus the manual URL input when it opens
+  const manualUrlInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (showManualUrlInput && manualUrlInputRef.current) {
+      // Small delay to ensure the input is rendered
+      setTimeout(() => {
+        manualUrlInputRef.current?.focus()
+      }, 100)
+    }
+  }, [showManualUrlInput])
 
   // Check if there's an existing google review URL to determine initial state
   const currentGoogleUrl = profile.google_review_url
@@ -243,6 +255,7 @@ export function BusinessInfoSettings({
                       Google Reviews URL
                     </Label>
                     <Input
+                      ref={manualUrlInputRef}
                       id="manual-google-url"
                       type="url"
                       value={manualGoogleUrl}
