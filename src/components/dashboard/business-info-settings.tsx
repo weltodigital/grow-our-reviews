@@ -7,9 +7,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Building, ExternalLink, Save, HelpCircle, X } from 'lucide-react'
 import { updateBusinessInfo } from './settings-actions'
-import GoogleReviewGuide from '@/components/GoogleReviewGuide'
-import { GoogleUrlValidator } from '@/components/GoogleUrlValidator'
+import BusinessSearch from '@/components/BusinessSearch'
 import type { Database } from '@/types/database'
+
+interface Business {
+  placeId: string
+  name: string
+  address: string
+  rating?: number
+  userRatingsTotal?: number
+  types: string[]
+  reviewUrl: string
+}
 
 interface BusinessInfoSettingsProps {
   profile: Database['public']['Tables']['profiles']['Row']
@@ -23,26 +32,25 @@ export function BusinessInfoSettings({
   onSettingsSaved
 }: BusinessInfoSettingsProps) {
   const [businessName, setBusinessName] = useState(profile.business_name || '')
-  const [googleReviewUrl, setGoogleReviewUrl] = useState(profile.google_review_url || '')
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [phone, setPhone] = useState(profile.phone || '')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [showGuide, setShowGuide] = useState(false)
-  const [isUrlValid, setIsUrlValid] = useState(true) // Start optimistic
+
+  // Check if there's an existing google review URL to determine initial state
+  const currentGoogleUrl = profile.google_review_url
+  const newGoogleUrl = selectedBusiness?.reviewUrl || null
 
   const hasChanges =
     businessName !== (profile.business_name || '') ||
-    googleReviewUrl !== (profile.google_review_url || '') ||
+    newGoogleUrl !== currentGoogleUrl ||
     phone !== (profile.phone || '')
 
   const handleInputChange = (field: string, value: string) => {
     switch (field) {
       case 'businessName':
         setBusinessName(value)
-        break
-      case 'googleReviewUrl':
-        setGoogleReviewUrl(value)
         break
       case 'phone':
         setPhone(value)
@@ -57,15 +65,27 @@ export function BusinessInfoSettings({
     setSuccess('')
   }
 
+  const handleBusinessSelect = (business: Business | null) => {
+    setSelectedBusiness(business)
+    if (!hasChanges) {
+      onSettingsChange()
+    }
+    setError('')
+    setSuccess('')
+  }
+
+  const handleBusinessNameChange = (name: string) => {
+    setBusinessName(name)
+    if (!hasChanges) {
+      onSettingsChange()
+    }
+    setError('')
+    setSuccess('')
+  }
+
   const handleSave = async () => {
     if (!businessName.trim()) {
       setError('Business name is required')
-      return
-    }
-
-    // Check URL validation status
-    if (googleReviewUrl.trim() && !isUrlValid) {
-      setError('Please fix the Google Review URL before saving. Check the validation feedback above.')
       return
     }
 
@@ -75,7 +95,7 @@ export function BusinessInfoSettings({
     try {
       const result = await updateBusinessInfo({
         businessName: businessName.trim(),
-        googleReviewUrl: googleReviewUrl.trim() || null,
+        googleReviewUrl: newGoogleUrl,
         phone: phone.trim() || null,
       })
 
@@ -124,22 +144,42 @@ export function BusinessInfoSettings({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="businessName">Business Name *</Label>
-            <Input
-              id="businessName"
-              type="text"
-              value={businessName}
-              onChange={(e) => handleInputChange('businessName', e.target.value)}
-              placeholder="e.g. Smith Plumbing Services"
-              required
-            />
-            <p className="text-xs text-gray-500">
-              This appears in SMS messages to customers
-            </p>
-          </div>
+        <div className="space-y-6">
+          {/* Business Search */}
+          <BusinessSearch
+            value={businessName}
+            onBusinessSelect={handleBusinessSelect}
+            onBusinessNameChange={handleBusinessNameChange}
+            placeholder="Search for your business to update Google Reviews URL..."
+            label="Business Information"
+            helperText="Update your business name and automatically configure Google Reviews. This appears in SMS messages to customers."
+            required
+          />
 
+          {/* Current Google Review URL Status */}
+          {currentGoogleUrl && !selectedBusiness && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Current Google Reviews URL:</strong> Configured ✓
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Search for your business above to update it, or keep the current URL.
+              </p>
+            </div>
+          )}
+
+          {!currentGoogleUrl && !selectedBusiness && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800">
+                <strong>Google Reviews URL not configured</strong>
+              </p>
+              <p className="text-xs text-amber-600 mt-1">
+                Search for your business above to automatically set up Google Reviews, or you'll need to add this before sending review requests.
+              </p>
+            </div>
+          )}
+
+          {/* Phone Number */}
           <div className="space-y-2">
             <Label htmlFor="phone">Your Phone Number</Label>
             <Input
@@ -153,52 +193,6 @@ export function BusinessInfoSettings({
               Optional contact number for your business
             </p>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="googleReviewUrl">Google Review URL</Label>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowGuide(true)}
-              className="text-green-600 hover:text-green-700 p-1"
-            >
-              <HelpCircle className="h-4 w-4" />
-            </Button>
-          </div>
-          <Input
-            id="googleReviewUrl"
-            type="url"
-            value={googleReviewUrl}
-            onChange={(e) => handleInputChange('googleReviewUrl', e.target.value)}
-            placeholder="https://search.google.com/local/writereview?placeid=..."
-          />
-          <p className="text-xs text-gray-500">
-            Where customers go to leave public reviews. {!googleReviewUrl && <span className="text-orange-600">Required before sending review requests.</span>}
-          </p>
-
-          {/* URL Validation */}
-          {googleReviewUrl && (
-            <GoogleUrlValidator
-              url={googleReviewUrl}
-              autoValidate={true}
-              onValidationChange={(valid) => setIsUrlValid(valid)}
-            />
-          )}
-          {!googleReviewUrl && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowGuide(true)}
-              className="w-full sm:w-auto"
-            >
-              <HelpCircle className="h-4 w-4 mr-2" />
-              How do I find this?
-            </Button>
-          )}
         </div>
 
         {error && (
@@ -235,30 +229,6 @@ export function BusinessInfoSettings({
           </div>
         )}
 
-        {/* Guide Modal */}
-        {showGuide && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">How to Find Your Google Review Link</h2>
-                <button
-                  onClick={() => setShowGuide(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="px-6 py-4">
-                <GoogleReviewGuide showTitle={false} />
-              </div>
-              <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
-                <Button onClick={() => setShowGuide(false)} className="w-full sm:w-auto text-white">
-                  Got it, thanks!
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   )

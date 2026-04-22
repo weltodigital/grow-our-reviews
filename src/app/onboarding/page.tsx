@@ -4,18 +4,24 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import GoogleReviewGuide from '@/components/GoogleReviewGuide'
+import BusinessSearch from '@/components/BusinessSearch'
 import { completeOnboarding } from './actions'
+
+interface Business {
+  placeId: string
+  name: string
+  address: string
+  rating?: number
+  userRatingsTotal?: number
+  types: string[]
+  reviewUrl: string
+}
 
 export default function OnboardingPage() {
   const [businessName, setBusinessName] = useState('')
-  const [googleReviewUrl, setGoogleReviewUrl] = useState('')
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [showGuide, setShowGuide] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +32,7 @@ export default function OnboardingPage() {
     try {
       const result = await completeOnboarding({
         businessName: businessName.trim(),
-        googleReviewUrl: googleReviewUrl.trim() || null,
+        googleReviewUrl: selectedBusiness?.reviewUrl || null,
       })
 
       if (result.error) {
@@ -41,26 +47,12 @@ export default function OnboardingPage() {
     }
   }
 
-  const handleSkip = async () => {
-    setIsLoading(true)
-    setError('')
+  const handleBusinessSelect = (business: Business | null) => {
+    setSelectedBusiness(business)
+  }
 
-    try {
-      const result = await completeOnboarding({
-        businessName: businessName.trim(),
-        googleReviewUrl: null,
-      })
-
-      if (result.error) {
-        setError(result.error)
-      } else {
-        router.push('/billing/setup')
-      }
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
+  const handleBusinessNameChange = (name: string) => {
+    setBusinessName(name)
   }
 
   return (
@@ -81,65 +73,26 @@ export default function OnboardingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="businessName">Business Name *</Label>
-                <Input
-                  id="businessName"
-                  type="text"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="e.g. Smith Plumbing Services"
-                  required
-                  className="mt-1"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  This will appear in your SMS messages to customers
-                </p>
-              </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <BusinessSearch
+                value={businessName}
+                onBusinessSelect={handleBusinessSelect}
+                onBusinessNameChange={handleBusinessNameChange}
+                placeholder="e.g. Smith Plumbing Services, Bristol"
+                label="Find Your Business"
+                helperText="Search for your business to automatically set up Google Reviews. This will appear in your SMS messages."
+                required
+                disabled={isLoading}
+              />
 
-              <div>
-                <Label htmlFor="googleReviewUrl">Google Reviews URL</Label>
-                <Input
-                  id="googleReviewUrl"
-                  type="url"
-                  value={googleReviewUrl}
-                  onChange={(e) => setGoogleReviewUrl(e.target.value)}
-                  placeholder="https://search.google.com/local/writereview?placeid=..."
-                  className="mt-1"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Where customers will be sent to leave a review. You can add this later if you don't have it ready.
-                </p>
-
-                {/* Collapsible Guide */}
-                <div className="mt-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowGuide(!showGuide)}
-                    className="flex items-center gap-2 text-sm hover:underline"
-                    style={{ color: 'var(--accent)' }}
-                  >
-                    {showGuide ? (
-                      <>
-                        <ChevronUp className="h-4 w-4" />
-                        Hide guide
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-4 w-4" />
-                        How do I find this?
-                      </>
-                    )}
-                  </button>
-
-                  {showGuide && (
-                    <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <GoogleReviewGuide showTitle={false} className="text-sm" />
-                    </div>
-                  )}
+              {/* Show manual entry option if no business selected */}
+              {!selectedBusiness && businessName.trim() && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">
+                    <strong>Can't find your business?</strong> No problem! You can continue with "{businessName}" and add the Google Reviews URL later from your dashboard settings.
+                  </p>
                 </div>
-              </div>
+              )}
 
               {error && (
                 <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
@@ -153,22 +106,19 @@ export default function OnboardingPage() {
                   className="w-full"
                   disabled={isLoading || !businessName.trim()}
                 >
-                  {isLoading ? 'Setting up...' : 'Complete Setup'}
+                  {isLoading ? 'Setting up...' : (selectedBusiness ? 'Complete Setup' : 'Continue Setup')}
                 </Button>
 
-                {!googleReviewUrl.trim() && businessName.trim() && (
+                {!selectedBusiness && businessName.trim() && (
+                  <p className="text-xs text-gray-500 text-center">
+                    You can search for your business anytime from Settings to enable Google Reviews.
+                  </p>
+                )}
+
+                {selectedBusiness && (
                   <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={handleSkip}
-                      disabled={isLoading}
-                      className="text-sm hover:underline"
-                      style={{ color: 'var(--accent)' }}
-                    >
-                      Skip for now - I'll add this later
-                    </button>
-                    <p className="text-xs text-gray-500 mt-1">
-                      No problem — you can add this anytime from Settings. You'll need it before you can send your first review request.
+                    <p className="text-xs text-green-600">
+                      ✓ Google Reviews ready! Customers will be directed to leave reviews automatically.
                     </p>
                   </div>
                 )}
@@ -179,7 +129,7 @@ export default function OnboardingPage() {
 
         <div className="text-center">
           <p className="text-xs text-gray-500">
-            Having trouble finding your Google Reviews URL?{' '}
+            Can't find your business in the search?{' '}
             <a
               href="mailto:support@growourreviews.com"
               className="hover:underline"
