@@ -76,14 +76,30 @@ export default function BusinessSearch({
       const data = await response.json()
 
       if (!response.ok) {
+        console.error('Business search API error:', data)
+
+        // Show specific error messages to help with debugging
+        if (data.details) {
+          throw new Error(`${data.error}: ${data.details}`)
+        }
         throw new Error(data.error || 'Failed to search businesses')
       }
 
       setBusinesses(data.businesses || [])
       setShowDropdown(true)
+      setError('') // Clear any previous errors
     } catch (err: any) {
       console.error('Business search error:', err)
-      setError(err.message || 'Failed to search businesses')
+
+      // Show user-friendly error messages
+      let userMessage = err.message || 'Failed to search businesses'
+      if (err.message?.includes('API key')) {
+        userMessage = 'Business search temporarily unavailable. Please enter your business name manually.'
+      } else if (err.message?.includes('quota')) {
+        userMessage = 'Too many searches. Please wait a moment and try again.'
+      }
+
+      setError(userMessage)
       setBusinesses([])
       setShowDropdown(false)
     } finally {
