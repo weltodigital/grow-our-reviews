@@ -437,7 +437,7 @@ export default function BusinessSearch({
                 </div>
                 <div>
                   <p className="text-sm font-medium text-green-800">Continue with "{query.trim()}"</p>
-                  <p className="text-xs text-green-600">Add Google Reviews URL manually in next step</p>
+                  <p className="text-xs text-green-600">Get URL from business.google.com or Google search</p>
                 </div>
               </div>
             </button>
@@ -480,9 +480,12 @@ export default function BusinessSearch({
               Continue with Manual Entry
             </Button>
 
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              You'll need to add your Google Reviews URL manually
-            </p>
+            <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+              <p className="font-medium text-gray-700 mb-1">Next step:</p>
+              <p>You'll get your Google Reviews URL from:</p>
+              <p>• <strong>business.google.com</strong> → "Ask for reviews"</p>
+              <p>• Or Google search → "[Your Business] reviews"</p>
+            </div>
           </div>
         </div>
       )}

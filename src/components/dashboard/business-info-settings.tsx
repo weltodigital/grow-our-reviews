@@ -242,12 +242,53 @@ export function BusinessInfoSettings({
                 <p className="text-sm text-blue-800 font-medium mb-2">
                   {currentGoogleUrl ? 'Edit Google Reviews URL' : 'Manual Google Reviews URL'}
                 </p>
-                <p className="text-xs text-blue-600 mb-3">
+                <p className="text-xs text-blue-600 mb-4">
                   {currentGoogleUrl
                     ? 'Update your Google Reviews URL for businesses not found in search, or if your business details have changed.'
                     : 'Perfect for Service Area Businesses (SAB), tradesmen, and businesses not found in the search above.'
                   }
                 </p>
+
+                {/* Detailed Instructions */}
+                <div className="bg-white border border-blue-200 rounded-lg p-3 mb-4">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-3">How to get your Google Reviews URL:</h4>
+
+                  <div className="space-y-4">
+                    {/* Method 1: Google Business Profile Manager */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="flex-shrink-0 w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                        <h5 className="text-sm font-medium text-blue-900">Best Method: Google Business Profile Manager</h5>
+                      </div>
+                      <div className="ml-7 space-y-1">
+                        <p className="text-xs text-blue-700">• Log in to <strong>business.google.com</strong></p>
+                        <p className="text-xs text-blue-700">• Select your business</p>
+                        <p className="text-xs text-blue-700">• Click <strong>"Ask for reviews"</strong> or <strong>"Get more reviews"</strong></p>
+                        <p className="text-xs text-blue-700">• Copy the review link</p>
+                        <p className="text-xs text-green-700 font-medium">✓ Example: https://g.page/r/CVehmWDUl4kvEBM/review</p>
+                      </div>
+                    </div>
+
+                    {/* Method 2: Google Search */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                        <h5 className="text-sm font-medium text-blue-900">Alternative: Google Search</h5>
+                      </div>
+                      <div className="ml-7 space-y-1">
+                        <p className="text-xs text-blue-700">• Search Google for: <strong>"[Your Business Name] reviews"</strong></p>
+                        <p className="text-xs text-blue-700">• Click on your business listing</p>
+                        <p className="text-xs text-blue-700">• Click on the <strong>"Reviews"</strong> tab</p>
+                        <p className="text-xs text-blue-700">• Copy the URL from the address bar</p>
+                        <p className="text-xs text-blue-700 italic">Example: google.com/search?q=[YourBusiness]+reviews</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
+                    <strong>💡 Tip:</strong> Method 1 gives you a shorter, cleaner URL that's easier to manage and looks more professional in SMS messages.
+                  </div>
+                </div>
 
                 <div className="space-y-3">
                   <div>
@@ -267,11 +308,11 @@ export function BusinessInfoSettings({
                         setError('')
                         setSuccess('')
                       }}
-                      placeholder="https://search.google.com/local/writereview?placeid=..."
+                      placeholder="https://g.page/r/CVehmWDUl4kvEBM/review or https://www.google.com/search?q=..."
                       className="text-sm"
                     />
                     <p className="text-xs text-blue-600 mt-1">
-                      Get this from your Google Business Profile under "Get more reviews"
+                      Paste either type of URL from the instructions above
                     </p>
                   </div>
 
