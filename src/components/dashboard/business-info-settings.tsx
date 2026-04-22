@@ -285,9 +285,6 @@ export function BusinessInfoSettings({
                     </div>
                   </div>
 
-                  <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
-                    <strong>💡 Tip:</strong> Method 1 gives you a shorter, cleaner URL that's easier to manage and looks more professional in SMS messages.
-                  </div>
                 </div>
 
                 <div className="space-y-3">
