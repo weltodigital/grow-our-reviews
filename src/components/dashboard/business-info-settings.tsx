@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +32,7 @@ export function BusinessInfoSettings({
   onSettingsChange,
   onSettingsSaved
 }: BusinessInfoSettingsProps) {
+  const router = useRouter()
   const [businessName, setBusinessName] = useState(profile.business_name || '')
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [phone, setPhone] = useState(profile.phone || '')
@@ -104,6 +106,8 @@ export function BusinessInfoSettings({
       } else {
         setSuccess('Business information updated successfully!')
         onSettingsSaved()
+        // Refresh the router to update the layout with new business name
+        router.refresh()
         setTimeout(() => setSuccess(''), 3000)
       }
     } catch (err) {
@@ -214,7 +218,7 @@ export function BusinessInfoSettings({
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto !text-black"
             >
               {isSaving ? (
                 <>
