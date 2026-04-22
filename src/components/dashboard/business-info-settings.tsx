@@ -71,6 +71,9 @@ export function BusinessInfoSettings({
 
   const handleBusinessSelect = (business: Business | null) => {
     setSelectedBusiness(business)
+    // Clear manual URL input when business is selected
+    setShowManualUrlInput(false)
+    setManualGoogleUrl('')
     if (!hasChanges) {
       onSettingsChange()
     }
@@ -165,14 +168,30 @@ export function BusinessInfoSettings({
           />
 
           {/* Current Google Review URL Status */}
-          {currentGoogleUrl && !selectedBusiness && (
+          {currentGoogleUrl && !selectedBusiness && !showManualUrlInput && (
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Current Google Reviews URL:</strong> Configured ✓
-              </p>
-              <p className="text-xs text-blue-600 mt-1">
-                Search for your business above to update it, or keep the current URL.
-              </p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm text-blue-800">
+                    <strong>Current Google Reviews URL:</strong> Configured ✓
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Search for your business above to update it automatically, or edit the URL manually below.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowManualUrlInput(true)
+                    setManualGoogleUrl(currentGoogleUrl || '')
+                  }}
+                  className="ml-3 text-blue-600 border-blue-300 hover:bg-blue-50"
+                >
+                  Edit Manually
+                </Button>
+              </div>
             </div>
           )}
 
@@ -204,9 +223,14 @@ export function BusinessInfoSettings({
           {showManualUrlInput && !selectedBusiness && (
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 font-medium mb-2">Manual Google Reviews URL</p>
+                <p className="text-sm text-blue-800 font-medium mb-2">
+                  {currentGoogleUrl ? 'Edit Google Reviews URL' : 'Manual Google Reviews URL'}
+                </p>
                 <p className="text-xs text-blue-600 mb-3">
-                  Perfect for Service Area Businesses (SAB), tradesmen, and businesses not found in the search above.
+                  {currentGoogleUrl
+                    ? 'Update your Google Reviews URL for businesses not found in search, or if your business details have changed.'
+                    : 'Perfect for Service Area Businesses (SAB), tradesmen, and businesses not found in the search above.'
+                  }
                 </p>
 
                 <div className="space-y-3">
@@ -253,7 +277,8 @@ export function BusinessInfoSettings({
                       size="sm"
                       onClick={() => {
                         setShowManualUrlInput(false)
-                        setManualGoogleUrl('')
+                        // Reset to original URL if editing, or clear if adding new
+                        setManualGoogleUrl(currentGoogleUrl || '')
                       }}
                       className="text-gray-600 hover:text-gray-800"
                     >
