@@ -54,7 +54,7 @@ export async function updateBusinessInfo(data: BusinessInfoData) {
       new URL(data.googleReviewUrl)
 
       // Basic Google domain validation
-      const googleDomains = ['google.com', 'maps.google.com', 'search.google.com', 'goo.gl']
+      const googleDomains = ['google.com', 'maps.google.com', 'search.google.com', 'goo.gl', 'g.page']
       const url = new URL(data.googleReviewUrl)
       const isGoogleDomain = googleDomains.some(domain =>
         url.hostname === domain || url.hostname.endsWith('.' + domain)
