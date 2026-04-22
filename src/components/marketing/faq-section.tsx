@@ -25,7 +25,7 @@ export function FaqSection() {
     },
     {
       question: 'Do I need any technical knowledge?',
-      answer: 'None whatsoever. If you can send a text message, you can use Grow Our Reviews. Setup takes 2 minutes - just enter your business name and Google Reviews URL. Everything else is automated.'
+      answer: 'None whatsoever. If you can send a text message, you can use Grow Our Reviews. Setup takes 2 minutes - just search for your business name and we\'ll find your Google Reviews link automatically. Everything else is automated.'
     },
     {
       question: 'Can I cancel anytime?',

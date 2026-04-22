@@ -40,7 +40,7 @@ export default function GoogleReviewLinkHelpPage() {
 
         {/* Back to Settings */}
         <div className="mt-8 text-center">
-          <Button asChild>
+          <Button asChild className="!text-black">
             <Link href="/dashboard/settings">
               Go to Settings to Add Your Link
             </Link>
