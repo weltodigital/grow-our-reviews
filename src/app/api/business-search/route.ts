@@ -21,14 +21,9 @@ export async function GET(request: NextRequest) {
 
     const requestBody = {
       textQuery: query,
-      maxResultCount: 10,
-      includedType: 'establishment',
-      locationBias: {
-        circle: {
-          center: { latitude: 51.5074, longitude: -0.1278 }, // London center - adjust if needed
-          radius: 50000 // 50km radius
-        }
-      }
+      maxResultCount: 10
+      // Remove locationBias for now to avoid potential issues
+      // Can add back later if needed for location-specific searches
     }
 
     const response = await fetch(url, {
@@ -36,7 +31,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.types,places.googleMapsUri'
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.types'
       },
       body: JSON.stringify(requestBody)
     })
