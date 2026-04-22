@@ -90,6 +90,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/feedback') ||
     pathname.startsWith('/api/emails/') ||
     pathname.startsWith('/api/test-') ||
+    pathname.startsWith('/api/business-search') ||
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt'
 
