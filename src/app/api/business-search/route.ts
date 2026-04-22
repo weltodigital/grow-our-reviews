@@ -36,14 +36,17 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify(requestBody)
     })
 
+    const data = await response.json()
+
     if (!response.ok) {
       console.error('Google Places API HTTP error:', response.status, response.statusText)
+      console.error('Google Places API error response:', data)
       return NextResponse.json({
-        error: `Google Places API error: ${response.status} ${response.statusText}`
+        error: `Google Places API error: ${response.status} ${response.statusText}`,
+        details: data.error?.message || JSON.stringify(data)
       }, { status: 500 })
     }
 
-    const data = await response.json()
     console.log('Google Places API (New) response:', { places: data.places?.length })
 
     // The new API doesn't return a status field like the old one
