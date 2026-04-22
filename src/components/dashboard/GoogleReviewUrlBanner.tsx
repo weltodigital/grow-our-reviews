@@ -34,7 +34,7 @@ export default function GoogleReviewUrlBanner({ profile }: GoogleReviewUrlBanner
                 You need to add your Google Review link so we know where to send your happy customers. It takes about 60 seconds.
               </p>
               <div className="mt-3 flex flex-col sm:flex-row sm:space-x-3 space-y-2 sm:space-y-0">
-                <Button size="sm" asChild className="">
+                <Button size="sm" asChild className="!text-black">
                   <a href="/dashboard/settings">Add Google Review Link</a>
                 </Button>
                 <button
@@ -67,7 +67,7 @@ export default function GoogleReviewUrlBanner({ profile }: GoogleReviewUrlBanner
               <GoogleReviewGuide showTitle={false} />
             </div>
             <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
-              <Button onClick={() => setShowGuide(false)} className="w-full sm:w-auto">
+              <Button onClick={() => setShowGuide(false)} className="w-full sm:w-auto !text-black">
                 Got it, thanks!
               </Button>
             </div>

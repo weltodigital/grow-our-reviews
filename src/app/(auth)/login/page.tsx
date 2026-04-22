@@ -203,7 +203,7 @@ export default function LoginPage() {
               {resendMessage}
             </div>
           )}
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full !text-black" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>

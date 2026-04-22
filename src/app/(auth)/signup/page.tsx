@@ -252,7 +252,7 @@ export default function SignUpPage() {
               {successMessage}
             </div>
           )}
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full !text-black" disabled={isLoading}>
             {isLoading ? 'Creating account...' : 'Start free trial'}
           </Button>
         </form>
