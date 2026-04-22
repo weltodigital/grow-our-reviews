@@ -39,10 +39,12 @@ export function BusinessInfoSettings({
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showManualUrlInput, setShowManualUrlInput] = useState(false)
+  const [manualGoogleUrl, setManualGoogleUrl] = useState(profile.google_review_url || '')
 
   // Check if there's an existing google review URL to determine initial state
   const currentGoogleUrl = profile.google_review_url
-  const newGoogleUrl = selectedBusiness?.reviewUrl || null
+  const newGoogleUrl = selectedBusiness?.reviewUrl || (showManualUrlInput ? manualGoogleUrl : null)
 
   const hasChanges =
     businessName !== (profile.business_name || '') ||
@@ -174,14 +176,92 @@ export function BusinessInfoSettings({
             </div>
           )}
 
-          {!currentGoogleUrl && !selectedBusiness && (
+          {!currentGoogleUrl && !selectedBusiness && !showManualUrlInput && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
-                <strong>Google Reviews URL not configured</strong>
-              </p>
-              <p className="text-xs text-amber-600 mt-1">
-                Search for your business above to automatically set up Google Reviews, or you'll need to add this before sending review requests.
-              </p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm text-amber-800">
+                    <strong>Google Reviews URL not configured</strong>
+                  </p>
+                  <p className="text-xs text-amber-600 mt-1">
+                    Search for your business above to automatically set up Google Reviews, or add it manually below.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowManualUrlInput(true)}
+                  className="ml-3 text-amber-600 border-amber-300 hover:bg-amber-50"
+                >
+                  Add Manually
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Manual Google URL Input */}
+          {showManualUrlInput && !selectedBusiness && (
+            <div className="space-y-4">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800 font-medium mb-2">Manual Google Reviews URL</p>
+                <p className="text-xs text-blue-600 mb-3">
+                  Perfect for Service Area Businesses (SAB), tradesmen, and businesses not found in the search above.
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="manual-google-url" className="text-xs font-medium text-blue-800">
+                      Google Reviews URL
+                    </Label>
+                    <Input
+                      id="manual-google-url"
+                      type="url"
+                      value={manualGoogleUrl}
+                      onChange={(e) => {
+                        setManualGoogleUrl(e.target.value)
+                        if (!hasChanges) {
+                          onSettingsChange()
+                        }
+                        setError('')
+                        setSuccess('')
+                      }}
+                      placeholder="https://search.google.com/local/writereview?placeid=..."
+                      className="text-sm"
+                    />
+                    <p className="text-xs text-blue-600 mt-1">
+                      Get this from your Google Business Profile under "Get more reviews"
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    {manualGoogleUrl && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(manualGoogleUrl, '_blank')}
+                        className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                      >
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Test URL
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowManualUrlInput(false)
+                        setManualGoogleUrl('')
+                      }}
+                      className="text-gray-600 hover:text-gray-800"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

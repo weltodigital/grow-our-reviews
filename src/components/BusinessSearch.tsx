@@ -414,13 +414,45 @@ export default function BusinessSearch({
         </div>
       )}
 
-      {/* No results message */}
+      {/* No results message with manual entry option */}
       {showDropdown && businesses.length === 0 && query.trim().length > 2 && !isLoading && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 text-center">
-          <p className="text-sm text-gray-600">No businesses found for "{query.trim()}"</p>
-          <p className="text-xs text-gray-500 mt-1">
-            Try searching with just the business name or location
-          </p>
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+          <div className="text-center mb-3">
+            <p className="text-sm text-gray-600">No businesses found for "{query.trim()}"</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Try searching with different terms, or use manual entry below
+            </p>
+          </div>
+
+          <div className="border-t pt-3">
+            <p className="text-xs font-medium text-gray-700 mb-2">
+              Can't find your business? This often happens with:
+            </p>
+            <ul className="text-xs text-gray-600 space-y-1 mb-3">
+              <li>• Service-area businesses (SAB) like tradesmen</li>
+              <li>• Home-based businesses</li>
+              <li>• New businesses not yet indexed</li>
+              <li>• Businesses with different names in Google</li>
+            </ul>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setShowDropdown(false)
+                // Focus back to input for manual entry
+                inputRef.current?.focus()
+              }}
+              className="w-full text-green-600 border-green-300 hover:bg-green-50"
+            >
+              Continue with Manual Entry
+            </Button>
+
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              You'll need to add your Google Reviews URL manually
+            </p>
+          </div>
         </div>
       )}
     </div>
