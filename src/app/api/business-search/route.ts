@@ -14,12 +14,32 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Google Places API key not configured' }, { status: 500 })
     }
 
-    // Use Google Places API Text Search to find businesses
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`
+    // Use the NEW Google Places API Text Search
+    const url = 'https://places.googleapis.com/v1/places:searchText'
 
-    console.log('Making request to Google Places API:', { query, url: url.replace(apiKey, '***') })
+    console.log('Making request to Google Places API (New):', { query })
 
-    const response = await fetch(url)
+    const requestBody = {
+      textQuery: query,
+      maxResultCount: 10,
+      includedType: 'establishment',
+      locationBias: {
+        circle: {
+          center: { latitude: 51.5074, longitude: -0.1278 }, // London center - adjust if needed
+          radius: 50000 // 50km radius
+        }
+      }
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.types,places.googleMapsUri'
+      },
+      body: JSON.stringify(requestBody)
+    })
 
     if (!response.ok) {
       console.error('Google Places API HTTP error:', response.status, response.statusText)
@@ -29,37 +49,36 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('Google Places API response:', { status: data.status, resultsCount: data.results?.length })
+    console.log('Google Places API (New) response:', { places: data.places?.length })
 
-    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      console.error('Google Places API error:', data.status, data.error_message)
+    // The new API doesn't return a status field like the old one
+    // Instead, check if we got places data or error
+    if (data.error) {
+      console.error('Google Places API error:', data.error)
 
-      // Provide specific error messages based on status
       let errorMessage = 'Failed to search businesses'
-      if (data.status === 'REQUEST_DENIED') {
+      if (data.error.code === 403) {
         errorMessage = 'Google Places API access denied. Please check API key and permissions.'
-      } else if (data.status === 'OVER_QUERY_LIMIT') {
+      } else if (data.error.code === 429) {
         errorMessage = 'Google Places API quota exceeded. Please try again later.'
-      } else if (data.status === 'INVALID_REQUEST') {
-        errorMessage = 'Invalid search query. Please try different keywords.'
       }
 
       return NextResponse.json({
         error: errorMessage,
-        details: data.error_message || data.status
+        details: data.error.message
       }, { status: 500 })
     }
 
     // Transform the results to a simpler format
-    const businesses = data.results?.map((place: any) => ({
-      placeId: place.place_id,
-      name: place.name,
-      address: place.formatted_address,
+    const businesses = data.places?.map((place: any) => ({
+      placeId: place.id,
+      name: place.displayName?.text || place.displayName,
+      address: place.formattedAddress,
       rating: place.rating,
-      userRatingsTotal: place.user_ratings_total,
-      types: place.types,
-      // Generate the direct review URL
-      reviewUrl: `https://search.google.com/local/writereview?placeid=${place.place_id}`
+      userRatingsTotal: place.userRatingCount,
+      types: place.types || [],
+      // Generate the direct review URL using the place ID
+      reviewUrl: `https://search.google.com/local/writereview?placeid=${place.id}`
     })) || []
 
     return NextResponse.json({ businesses })

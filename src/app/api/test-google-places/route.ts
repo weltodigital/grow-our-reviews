@@ -15,13 +15,28 @@ export async function GET() {
       })
     }
 
-    // Test with a simple known business
+    // Test with a simple known business using NEW API
     const testQuery = 'McDonald\'s London'
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(testQuery)}&key=${apiKey}`
+    const url = 'https://places.googleapis.com/v1/places:searchText'
 
-    console.log('Testing Google Places API with query:', testQuery)
+    console.log('Testing Google Places API (New) with query:', testQuery)
 
-    const response = await fetch(url)
+    const requestBody = {
+      textQuery: testQuery,
+      maxResultCount: 1,
+      includedType: 'restaurant'
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress'
+      },
+      body: JSON.stringify(requestBody)
+    })
+
     const data = await response.json()
 
     return NextResponse.json({
@@ -29,27 +44,30 @@ export async function GET() {
       apiKeyConfigured: true,
       apiKeyLength: apiKey.length,
       apiKeyPrefix: apiKey.substring(0, 8) + '...',
+      usingNewAPI: true,
       googleResponse: {
-        status: data.status,
-        error_message: data.error_message,
-        resultsCount: data.results?.length || 0,
-        sampleResult: data.results?.[0] ? {
-          name: data.results[0].name,
-          place_id: data.results[0].place_id,
-          formatted_address: data.results[0].formatted_address
+        httpStatus: response.status,
+        error: data.error,
+        resultsCount: data.places?.length || 0,
+        sampleResult: data.places?.[0] ? {
+          name: data.places[0].displayName?.text || data.places[0].displayName,
+          place_id: data.places[0].id,
+          formatted_address: data.places[0].formattedAddress
         } : null
       },
       troubleshooting: {
+        apiUpgrade: 'Now using Places API (New) instead of legacy API',
         commonIssues: [
-          'REQUEST_DENIED: API key lacks permissions or Places API not enabled',
-          'OVER_QUERY_LIMIT: Billing not set up or daily quota exceeded',
-          'INVALID_REQUEST: API request format incorrect'
+          'HTTP 403: API key lacks permissions or Places API (New) not enabled',
+          'HTTP 429: Billing not set up or daily quota exceeded',
+          'HTTP 400: Invalid request format'
         ],
         nextSteps: [
           '1. Go to Google Cloud Console: https://console.cloud.google.com',
-          '2. Enable "Places API (New)" in APIs & Services',
-          '3. Set up billing if not already done',
-          '4. Check API key restrictions in Credentials section'
+          '2. Enable "Places API (New)" (not the old Places API)',
+          '3. Set up billing (required for Places API New)',
+          '4. Check API key restrictions in Credentials section',
+          '5. Ensure your API key has Places API (New) in allowed APIs'
         ]
       }
     })
