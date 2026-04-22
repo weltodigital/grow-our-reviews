@@ -265,7 +265,7 @@ export function BusinessInfoSettings({
                         <p className="text-xs text-blue-700">• Select your business</p>
                         <p className="text-xs text-blue-700">• Click <strong>"Ask for reviews"</strong> or <strong>"Get more reviews"</strong></p>
                         <p className="text-xs text-blue-700">• Copy the review link</p>
-                        <p className="text-xs text-green-700 font-medium">✓ Example: https://g.page/r/CVehmWDUl4kvEBM/review</p>
+                        <p className="text-xs text-green-700 font-medium">✓ Example: https://g.page/r/[your-place-id]/review</p>
                       </div>
                     </div>
 
@@ -308,7 +308,7 @@ export function BusinessInfoSettings({
                         setError('')
                         setSuccess('')
                       }}
-                      placeholder="https://g.page/r/CVehmWDUl4kvEBM/review or https://www.google.com/search?q=..."
+                      placeholder="https://g.page/r/[your-place-id]/review or https://www.google.com/search?q=..."
                       className="text-sm"
                     />
                     <p className="text-xs text-blue-600 mt-1">
