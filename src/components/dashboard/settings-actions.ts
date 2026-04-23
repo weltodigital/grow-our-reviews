@@ -265,7 +265,7 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
   // Validate total message length (simulate with common values and shorter tokens)
   const testCustomerName = 'Christopher'
   const testBusinessName = 'Professional Services Ltd'
-  const testUrl = 'https://app.growourreviews.com/review/00eaf91e9edf4664af0c9695a483c64f'  // 32-char token (actual length)
+  const testUrl = 'https://app.growourreviews.com/review/abc123def456ghi789jk'  // 32-char token (actual length)
 
   const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, testBusinessName)
 

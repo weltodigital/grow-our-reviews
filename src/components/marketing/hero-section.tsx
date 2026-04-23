@@ -87,7 +87,7 @@ export function HeroSection() {
                       <div className="text-sm p-3 rounded-2xl rounded-bl-md max-w-[90%] break-words" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-text)' }}>
                         Hi Sarah, thanks for choosing Smith Plumbing!<br />
                         We'd love your feedback 👇<br />
-                        <span className="underline break-all" style={{ color: 'var(--accent-dark)' }}>https://app.growourreviews.com/review/a1b2c3d4e5f</span>
+                        <span className="underline break-all" style={{ color: 'var(--accent-dark)' }}>https://app.growourreviews.com/review/abc123def456</span>
                       </div>
                     </div>
                   </div>
