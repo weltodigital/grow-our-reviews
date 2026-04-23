@@ -82,7 +82,7 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
           Follow-up Nudges
         </CardTitle>
         <CardDescription>
-          Automatically send a gentle reminder if customers don't respond to your initial review request
+          Automatically send a gentle reminder if customers don't click the link in your initial review request
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -91,7 +91,7 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
           <div>
             <div className="font-medium">Send follow-up nudges</div>
             <div className="text-sm text-gray-500">
-              Send a gentle reminder if no response after the delay period
+              Send a gentle reminder if the customer hasn't clicked the review link after the delay period
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -185,7 +185,7 @@ export function NudgeSettings({ initialSettings, onSave }: NudgeSettingsProps) {
         <div className="text-xs text-gray-500 space-y-1">
           <p>• <strong>Each nudge uses 1 message credit</strong> from your monthly allowance</p>
           <p>• Nudges are only sent once per review request</p>
-          <p>• No nudges sent if customer already clicked or responded</p>
+          <p>• No nudges sent if customer already clicked the review link</p>
           <p>• Nudges respect the same time restrictions (no SMS 9pm-8am)</p>
         </div>
       </CardContent>
