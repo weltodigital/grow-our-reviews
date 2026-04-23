@@ -69,9 +69,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Apply search filter (search in customer name)
-    if (search) {
-      query = query.ilike('customers.name', `%${search}%`)
-    }
+    // Note: Temporarily disabled to isolate API issues
+    // if (search) {
+    //   query = query.ilike('customers.name', `%${search}%`)
+    // }
 
     const { data: requests, error, count } = await query
 
