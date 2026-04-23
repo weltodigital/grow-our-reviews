@@ -68,9 +68,9 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status)
     }
 
-    // Apply search filter (search in customer name and phone)
+    // Apply search filter (search in customer name)
     if (search) {
-      query = query.or(`customers.name.ilike.%${search}%,customers.phone.ilike.%${search}%`)
+      query = query.ilike('customers.name', `%${search}%`)
     }
 
     const { data: requests, error, count } = await query
