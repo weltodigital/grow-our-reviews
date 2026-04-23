@@ -32,7 +32,6 @@ export interface ReviewRequest {
 
 export default function RequestsPage() {
   const [requests, setRequests] = useState<ReviewRequest[]>([])
-  const [filteredRequests, setFilteredRequests] = useState<ReviewRequest[]>([])
   const [statusCounts, setStatusCounts] = useState({
     all: 0,
     scheduled: 0,
@@ -44,6 +43,8 @@ export default function RequestsPage() {
     failed: 0,
     suppressed: 0,
   })
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -77,7 +78,8 @@ export default function RequestsPage() {
 
         const data = await response.json()
         setRequests(data.requests || [])
-        setFilteredRequests(data.requests || [])
+        setTotalPages(data.totalPages || 1)
+        setTotalCount(data.total || 0)
         setStatusCounts(data.statusCounts || {
           all: 0,
           scheduled: 0,
@@ -99,36 +101,14 @@ export default function RequestsPage() {
     fetchRequests()
   }, [currentPage, statusFilter, searchTerm])
 
-  // Filter and search logic
+  // Reset to first page when filters change
   useEffect(() => {
-    let filtered = requests
-
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(request => request.status === statusFilter)
-    }
-
-    // Apply search filter
-    if (searchTerm.trim()) {
-      const search = searchTerm.toLowerCase().trim()
-      filtered = filtered.filter(request =>
-        request.customer_name.toLowerCase().includes(search) ||
-        request.customer_phone.includes(search)
-      )
-    }
-
-    setFilteredRequests(filtered)
-    setCurrentPage(1) // Reset to first page when filters change
-  }, [requests, statusFilter, searchTerm])
-
-  // Pagination
-  const totalPages = Math.ceil(filteredRequests.length / requestsPerPage)
-  const startIndex = (currentPage - 1) * requestsPerPage
-  const paginatedRequests = filteredRequests.slice(startIndex, startIndex + requestsPerPage)
+    setCurrentPage(1)
+  }, [statusFilter, searchTerm])
 
   const handleExport = () => {
     const { exportToCSV, formatRequestsForExport } = require('@/lib/export')
-    const dataToExport = formatRequestsForExport(filteredRequests)
+    const dataToExport = formatRequestsForExport(requests)
     exportToCSV(dataToExport, 'review-requests')
   }
 
@@ -273,13 +253,13 @@ export default function RequestsPage() {
 
           {/* Results summary */}
           <div className="text-sm text-gray-600">
-            Showing {paginatedRequests.length} of {filteredRequests.length} requests
+            Showing {requests.length} of {totalCount} requests {totalPages > 1 && `(page ${currentPage} of ${totalPages})`}
           </div>
         </CardContent>
       </Card>
 
       {/* Requests Table or Empty State */}
-      {filteredRequests.length === 0 ? (
+      {requests.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
             <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -318,7 +298,7 @@ export default function RequestsPage() {
         </Card>
       ) : (
         <RequestsTable
-          requests={paginatedRequests}
+          requests={requests}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
@@ -347,7 +327,8 @@ export default function RequestsPage() {
 
                 const data = await response.json()
                 setRequests(data.requests || [])
-                setFilteredRequests(data.requests || [])
+                setTotalPages(data.totalPages || 1)
+                setTotalCount(data.total || 0)
                 setStatusCounts(data.statusCounts || {
                   all: 0,
                   scheduled: 0,
