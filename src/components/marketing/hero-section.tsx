@@ -89,7 +89,7 @@ export function HeroSection() {
                         <br />
                         We'd love your feedback 👇<br />
                         <br />
-                        <span className="underline break-all" style={{ color: 'var(--accent-dark)' }}>https://growourreviews.com/review/a1b2c3d4e5f6</span>
+                        <span className="underline break-all" style={{ color: 'var(--accent-dark)' }}>https://app.growourreviews.com/review/a1b2c3d4e5f</span>
                       </div>
                     </div>
                   </div>

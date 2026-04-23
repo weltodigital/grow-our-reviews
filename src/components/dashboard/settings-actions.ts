@@ -265,15 +265,15 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
   // Validate total message length (simulate with common values and shorter tokens)
   const testCustomerName = 'Christopher'
   const testBusinessName = 'Professional Services Ltd'
-  const testUrl = 'https://growourreviews.com/review/a1b2c3d4e5f6'  // 12-char token (shorter)
+  const testUrl = 'https://app.growourreviews.com/review/00eaf91e9edf4664af0c9695a483c64f'  // 32-char token (actual length)
 
   const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, testBusinessName)
 
   // Calculate message length based on type
   let testMessage = ''
   if (data.type === 'nudge') {
-    // Nudge format: {greeting} {customer_name}, just a quick reminder — would you mind leaving us a review:
-    testMessage = `${data.greeting} ${testCustomerName}, just a quick reminder — would you mind leaving us a review:\n\n${testUrl}`
+    // Nudge format: {greeting} {customer_name}, {request_line}: {url}
+    testMessage = `${data.greeting} ${testCustomerName}, ${data.request_line}: ${testUrl}`
     if (data.sign_off?.trim()) {
       testMessage += `\n\n${data.sign_off}`
     }

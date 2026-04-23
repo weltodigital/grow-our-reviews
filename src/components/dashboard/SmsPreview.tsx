@@ -27,7 +27,7 @@ export default function SmsPreview({
     if (templateType === 'nudge') {
       // Nudge format: {greeting} {customer_name}, {requestLine}: {link}
       const messageLines = []
-      messageLines.push(`${greeting} ${customerName}, ${requestLine}: https://growourreviews.com/review/a1b2c3d4e5f6`)
+      messageLines.push(`${greeting} ${customerName}, ${requestLine}: https://app.growourreviews.com/review/00eaf91e9edf4664af0c9695a483c64f`)
 
       if (signOff && signOff.trim()) {
         messageLines.push('')
@@ -42,7 +42,7 @@ export default function SmsPreview({
       messageLines.push('')
       messageLines.push(`${requestLine}:`)
       messageLines.push('')
-      messageLines.push('https://growourreviews.com/review/a1b2c3d4e5f6')
+      messageLines.push('https://app.growourreviews.com/review/00eaf91e9edf4664af0c9695a483c64f')
 
       if (signOff && signOff.trim()) {
         messageLines.push('')
