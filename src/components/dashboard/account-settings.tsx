@@ -241,7 +241,7 @@ export function AccountSettings({
                 <Button
                   onClick={handleUpgrade}
                   disabled={isUpgrading}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-green-600 hover:bg-green-700 !text-black"
                 >
                   {isUpgrading ? (
                     <>

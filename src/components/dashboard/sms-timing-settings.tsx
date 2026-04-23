@@ -186,7 +186,7 @@ export function SmsTimingSettings({
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto !text-black"
             >
               {isSaving ? (
                 <>

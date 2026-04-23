@@ -257,7 +257,7 @@ export default function SmsTemplateEditor({
                   <Button
                     onClick={saveInitialTemplate}
                     disabled={isInitialSaving}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto !text-black"
                   >
                     {isInitialSaving ? (
                       <>
@@ -365,7 +365,7 @@ export default function SmsTemplateEditor({
                   <Button
                     onClick={saveNudgeTemplate}
                     disabled={isNudgeSaving}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto !text-black"
                   >
                     {isNudgeSaving ? (
                       <>

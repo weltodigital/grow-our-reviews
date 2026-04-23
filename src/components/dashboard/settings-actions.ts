@@ -242,12 +242,15 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
     return { error: 'Greeting must be 20 characters or less' }
   }
 
-  if (!data.opening_line.trim()) {
-    return { error: 'Opening line is required' }
-  }
+  // Opening line is only required for initial templates, not nudge templates
+  if (data.type === 'initial') {
+    if (!data.opening_line.trim()) {
+      return { error: 'Opening line is required' }
+    }
 
-  if (data.opening_line.length > 150) {
-    return { error: 'Opening line must be 150 characters or less' }
+    if (data.opening_line.length > 150) {
+      return { error: 'Opening line must be 150 characters or less' }
+    }
   }
 
   if (!data.request_line.trim()) {
