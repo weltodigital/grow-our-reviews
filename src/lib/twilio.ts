@@ -35,7 +35,6 @@ export interface MessageData {
 
 export function createInitialReviewMessage({ customerName, businessName, sentimentGateUrl }: SMSTemplate): string {
   return `Hi ${customerName}, thanks for choosing ${businessName}! If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds:
-
 ${sentimentGateUrl}`
 }
 
@@ -57,9 +56,7 @@ export function createCustomInitialMessage({ customerName, businessName, sentime
 
   // Format: {greeting} {customer_name}, {opening_line}
   messageParts.push(`${template.greeting} ${customerName}, ${processedOpeningLine}`)
-  messageParts.push('')
   messageParts.push(`${template.request_line}:`)
-  messageParts.push('')
   messageParts.push(sentimentGateUrl)
 
   // Add sign-off if provided
@@ -85,7 +82,6 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
 
   // Format: {greeting} {customer_name}, {request_line}
   messageParts.push(`${template.greeting} ${customerName}, ${processedRequestLine}`)
-  messageParts.push('')
   messageParts.push(sentimentGateUrl)
 
   // Add sign-off if provided

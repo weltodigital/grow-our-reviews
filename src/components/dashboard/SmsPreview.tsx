@@ -39,9 +39,7 @@ export default function SmsPreview({
       // Initial format: {greeting} {customer_name}, {opening_line}
       const messageLines = []
       messageLines.push(`${greeting} ${customerName}, ${processedOpeningLine}`)
-      messageLines.push('')
       messageLines.push(`${requestLine}:`)
-      messageLines.push('')
       messageLines.push('https://app.growourreviews.com/review/00eaf91e9edf4664af0c9695a483c64f')
 
       if (signOff && signOff.trim()) {
