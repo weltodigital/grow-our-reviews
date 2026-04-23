@@ -275,13 +275,13 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
     // Nudge format: {greeting} {customer_name}, {request_line}: {url}
     testMessage = `${data.greeting} ${testCustomerName}, ${data.request_line}: ${testUrl}`
     if (data.sign_off?.trim()) {
-      testMessage += `\n\n${data.sign_off}`
+      testMessage += `\n${data.sign_off}`
     }
   } else {
     // Initial format: {greeting} {customer_name}, {opening_line}\n{request_line}:
     testMessage = `${data.greeting} ${testCustomerName}, ${processedOpeningLine}\n${data.request_line}:\n${testUrl}`
     if (data.sign_off?.trim()) {
-      testMessage += `\n\n${data.sign_off}`
+      testMessage += `\n${data.sign_off}`
     }
   }
 

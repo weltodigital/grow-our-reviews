@@ -30,7 +30,6 @@ export default function SmsPreview({
       messageLines.push(`${greeting} ${customerName}, ${requestLine}: https://app.growourreviews.com/review/abc123def456ghi789jk`)
 
       if (signOff && signOff.trim()) {
-        messageLines.push('')
         messageLines.push(signOff)
       }
 
@@ -43,7 +42,6 @@ export default function SmsPreview({
       messageLines.push('https://app.growourreviews.com/review/abc123def456ghi789jk')
 
       if (signOff && signOff.trim()) {
-        messageLines.push('')
         messageLines.push(signOff)
       }
 

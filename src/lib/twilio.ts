@@ -61,7 +61,6 @@ export function createCustomInitialMessage({ customerName, businessName, sentime
 
   // Add sign-off if provided
   if (template.sign_off && template.sign_off.trim()) {
-    messageParts.push('')
     messageParts.push(template.sign_off)
   }
 
@@ -86,7 +85,6 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
 
   // Add sign-off if provided
   if (template.sign_off && template.sign_off.trim()) {
-    messageParts.push('')
     messageParts.push(template.sign_off)
   }
 
