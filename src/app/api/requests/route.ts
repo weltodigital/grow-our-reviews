@@ -102,14 +102,14 @@ export async function GET(request: NextRequest) {
     // Calculate status counts from ALL requests
     const statusCounts = {
       all: allRequests?.length || 0,
-      scheduled: allRequests?.filter(r => r.status === 'scheduled').length || 0,
-      queued: allRequests?.filter(r => r.status === 'queued').length || 0,
-      sent: allRequests?.filter(r => r.status === 'sent').length || 0,
-      clicked: allRequests?.filter(r => r.status === 'clicked').length || 0,
-      reviewed: allRequests?.filter(r => r.status === 'reviewed').length || 0,
-      feedback_given: allRequests?.filter(r => r.status === 'feedback_given').length || 0,
-      failed: allRequests?.filter(r => r.status === 'failed').length || 0,
-      suppressed: allRequests?.filter(r => r.status === 'suppressed').length || 0,
+      scheduled: allRequests?.filter((r: any) => r.status === 'scheduled').length || 0,
+      queued: allRequests?.filter((r: any) => r.status === 'queued').length || 0,
+      sent: allRequests?.filter((r: any) => r.status === 'sent').length || 0,
+      clicked: allRequests?.filter((r: any) => r.status === 'clicked').length || 0,
+      reviewed: allRequests?.filter((r: any) => r.status === 'reviewed').length || 0,
+      feedback_given: allRequests?.filter((r: any) => r.status === 'feedback_given').length || 0,
+      failed: allRequests?.filter((r: any) => r.status === 'failed').length || 0,
+      suppressed: allRequests?.filter((r: any) => r.status === 'suppressed').length || 0,
     }
 
     // Format the data for the frontend
