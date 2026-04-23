@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,7 +15,7 @@ export interface ReviewRequest {
   id: string
   customer_name: string
   customer_phone: string
-  status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'reviewed' | 'feedback_given' | 'failed' | 'suppressed'
+  status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'feedback_given' | 'failed' | 'suppressed'
   scheduled_for: string
   sent_at: string | null
   clicked_at: string | null
@@ -38,7 +38,6 @@ export default function RequestsPage() {
     queued: 0,
     sent: 0,
     clicked: 0,
-    reviewed: 0,
     feedback_given: 0,
     failed: 0,
     suppressed: 0,
@@ -47,11 +46,21 @@ export default function RequestsPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState('')
 
   const requestsPerPage = 20
+
+  // Debounce search term to prevent API calls on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -69,8 +78,8 @@ export default function RequestsPage() {
           params.append('status', statusFilter)
         }
 
-        if (searchTerm.trim()) {
-          params.append('search', searchTerm.trim())
+        if (debouncedSearchTerm.trim()) {
+          params.append('search', debouncedSearchTerm.trim())
         }
 
         const response = await fetch(`/api/requests?${params}`)
@@ -86,7 +95,6 @@ export default function RequestsPage() {
           queued: 0,
           sent: 0,
           clicked: 0,
-          reviewed: 0,
           feedback_given: 0,
           failed: 0,
           suppressed: 0,
@@ -99,12 +107,12 @@ export default function RequestsPage() {
     }
 
     fetchRequests()
-  }, [currentPage, statusFilter, searchTerm])
+  }, [currentPage, statusFilter, debouncedSearchTerm])
 
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [statusFilter, searchTerm])
+  }, [statusFilter, debouncedSearchTerm])
 
   const handleExport = () => {
     const { exportToCSV, formatRequestsForExport } = require('@/lib/export')
@@ -266,16 +274,16 @@ export default function RequestsPage() {
               <Search className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {statusFilter === 'all' && !searchTerm
+              {statusFilter === 'all' && !debouncedSearchTerm
                 ? 'No review requests yet'
                 : 'No matching requests found'}
             </h3>
             <p className="text-gray-600 mb-6">
-              {statusFilter === 'all' && !searchTerm
+              {statusFilter === 'all' && !debouncedSearchTerm
                 ? 'Start sending review requests to see them appear here.'
                 : 'Try adjusting your filters or search terms.'}
             </p>
-            {statusFilter === 'all' && !searchTerm && (
+            {statusFilter === 'all' && !debouncedSearchTerm && (
               <Button asChild className="!text-black">
                 <Link href="/dashboard/send">
                   <Plus className="h-4 w-4 mr-2" />
@@ -283,12 +291,13 @@ export default function RequestsPage() {
                 </Link>
               </Button>
             )}
-            {(statusFilter !== 'all' || searchTerm) && (
+            {(statusFilter !== 'all' || debouncedSearchTerm) && (
               <Button
                 variant="outline"
                 onClick={() => {
                   setStatusFilter('all')
                   setSearchTerm('')
+                  setDebouncedSearchTerm('')
                 }}
               >
                 Clear Filters
@@ -318,8 +327,8 @@ export default function RequestsPage() {
                   params.append('status', statusFilter)
                 }
 
-                if (searchTerm.trim()) {
-                  params.append('search', searchTerm.trim())
+                if (debouncedSearchTerm.trim()) {
+                  params.append('search', debouncedSearchTerm.trim())
                 }
 
                 const response = await fetch(`/api/requests?${params}`)
@@ -335,7 +344,6 @@ export default function RequestsPage() {
                   queued: 0,
                   sent: 0,
                   clicked: 0,
-                  reviewed: 0,
                   feedback_given: 0,
                   failed: 0,
                   suppressed: 0,

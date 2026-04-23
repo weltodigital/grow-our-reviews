@@ -9,7 +9,6 @@ interface RequestFiltersProps {
     queued: number
     sent: number
     clicked: number
-    reviewed: number
     feedback_given: number
     failed: number
     suppressed: number
@@ -27,7 +26,6 @@ export function RequestFilters({
     { key: 'queued', label: 'Queued', count: statusCounts.queued, color: 'amber' },
     { key: 'sent', label: 'Sent', count: statusCounts.sent, color: 'yellow' },
     { key: 'clicked', label: 'Clicked', count: statusCounts.clicked, color: 'orange' },
-    { key: 'reviewed', label: 'Reviewed', count: statusCounts.reviewed, color: 'green' },
     { key: 'feedback_given', label: 'Feedback', count: statusCounts.feedback_given, color: 'purple' },
     { key: 'failed', label: 'Failed', count: statusCounts.failed, color: 'red' },
     { key: 'suppressed', label: 'Suppressed', count: statusCounts.suppressed, color: 'gray' },

@@ -68,9 +68,9 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status)
     }
 
-    // Apply search filter (search in customer name)
+    // Apply search filter (search in customer name and phone)
     if (search) {
-      query = query.ilike('customers.name', `%${search}%`)
+      query = query.or(`customers.name.ilike.%${search}%,customers.phone.ilike.%${search}%`)
     }
 
     const { data: requests, error, count } = await query
@@ -106,7 +106,6 @@ export async function GET(request: NextRequest) {
       queued: allRequests?.filter((r: any) => r.status === 'queued').length || 0,
       sent: allRequests?.filter((r: any) => r.status === 'sent').length || 0,
       clicked: allRequests?.filter((r: any) => r.status === 'clicked').length || 0,
-      reviewed: allRequests?.filter((r: any) => r.status === 'reviewed').length || 0,
       feedback_given: allRequests?.filter((r: any) => r.status === 'feedback_given').length || 0,
       failed: allRequests?.filter((r: any) => r.status === 'failed').length || 0,
       suppressed: allRequests?.filter((r: any) => r.status === 'suppressed').length || 0,
@@ -127,12 +126,17 @@ export async function GET(request: NextRequest) {
       created_at: request.created_at
     })) || []
 
+    // Use count based on current filter
+    const totalCount = status && status !== 'all'
+      ? statusCounts[status as keyof typeof statusCounts] || 0
+      : statusCounts.all || 0
+
     response = NextResponse.json({
       requests: formattedRequests,
-      total: count || 0,
+      total: totalCount,
       page,
       limit,
-      totalPages: Math.ceil((count || 0) / limit),
+      totalPages: Math.ceil(totalCount / limit),
       statusCounts
     })
     return response

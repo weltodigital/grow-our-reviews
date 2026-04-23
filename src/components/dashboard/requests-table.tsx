@@ -142,8 +142,6 @@ export function RequestsTable({
             Send Now
           </Button>
         )
-      case 'clicked':
-      case 'reviewed':
       case 'feedback_given':
         return (
           <Button
