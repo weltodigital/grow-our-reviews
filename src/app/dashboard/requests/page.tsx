@@ -33,6 +33,17 @@ export interface ReviewRequest {
 export default function RequestsPage() {
   const [requests, setRequests] = useState<ReviewRequest[]>([])
   const [filteredRequests, setFilteredRequests] = useState<ReviewRequest[]>([])
+  const [statusCounts, setStatusCounts] = useState({
+    all: 0,
+    scheduled: 0,
+    queued: 0,
+    sent: 0,
+    clicked: 0,
+    reviewed: 0,
+    feedback_given: 0,
+    failed: 0,
+    suppressed: 0,
+  })
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -67,6 +78,17 @@ export default function RequestsPage() {
         const data = await response.json()
         setRequests(data.requests || [])
         setFilteredRequests(data.requests || [])
+        setStatusCounts(data.statusCounts || {
+          all: 0,
+          scheduled: 0,
+          queued: 0,
+          sent: 0,
+          clicked: 0,
+          reviewed: 0,
+          feedback_given: 0,
+          failed: 0,
+          suppressed: 0,
+        })
       } catch (err: any) {
         setError(err.message || 'Failed to load requests')
       } finally {
@@ -110,17 +132,6 @@ export default function RequestsPage() {
     exportToCSV(dataToExport, 'review-requests')
   }
 
-  const statusCounts = {
-    all: requests.length,
-    scheduled: requests.filter(r => r.status === 'scheduled').length,
-    queued: requests.filter(r => r.status === 'queued').length,
-    sent: requests.filter(r => r.status === 'sent').length,
-    clicked: requests.filter(r => r.status === 'clicked').length,
-    reviewed: requests.filter(r => r.status === 'reviewed').length,
-    feedback_given: requests.filter(r => r.status === 'feedback_given').length,
-    failed: requests.filter(r => r.status === 'failed').length,
-    suppressed: requests.filter(r => r.status === 'suppressed').length,
-  }
 
   if (isLoading) {
     return (
@@ -337,6 +348,17 @@ export default function RequestsPage() {
                 const data = await response.json()
                 setRequests(data.requests || [])
                 setFilteredRequests(data.requests || [])
+                setStatusCounts(data.statusCounts || {
+                  all: 0,
+                  scheduled: 0,
+                  queued: 0,
+                  sent: 0,
+                  clicked: 0,
+                  reviewed: 0,
+                  feedback_given: 0,
+                  failed: 0,
+                  suppressed: 0,
+                })
               } catch (err: any) {
                 setError(err.message || 'Failed to load requests')
               } finally {

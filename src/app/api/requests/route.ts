@@ -84,6 +84,34 @@ export async function GET(request: NextRequest) {
       return response
     }
 
+    // Get status counts for ALL requests (not just current page)
+    const { data: allRequests, error: countsError } = await supabase
+      .from('review_requests')
+      .select('status')
+      .eq('user_id', user.id)
+
+    if (countsError) {
+      console.error('Error fetching status counts:', countsError)
+      response = NextResponse.json(
+        { error: 'Failed to fetch status counts' },
+        { status: 500 }
+      )
+      return response
+    }
+
+    // Calculate status counts from ALL requests
+    const statusCounts = {
+      all: allRequests?.length || 0,
+      scheduled: allRequests?.filter(r => r.status === 'scheduled').length || 0,
+      queued: allRequests?.filter(r => r.status === 'queued').length || 0,
+      sent: allRequests?.filter(r => r.status === 'sent').length || 0,
+      clicked: allRequests?.filter(r => r.status === 'clicked').length || 0,
+      reviewed: allRequests?.filter(r => r.status === 'reviewed').length || 0,
+      feedback_given: allRequests?.filter(r => r.status === 'feedback_given').length || 0,
+      failed: allRequests?.filter(r => r.status === 'failed').length || 0,
+      suppressed: allRequests?.filter(r => r.status === 'suppressed').length || 0,
+    }
+
     // Format the data for the frontend
     const formattedRequests = requests?.map((request: any) => ({
       id: request.id,
@@ -104,7 +132,8 @@ export async function GET(request: NextRequest) {
       total: count || 0,
       page,
       limit,
-      totalPages: Math.ceil((count || 0) / limit)
+      totalPages: Math.ceil((count || 0) / limit),
+      statusCounts
     })
     return response
 
