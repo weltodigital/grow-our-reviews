@@ -45,6 +45,7 @@ export default function RequestsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [isFilteringOrSearching, setIsFilteringOrSearching] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -65,7 +66,14 @@ export default function RequestsPage() {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        setIsLoading(true)
+        // Determine if this is initial load or filtering/searching
+        const isInitialLoad = requests.length === 0 && !error
+
+        if (isInitialLoad) {
+          setIsLoading(true)
+        } else {
+          setIsFilteringOrSearching(true)
+        }
         setError('')
 
         // Build query parameters
@@ -103,6 +111,7 @@ export default function RequestsPage() {
         setError(err.message || 'Failed to load requests')
       } finally {
         setIsLoading(false)
+        setIsFilteringOrSearching(false)
       }
     }
 
@@ -252,7 +261,7 @@ export default function RequestsPage() {
           {/* Search */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1 max-w-sm">
-              {isLoading && debouncedSearchTerm ? (
+              {isFilteringOrSearching && debouncedSearchTerm ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent absolute left-3 top-1/2 transform -translate-y-1/2" />
               ) : (
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -274,7 +283,7 @@ export default function RequestsPage() {
       </Card>
 
       {/* Requests Table, Loading State, or Empty State */}
-      {isLoading && requests.length === 0 ? (
+      {isInitialLoading ? (
         <Card>
           <CardContent className="p-12 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-600 border-t-transparent mx-auto mb-4"></div>
@@ -282,7 +291,7 @@ export default function RequestsPage() {
             <p className="text-gray-600">Please wait while we fetch your review requests.</p>
           </CardContent>
         </Card>
-      ) : isLoading ? (
+      ) : isFilteringOrSearching ? (
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-3">
@@ -339,7 +348,7 @@ export default function RequestsPage() {
             // Refresh the requests by re-fetching
             const fetchRequests = async () => {
               try {
-                setIsLoading(true)
+                setIsFilteringOrSearching(true)
                 setError('')
 
                 const params = new URLSearchParams({
@@ -375,7 +384,7 @@ export default function RequestsPage() {
               } catch (err: any) {
                 setError(err.message || 'Failed to load requests')
               } finally {
-                setIsLoading(false)
+                setIsFilteringOrSearching(false)
               }
             }
             fetchRequests()
