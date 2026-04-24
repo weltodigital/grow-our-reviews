@@ -68,9 +68,19 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status)
     }
 
-    // Apply search filter (search in customer name)
+    // Apply search filter (search in customer name and phone)
     if (search) {
-      query = query.ilike('customers.name', `%${search}%`)
+      // Check if search looks like a phone number (contains digits)
+      const isPhoneSearch = /\d/.test(search)
+
+      if (isPhoneSearch) {
+        // Search in phone field, removing any formatting
+        const cleanSearch = search.replace(/[^\d]/g, '')
+        query = query.ilike('customers.phone', `%${cleanSearch}%`)
+      } else {
+        // Search in customer name
+        query = query.ilike('customers.name', `%${search}%`)
+      }
     }
 
     const { data: requests, error } = await query
