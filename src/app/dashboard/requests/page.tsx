@@ -45,6 +45,7 @@ export default function RequestsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasLoadedBefore, setHasLoadedBefore] = useState(false)
   const [isFilteringOrSearching, setIsFilteringOrSearching] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
@@ -67,7 +68,7 @@ export default function RequestsPage() {
     const fetchRequests = async () => {
       try {
         // Determine if this is initial load or filtering/searching
-        const isInitialLoad = requests.length === 0 && !error
+        const isInitialLoad = !hasLoadedBefore && !error
 
         if (isInitialLoad) {
           setIsLoading(true)
@@ -107,6 +108,8 @@ export default function RequestsPage() {
           failed: 0,
           suppressed: 0,
         })
+        // Mark that we've successfully loaded at least once
+        setHasLoadedBefore(true)
       } catch (err: any) {
         setError(err.message || 'Failed to load requests')
       } finally {
