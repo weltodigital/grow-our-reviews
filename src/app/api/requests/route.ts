@@ -75,9 +75,10 @@ export async function GET(request: NextRequest) {
       const isPhoneSearch = /\d/.test(search)
 
       if (isPhoneSearch) {
-        // Search in phone field, removing any formatting
-        const cleanSearch = search.replace(/[^\d]/g, '')
-        query = query.ilike('customers.phone', `%${cleanSearch}%`)
+        // Search in phone field with multiple format possibilities
+        // Phone numbers might be stored as "+447123456789", "07123456789", "07123 456789", etc.
+        const searchTerm = search.trim()
+        query = query.ilike('customers.phone', `%${searchTerm}%`)
       } else {
         // Search in customer name
         query = query.ilike('customers.name', `%${search}%`)
