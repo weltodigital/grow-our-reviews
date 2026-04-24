@@ -65,15 +65,13 @@ export async function GET(request: NextRequest) {
 
     // Apply status filter
     if (status && status !== 'all') {
-      console.log('Filtering by status:', status)
       query = query.eq('status', status)
     }
 
     // Apply search filter (search in customer name)
-    // Note: Temporarily disabled to isolate API issues
-    // if (search) {
-    //   query = query.ilike('customers.name', `%${search}%`)
-    // }
+    if (search) {
+      query = query.ilike('customers.name', `%${search}%`)
+    }
 
     const { data: requests, error } = await query
 
@@ -135,10 +133,6 @@ export async function GET(request: NextRequest) {
       ? statusCounts[status as keyof typeof statusCounts] || 0
       : statusCounts.all || 0
 
-    console.log('Status filter:', status)
-    console.log('Status counts:', statusCounts)
-    console.log('Total count for response:', totalCount)
-    console.log('Requests returned:', requests?.length || 0)
 
     response = NextResponse.json({
       requests: formattedRequests,
