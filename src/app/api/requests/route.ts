@@ -75,10 +75,28 @@ export async function GET(request: NextRequest) {
       const isPhoneSearch = /\d/.test(search)
 
       if (isPhoneSearch) {
-        // Search in phone field with multiple format possibilities
-        // Phone numbers might be stored as "+447123456789", "07123456789", "07123 456789", etc.
-        const searchTerm = search.trim()
-        query = query.ilike('customers.phone', `%${searchTerm}%`)
+        // Phones are stored in E.164 (e.g. "+447123456789"), but users may search
+        // using national format ("07..."), digits-only, or with spaces. Build variants
+        // that cover these formats and OR-match them.
+        const raw = search.trim()
+        const digits = raw.replace(/\D/g, '')
+        const variants = new Set<string>()
+        if (raw) variants.add(raw)
+        if (digits) variants.add(digits)
+
+        if (digits.startsWith('0')) {
+          const rest = digits.slice(1)
+          variants.add('+44' + rest)
+          variants.add('44' + rest)
+        } else if (digits.startsWith('44')) {
+          variants.add('+' + digits)
+          variants.add('0' + digits.slice(2))
+        }
+
+        const orFilters = Array.from(variants)
+          .map(v => `phone.ilike.%${v}%`)
+          .join(',')
+        query = query.or(orFilters, { referencedTable: 'customers' })
       } else {
         // Search in customer name
         query = query.ilike('customers.name', `%${search}%`)
