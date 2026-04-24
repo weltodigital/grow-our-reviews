@@ -3,6 +3,7 @@
 import { createServerSupabase } from '@/lib/auth'
 import { randomBytes } from 'crypto'
 import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle'
+import { countNudgesSentInPeriod } from '@/lib/credit-usage'
 import type { Database } from '@/types/database'
 
 interface CreateReviewRequestData {
@@ -134,12 +135,18 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
     nextResetDate = new Date(billingStart.getFullYear(), billingStart.getMonth() + 1, 1)
   }
 
-  const { count: requestsThisMonth } = await (supabase as any)
-    .from('review_requests')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', billingStart.toISOString())
-    .lte('created_at', billingEnd.toISOString())
+  // Credits consumed = originals created this period (reserves a credit on creation,
+  // even for scheduled-future sends) + nudges actually sent this period.
+  const [{ count: originalsThisMonth }, nudgesThisMonth] = await Promise.all([
+    (supabase as any)
+      .from('review_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', billingStart.toISOString())
+      .lte('created_at', billingEnd.toISOString()),
+    countNudgesSentInPeriod(supabase, user.id, billingStart, billingEnd),
+  ])
+  const requestsThisMonth = (originalsThisMonth || 0) + nudgesThisMonth
 
   if (requestsThisMonth && requestsThisMonth >= (profile as any).monthly_request_limit) {
     // Send plan limit reached email (don't wait for it to complete)

@@ -1,6 +1,7 @@
 import { createServerSupabase } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle'
+import { countNudgesSentInPeriod } from '@/lib/credit-usage'
 import { createAbuseDetector } from '@/lib/abuse-detector'
 import type { Database } from '@/types/database'
 
@@ -130,15 +131,19 @@ export async function POST(request: NextRequest) {
       billingEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
     }
 
-    const { data: requestsThisMonth } = await supabase
-      .from('review_requests')
-      .select('id', { count: 'exact' })
-      .eq('user_id', user.id)
-      .gte('sent_at', billingStart.toISOString())
-      .lte('sent_at', billingEnd.toISOString())
-      .not('sent_at', 'is', null)
+    // Credits used this period = originals sent + nudges sent.
+    const [{ data: originalsThisMonth }, nudgesThisMonth] = await Promise.all([
+      supabase
+        .from('review_requests')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id)
+        .gte('sent_at', billingStart.toISOString())
+        .lte('sent_at', billingEnd.toISOString())
+        .not('sent_at', 'is', null),
+      countNudgesSentInPeriod(supabase, user.id, billingStart, billingEnd),
+    ])
 
-    const requestsSent = requestsThisMonth?.length || 0
+    const requestsSent = (originalsThisMonth?.length || 0) + nudgesThisMonth
     const monthlyLimit = (profile as any)?.monthly_request_limit || 150
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 

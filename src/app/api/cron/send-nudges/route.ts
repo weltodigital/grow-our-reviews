@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendSMS, createNudgeMessage, createCustomNudgeMessage } from '@/lib/twilio'
+import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
+import { countCreditsSentInPeriod } from '@/lib/credit-usage'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -54,7 +56,9 @@ export async function GET(request: NextRequest) {
           business_name,
           google_review_url,
           nudge_enabled,
-          nudge_delay_hours
+          nudge_delay_hours,
+          monthly_request_limit,
+          billing_cycle_date
         ),
         customers!inner(name, phone),
         feedback(id)
@@ -126,6 +130,33 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    // Build a per-user credit budget map. A nudge costs one credit, so we must
+    // refuse to send if the user is already at their monthly limit — otherwise
+    // nudges would ship for free past the plan cap.
+    const budgetByUser = new Map<string, { remaining: number; limit: number }>()
+    await Promise.all(
+      userIds.map(async (uid: string) => {
+        const sample = eligibleRequests.find((r: any) => r.profiles.id === uid) as any
+        const limit = sample?.profiles?.monthly_request_limit ?? 150
+        const cycleDate = sample?.profiles?.billing_cycle_date
+
+        let periodStart: Date
+        let periodEnd: Date
+        if (cycleDate) {
+          const period = getCurrentBillingPeriod(cycleDate)
+          periodStart = period.start
+          periodEnd = period.end
+        } else {
+          const now = new Date()
+          periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+          periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+        }
+
+        const used = await countCreditsSentInPeriod(supabase, uid, periodStart, periodEnd)
+        budgetByUser.set(uid, { remaining: Math.max(0, limit - used), limit })
+      })
+    )
+
     const results = []
     const sentCount = { success: 0, failed: 0 }
 
@@ -142,12 +173,14 @@ export async function GET(request: NextRequest) {
           .single()
 
         if (suppression) {
-          // Customer has opted out - skip nudge and mark nudge as sent to prevent retries
+          // Customer has opted out - skip nudge and mark nudge_sent=true so the
+          // scheduler stops retrying. Leave nudge_sent_at null because no SMS
+          // actually went out — nudge_sent_at drives credit accounting and we
+          // shouldn't charge for a suppressed nudge.
           const { error: suppressError } = await (supabase as any)
             .from('review_requests')
             .update({
               nudge_sent: true,
-              nudge_sent_at: new Date().toISOString()
             })
             .eq('id', (request as any).id)
 
@@ -163,6 +196,31 @@ export async function GET(request: NextRequest) {
             reason: 'Customer has opted out'
           })
           continue // Skip to next request
+        }
+
+        // Enforce per-user monthly credit limit. If the user has no remaining
+        // credits, skip the nudge (same pattern as suppression: flip nudge_sent
+        // to stop retries, leave nudge_sent_at null so we don't bill them).
+        const userId = (request as any).profiles.id
+        const budget = budgetByUser.get(userId)
+        if (budget && budget.remaining <= 0) {
+          const { error: limitError } = await (supabase as any)
+            .from('review_requests')
+            .update({ nudge_sent: true })
+            .eq('id', (request as any).id)
+
+          if (limitError) {
+            console.error(`Error marking nudge as skipped for over-limit request ${(request as any).id}:`, limitError)
+          } else {
+            console.log(`Nudge skipped for request ${(request as any).id} - user ${userId} at monthly credit limit (${budget.limit})`)
+          }
+
+          results.push({
+            requestId: (request as any).id,
+            status: 'skipped_over_limit',
+            reason: `User at monthly credit limit of ${budget.limit}`,
+          })
+          continue
         }
 
         // Create the sentiment gate URL
@@ -202,6 +260,8 @@ export async function GET(request: NextRequest) {
 
         if (smsResult.success) {
           sentCount.success++
+          const budget = budgetByUser.get(userId)
+          if (budget) budget.remaining = Math.max(0, budget.remaining - 1)
           results.push({
             id: (request as any).id,
             customer: (request as any).customers.name,

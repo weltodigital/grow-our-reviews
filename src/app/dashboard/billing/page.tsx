@@ -1,6 +1,7 @@
 import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { BillingDashboard } from '@/components/dashboard/billing-dashboard'
 import { getCurrentBillingPeriod, getDaysUntilReset } from '@/lib/billing-cycle'
+import { countCreditsSentInPeriod } from '@/lib/credit-usage'
 
 async function getBillingStats(userId: string) {
   try {
@@ -15,31 +16,27 @@ async function getBillingStats(userId: string) {
 
     // Get billing period bounds based on user's billing cycle
     // If user doesn't have billing_cycle_date, fall back to calendar month
-    let startOfPeriod: Date, daysUntilReset: number, billingCycleDate: number | undefined
+    let startOfPeriod: Date, endOfPeriod: Date, daysUntilReset: number, billingCycleDate: number | undefined
 
     if (profile?.billing_cycle_date) {
       const billingPeriod = getCurrentBillingPeriod(profile.billing_cycle_date)
       startOfPeriod = billingPeriod.start
+      endOfPeriod = billingPeriod.end
       daysUntilReset = getDaysUntilReset(profile.billing_cycle_date)
       billingCycleDate = profile.billing_cycle_date
     } else {
       // Fallback to calendar month for users without billing cycle date
       const now = new Date()
       startOfPeriod = new Date(now.getFullYear(), now.getMonth(), 1)
+      endOfPeriod = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
       daysUntilReset = 0
       billingCycleDate = undefined
     }
 
-    // Get requests sent this period
-    const { count: requestsThisMonth } = await (supabase as any)
-      .from('review_requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .gte('sent_at', startOfPeriod.toISOString())
-      .not('sent_at', 'is', null)
+    const creditsUsed = await countCreditsSentInPeriod(supabase, userId, startOfPeriod, endOfPeriod)
 
     return {
-      requestsSentThisMonth: requestsThisMonth || 0,
+      requestsSentThisMonth: creditsUsed, // credits = originals + nudges
       daysUntilReset: daysUntilReset,
       billingCycleDate: billingCycleDate,
     }

@@ -2,6 +2,7 @@ import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
 import { getCurrentBillingPeriod, getDaysUntilReset, getNextBillingDate } from '@/lib/billing-cycle'
+import { countCreditsSentInPeriod } from '@/lib/credit-usage'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -44,13 +45,14 @@ async function getDashboardStats(userId: string) {
     // Parallel queries for stats
     const [
       requestsThisPeriod,
+      creditsThisPeriod,
       clicksThisPeriod,
       reviewsThisPeriod,
       feedbackThisPeriod,
       totalRequestsAllTime,
       totalReviewsAllTime
     ] = await Promise.all([
-      // Requests sent this billing period
+      // Original requests sent this billing period — used for click-through rate
       supabase
         .from('review_requests')
         .select('id', { count: 'exact' })
@@ -58,6 +60,9 @@ async function getDashboardStats(userId: string) {
         .gte('sent_at', startOfPeriod.toISOString())
         .lte('sent_at', endOfPeriod.toISOString())
         .not('sent_at', 'is', null),
+
+      // Credits consumed this period = originals sent + nudges sent
+      countCreditsSentInPeriod(supabase, userId, startOfPeriod, endOfPeriod),
 
       // Clicks this billing period
       supabase
@@ -101,21 +106,22 @@ async function getDashboardStats(userId: string) {
     ])
 
     const requestsSent = requestsThisPeriod.count || 0
+    const creditsUsed = creditsThisPeriod
     const clicks = clicksThisPeriod.count || 0
     const reviews = reviewsThisPeriod.count || 0
     const feedback = feedbackThisPeriod.count || 0
     const monthlyLimit = profile.monthly_request_limit || 150
 
-    // Calculate click through rate
+    // CTR is clicks over originals, not over total SMS (nudges don't get their own click link).
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0
 
     return {
-      requestsSentThisMonth: requestsSent, // Keep same property name for backward compatibility
+      requestsSentThisMonth: creditsUsed, // credits = originals + nudges
       clicksThisMonth: clicks,
       reviewsThisMonth: reviews,
       feedbackThisMonth: feedback,
       clickThroughRate: Math.round(clickThroughRate * 10) / 10, // Round to 1 decimal
-      requestsRemaining: Math.max(0, monthlyLimit - requestsSent),
+      requestsRemaining: Math.max(0, monthlyLimit - creditsUsed),
       totalRequestsAllTime: totalRequestsAllTime.count || 0,
       totalReviewsAllTime: totalReviewsAllTime.count || 0,
       daysUntilReset: daysUntilReset,
