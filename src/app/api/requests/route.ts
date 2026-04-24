@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
         customers(name, phone)
       `)
       .eq('user_id', user.id)
+      .not('customers', 'is', null)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -97,8 +98,9 @@ export async function GET(request: NextRequest) {
     // Get status counts for ALL requests (not just current page)
     const { data: allRequests, error: countsError } = await supabase
       .from('review_requests')
-      .select('status')
+      .select('status, customers(name)')
       .eq('user_id', user.id)
+      .not('customers', 'is', null)
 
     if (countsError) {
       console.error('Error fetching status counts:', countsError)
