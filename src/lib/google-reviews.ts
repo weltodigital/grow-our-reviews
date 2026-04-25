@@ -70,6 +70,14 @@ interface PlacesApiReview {
   }
 }
 
+function sortByPublishTimeDesc(reviews: GoogleReview[]): GoogleReview[] {
+  return [...reviews].sort((a, b) => {
+    const ta = a.publishTime ? Date.parse(a.publishTime) : 0
+    const tb = b.publishTime ? Date.parse(b.publishTime) : 0
+    return tb - ta
+  })
+}
+
 function normalizeReview(review: PlacesApiReview): GoogleReview {
   // Review resource name looks like "places/{placeId}/reviews/{reviewId}" — we
   // pull the trailing ID for stable dedup keys if we ever want to store full
@@ -123,10 +131,13 @@ export async function fetchPlaceReviews(placeId: string): Promise<{
 
   const rawReviews: PlacesApiReview[] = Array.isArray(data.reviews) ? data.reviews : []
 
+  // Places API (New) returns reviews ordered by relevance, not recency. Re-sort
+  // by publishTime descending so the dashboard always shows the genuinely most
+  // recent five.
   return {
     totalReviewCount: typeof data.userRatingCount === 'number' ? data.userRatingCount : null,
     averageRating: typeof data.rating === 'number' ? data.rating : null,
-    reviews: rawReviews.map(normalizeReview),
+    reviews: sortByPublishTimeDesc(rawReviews.map(normalizeReview)),
   }
 }
 
@@ -156,13 +167,14 @@ export async function getOrRefreshReviews(
     .eq('user_id', userId)
     .maybeSingle()
 
-  // Cache hit and fresh — return as-is.
+  // Cache hit and fresh — return as-is. Sort defensively in case the row was
+  // written before we started ordering by publishTime.
   if (existing && existing.place_id === placeId && !isStale(existing.last_fetched_at)) {
     return {
       placeId: existing.place_id,
       totalReviewCount: existing.total_review_count,
       averageRating: existing.average_rating ? Number(existing.average_rating) : null,
-      reviews: (existing.reviews || []) as GoogleReview[],
+      reviews: sortByPublishTimeDesc((existing.reviews || []) as GoogleReview[]),
       lastFetchedAt: existing.last_fetched_at,
       lastError: existing.last_error,
     }
@@ -224,7 +236,7 @@ export async function getOrRefreshReviews(
         placeId: existing.place_id,
         totalReviewCount: existing.total_review_count,
         averageRating: existing.average_rating ? Number(existing.average_rating) : null,
-        reviews: (existing.reviews || []) as GoogleReview[],
+        reviews: sortByPublishTimeDesc((existing.reviews || []) as GoogleReview[]),
         lastFetchedAt: existing.last_fetched_at,
         lastError: errorMessage,
       }
@@ -242,24 +254,46 @@ export async function getOrRefreshReviews(
 }
 
 /**
- * Count reviews added this calendar month for a user. Logic:
- *   1. Look for the last observation BEFORE the start of this month — that's
- *      the prior-month closing total. Delta = current − that.
- *   2. If no prior-month data exists (e.g. a user who joined this month), use
- *      the FIRST observation IN this month as the baseline. Delta = current −
- *      that. This means the count starts at 0 the day they sign up and rises
- *      as new reviews arrive.
- *   3. If we have no observations at all, return null (the UI hides the badge).
+ * Count reviews added this calendar month for a user. We combine two signals
+ * and take the larger:
+ *
+ *   A. Observation-based delta: current total − (last observation before this
+ *      month, or the earliest observation in this month if we have no prior).
+ *      Accurate for any volume but only counts growth since we started
+ *      observing this user.
+ *
+ *   B. Publish-time count: how many of the 5 most recent review objects from
+ *      Google have a publishTime in this month. Works retroactively (great
+ *      for users who already had reviews when we deployed) but caps at 5,
+ *      since Places API only returns 5.
+ *
+ * Taking max(A, B) gives accurate retroactive coverage for typical volume
+ * while still scaling correctly when more than 5 reviews land in one month.
+ *
+ * Returns null when we have no information at all (the UI hides the badge).
  */
 export async function getNewReviewsThisMonth(
   supabase: any,
   userId: string,
-  currentTotal: number | null
+  currentTotal: number | null,
+  reviews: GoogleReview[]
 ): Promise<number | null> {
   if (currentTotal == null) return null
 
   const now = new Date()
-  const monthStartIso = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString()
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+  const monthStartIso = monthStart.toISOString()
+
+  // Signal B: count reviews in the latest 5 that were published this month.
+  const publishTimeCount = reviews.reduce((acc, r) => {
+    if (!r.publishTime) return acc
+    const ts = Date.parse(r.publishTime)
+    if (Number.isNaN(ts)) return acc
+    return ts >= monthStart.getTime() ? acc + 1 : acc
+  }, 0)
+
+  // Signal A: observation-based delta.
+  let observationDelta: number | null = null
 
   const { data: priorMonth } = await supabase
     .from('google_review_observations')
@@ -271,21 +305,22 @@ export async function getNewReviewsThisMonth(
     .maybeSingle()
 
   if (priorMonth && typeof priorMonth.total_review_count === 'number') {
-    return Math.max(0, currentTotal - priorMonth.total_review_count)
+    observationDelta = Math.max(0, currentTotal - priorMonth.total_review_count)
+  } else {
+    const { data: earliestThisMonth } = await supabase
+      .from('google_review_observations')
+      .select('total_review_count')
+      .eq('user_id', userId)
+      .gte('observed_at', monthStartIso)
+      .order('observed_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (earliestThisMonth && typeof earliestThisMonth.total_review_count === 'number') {
+      observationDelta = Math.max(0, currentTotal - earliestThisMonth.total_review_count)
+    }
   }
 
-  const { data: earliestThisMonth } = await supabase
-    .from('google_review_observations')
-    .select('total_review_count')
-    .eq('user_id', userId)
-    .gte('observed_at', monthStartIso)
-    .order('observed_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
-
-  if (earliestThisMonth && typeof earliestThisMonth.total_review_count === 'number') {
-    return Math.max(0, currentTotal - earliestThisMonth.total_review_count)
-  }
-
-  return null
+  if (observationDelta == null && publishTimeCount === 0) return null
+  return Math.max(observationDelta ?? 0, publishTimeCount)
 }

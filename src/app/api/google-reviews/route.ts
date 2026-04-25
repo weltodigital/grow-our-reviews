@@ -64,7 +64,8 @@ export async function GET(request: NextRequest) {
   const newReviewsThisMonth = await getNewReviewsThisMonth(
     supabase,
     user.id,
-    cached.totalReviewCount
+    cached.totalReviewCount,
+    cached.reviews
   )
 
   response = NextResponse.json({
