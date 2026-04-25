@@ -1,6 +1,7 @@
 import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
+import { GoogleReviewsCard } from '@/components/dashboard/google-reviews-card'
 import { getCurrentBillingPeriod, getDaysUntilReset, getNextBillingDate } from '@/lib/billing-cycle'
 import { countCreditsSentInPeriod } from '@/lib/credit-usage'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -335,6 +336,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </Button>
         )}
       </div>
+
+      {/* Google Reviews (refreshes every 2 days per user) */}
+      <GoogleReviewsCard />
 
       {/* SMS Failure Alert */}
       <SmsFailureAlert />
