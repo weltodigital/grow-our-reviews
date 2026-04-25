@@ -4,6 +4,7 @@ import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
 import { GoogleReviewsCard } from '@/components/dashboard/google-reviews-card'
 import { getCurrentBillingPeriod, getDaysUntilReset, getNextBillingDate } from '@/lib/billing-cycle'
 import { countCreditsSentInPeriod } from '@/lib/credit-usage'
+import { extractPlaceId } from '@/lib/google-reviews'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -337,8 +338,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         )}
       </div>
 
-      {/* Google Reviews (refreshes every 2 days per user) */}
-      <GoogleReviewsCard />
+      {/* Google Reviews (refreshes every 2 days per user). Only render for users
+          whose review URL contains a Place ID we can resolve — businesses that
+          aren't on Places at all can't be shown, and prompting them to reconnect
+          is dead-end advice. */}
+      {extractPlaceId((profile as any).google_review_url) && <GoogleReviewsCard />}
 
       {/* SMS Failure Alert */}
       <SmsFailureAlert />

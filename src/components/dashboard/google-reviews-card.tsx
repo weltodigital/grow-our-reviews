@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Star, ExternalLink, AlertCircle } from 'lucide-react'
+import { Star, AlertCircle } from 'lucide-react'
 
 interface GoogleReview {
   reviewId: string
@@ -105,48 +104,12 @@ export function GoogleReviewsCard() {
     )
   }
 
-  if (!data || data.status === 'no_url') {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Recent Google Reviews</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-600 mb-3">
-            Connect your Google Business profile to see your reviews here.
-          </p>
-          <Link
-            href="/dashboard/settings"
-            className="inline-flex items-center gap-1 text-sm font-medium text-green-700 hover:text-green-800"
-          >
-            Add your Google review URL
-            <ExternalLink className="h-3.5 w-3.5" />
-          </Link>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (data.status === 'no_place_id') {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Recent Google Reviews</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-start gap-3 text-sm text-gray-600">
-            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-            <span>
-              We couldn&apos;t recognise your Google review URL format.{' '}
-              <Link href="/dashboard/settings" className="text-green-700 hover:text-green-800 underline">
-                Reconnect it
-              </Link>{' '}
-              by searching for your business.
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-    )
+  // If we ever land on no_url or no_place_id (race condition: profile changed
+  // after the page-level Place ID gate), render nothing rather than a CTA the
+  // user can't act on — businesses that can't be found in Places search can't
+  // be reconnected either.
+  if (!data || data.status === 'no_url' || data.status === 'no_place_id') {
+    return null
   }
 
   const { totalReviewCount, averageRating, reviews = [], lastError } = data
