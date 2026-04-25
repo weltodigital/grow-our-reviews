@@ -73,7 +73,7 @@ export function GoogleReviewsCard() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Your Google Reviews</CardTitle>
+          <CardTitle>Your Recent Google Reviews</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -93,7 +93,7 @@ export function GoogleReviewsCard() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Your Google Reviews</CardTitle>
+          <CardTitle>Your Recent Google Reviews</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-3 text-sm text-gray-600">
@@ -109,7 +109,7 @@ export function GoogleReviewsCard() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Your Google Reviews</CardTitle>
+          <CardTitle>Your Recent Google Reviews</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-600 mb-3">
@@ -131,7 +131,7 @@ export function GoogleReviewsCard() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Your Google Reviews</CardTitle>
+          <CardTitle>Your Recent Google Reviews</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-3 text-sm text-gray-600">
@@ -155,7 +155,7 @@ export function GoogleReviewsCard() {
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
-          <CardTitle>Your Google Reviews</CardTitle>
+          <CardTitle>Your Recent Google Reviews</CardTitle>
           <div className="mt-2 flex items-center gap-3">
             {averageRating != null && (
               <div className="flex items-center gap-2">
