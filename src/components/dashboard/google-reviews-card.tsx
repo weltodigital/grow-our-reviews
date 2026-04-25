@@ -24,6 +24,7 @@ interface ReviewsResponse {
   totalReviewCount?: number | null
   averageRating?: number | null
   reviews?: GoogleReview[]
+  newReviewsThisMonth?: number | null
   lastFetchedAt?: string
   lastError?: string | null
 }
@@ -112,7 +113,8 @@ export function GoogleReviewsCard() {
     return null
   }
 
-  const { totalReviewCount, averageRating, reviews = [], lastError } = data
+  const { totalReviewCount, averageRating, reviews = [], newReviewsThisMonth, lastError } = data
+  const monthLabel = new Date().toLocaleString('en-GB', { month: 'long' })
 
   return (
     <Card>
@@ -129,6 +131,11 @@ export function GoogleReviewsCard() {
             {totalReviewCount != null && (
               <span className="text-sm text-gray-600">
                 {totalReviewCount.toLocaleString()} {totalReviewCount === 1 ? 'review' : 'reviews'}
+              </span>
+            )}
+            {newReviewsThisMonth != null && newReviewsThisMonth > 0 && (
+              <span className="inline-flex items-center rounded-full bg-green-50 text-green-700 border border-green-200 px-2.5 py-0.5 text-xs font-medium">
+                +{newReviewsThisMonth} new in {monthLabel}
               </span>
             )}
           </div>

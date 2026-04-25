@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
-import { getOrRefreshReviews } from '@/lib/google-reviews'
+import { getOrRefreshReviews, getNewReviewsThisMonth } from '@/lib/google-reviews'
 
 export async function GET(request: NextRequest) {
   let response: NextResponse
@@ -61,12 +61,19 @@ export async function GET(request: NextRequest) {
     return response
   }
 
+  const newReviewsThisMonth = await getNewReviewsThisMonth(
+    supabase,
+    user.id,
+    cached.totalReviewCount
+  )
+
   response = NextResponse.json({
     status: 'ok',
     placeId: cached.placeId,
     totalReviewCount: cached.totalReviewCount,
     averageRating: cached.averageRating,
     reviews: cached.reviews,
+    newReviewsThisMonth,
     lastFetchedAt: cached.lastFetchedAt,
     lastError: cached.lastError,
   })
