@@ -1,17 +1,31 @@
 import { Twilio } from 'twilio'
-import { createSMSRateLimiter } from './sms-rate-limiter'
+import { createSMSRateLimiter, type SMSRateLimiter } from './sms-rate-limiter'
 
-// Initialize Twilio client
-const twilioClient = new Twilio(
-  process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
-)
+// Lazy initialization so a misconfigured environment surfaces a clean runtime
+// error from the call site rather than crashing the function on import.
+let _twilioClient: Twilio | null = null
+export function getTwilioClient(): Twilio {
+  if (_twilioClient) return _twilioClient
+  const sid = process.env.TWILIO_ACCOUNT_SID
+  const token = process.env.TWILIO_AUTH_TOKEN
+  if (!sid || !token) {
+    throw new Error('Twilio is not configured: set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN')
+  }
+  _twilioClient = new Twilio(sid, token)
+  return _twilioClient
+}
 
-// Initialize SMS rate limiter
-const smsRateLimiter = createSMSRateLimiter(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+let _smsRateLimiter: SMSRateLimiter | null = null
+function getSmsRateLimiter(): SMSRateLimiter {
+  if (_smsRateLimiter) return _smsRateLimiter
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    throw new Error('Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+  }
+  _smsRateLimiter = createSMSRateLimiter(url, key)
+  return _smsRateLimiter
+}
 
 export interface SMSTemplate {
   customerName: string
@@ -99,15 +113,17 @@ export async function sendSMS(to: string, message: string, userId?: string, forc
   queuedReason?: string
 }> {
   try {
+    const rateLimiter = getSmsRateLimiter()
+
     // Check SMS rate limits before sending (skip if force is true)
     if (!force) {
-      const rateLimitCheck = await smsRateLimiter.canSendSMS(userId)
+      const rateLimitCheck = await rateLimiter.canSendSMS(userId)
 
       if (!rateLimitCheck.allowed) {
         console.warn(`SMS rate limit exceeded: ${rateLimitCheck.message}`)
 
         // Send alert if we haven't already
-        await smsRateLimiter.checkAndAlert()
+        await rateLimiter.checkAndAlert()
 
         return {
           success: false,
@@ -121,17 +137,22 @@ export async function sendSMS(to: string, message: string, userId?: string, forc
       console.log(`SMS rate limiter: ${rateLimitCheck.message} (${Math.round(rateLimitCheck.percentage)}%)`)
     }
 
-    const twilioResponse = await twilioClient.messages.create({
+    const fromNumber = process.env.TWILIO_PHONE_NUMBER
+    if (!fromNumber) {
+      throw new Error('Twilio is not configured: set TWILIO_PHONE_NUMBER')
+    }
+
+    const twilioResponse = await getTwilioClient().messages.create({
       body: message,
-      from: process.env.TWILIO_PHONE_NUMBER!,
+      from: fromNumber,
       to: to,
     })
 
     // Increment usage counter after successful send (include userId for per-user tracking)
-    await smsRateLimiter.incrementUsage(userId)
+    await rateLimiter.incrementUsage(userId)
 
     // Check if we need to send usage alerts
-    await smsRateLimiter.checkAndAlert()
+    await rateLimiter.checkAndAlert()
 
     return {
       success: true,
@@ -164,7 +185,3 @@ export async function sendSMS(to: string, message: string, userId?: string, forc
   }
 }
 
-// Export rate limiter for use in cron jobs if needed
-export { smsRateLimiter }
-
-export { twilioClient }

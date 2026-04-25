@@ -5,7 +5,7 @@ import type { Database } from '@/types/database'
 
 export async function middleware(request: NextRequest) {
   // Define public routes that should never require auth
-  const publicRoutes = ['/blog', '/debug', '/pricing', '/privacy', '/terms', '/cookies', '/test123', '/debug-page', '/blog-test', '/sitemap.xml', '/robots.txt']
+  const publicRoutes = ['/blog', '/pricing', '/privacy', '/terms', '/cookies', '/sitemap.xml', '/robots.txt']
   const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))
 
   if (isPublicRoute) {
@@ -74,7 +74,6 @@ export async function middleware(request: NextRequest) {
     '/signup',
     '/reset-password',
     '/forgot-password',
-    '/test-emails',
   ]
 
   // Check if this is a public route, review route, or API route
@@ -86,10 +85,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/cron/') ||
     pathname.startsWith('/api/stripe/webhook') ||
     pathname.startsWith('/api/twilio/webhook') ||
-    pathname.startsWith('/api/debug') ||
     pathname.startsWith('/api/feedback') ||
     pathname.startsWith('/api/emails/') ||
-    pathname.startsWith('/api/test-') ||
     pathname.startsWith('/api/business-search') ||
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt'

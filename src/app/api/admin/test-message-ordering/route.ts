@@ -1,9 +1,13 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
+import { protectAdminEndpoint } from '@/lib/admin-auth'
 
-// Test endpoint to create sample queued messages and verify ordering
+// Admin endpoint to create sample queued messages and verify ordering
 export async function POST(request: NextRequest) {
+  const authResult = protectAdminEndpoint(request)
+  if (authResult !== true) return authResult
+
   try {
     const { action, testUserId } = await request.json()
 

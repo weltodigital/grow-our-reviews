@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { twilioClient } from '@/lib/twilio'
+import { getTwilioClient } from '@/lib/twilio'
 import type { Database } from '@/types/database'
 
 // Validate Twilio webhook signature
@@ -10,8 +10,12 @@ function validateTwilioSignature(
   params: Record<string, string>
 ): boolean {
   try {
-    const authToken = process.env.TWILIO_AUTH_TOKEN!
-    return (twilioClient as any).validateRequest(authToken, signature, url, params)
+    const authToken = process.env.TWILIO_AUTH_TOKEN
+    if (!authToken) {
+      console.error('TWILIO_AUTH_TOKEN not configured — rejecting webhook')
+      return false
+    }
+    return (getTwilioClient() as any).validateRequest(authToken, signature, url, params)
   } catch (error) {
     console.error('Error validating Twilio signature:', error)
     return false
@@ -206,7 +210,7 @@ async function handleGeneralReply(phoneNumber: string, messageBody: string, supa
       : `Thanks for your message. This is an automated number - please contact ${businessName} directly for any enquiries.`;
 
     try {
-      await twilioClient.messages.create({
+      await getTwilioClient().messages.create({
         body: replyMessage,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: phoneNumber
