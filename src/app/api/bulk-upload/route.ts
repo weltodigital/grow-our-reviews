@@ -2,6 +2,7 @@ import { createServerSupabase } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle'
 import { countNudgesSentInPeriod } from '@/lib/credit-usage'
+import { generateToken } from '@/lib/generate-token'
 import { createAbuseDetector } from '@/lib/abuse-detector'
 import type { Database } from '@/types/database'
 
@@ -245,7 +246,7 @@ export async function POST(request: NextRequest) {
         id: crypto.randomUUID(),
         user_id: user.id,
         customer_id: customer.id,
-        token: crypto.randomUUID().replace(/-/g, ''),
+        token: generateToken(),
         status: 'scheduled' as const,
         scheduled_for: scheduledFor.toISOString(),
         created_at: new Date().toISOString(),

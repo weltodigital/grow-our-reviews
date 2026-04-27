@@ -1,9 +1,9 @@
 'use server'
 
 import { createServerSupabase } from '@/lib/auth'
-import { randomBytes } from 'crypto'
 import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle'
 import { countNudgesSentInPeriod } from '@/lib/credit-usage'
+import { generateToken } from '@/lib/generate-token'
 import type { Database } from '@/types/database'
 
 interface CreateReviewRequestData {
@@ -30,11 +30,6 @@ function normalizePhoneNumber(phone: string): string {
 
   // For other formats, assume they're correct
   return phone.startsWith('+') ? phone : '+' + digits
-}
-
-// Generate a secure random token (shorter to save SMS characters)
-function generateToken(): string {
-  return randomBytes(8).toString('hex') // 8 bytes = 16 character hex string for shorter URLs
 }
 
 // Calculate scheduled time based on user's delay settings

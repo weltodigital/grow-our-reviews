@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
+import { generateToken } from '@/lib/generate-token'
 import type { Database } from '@/types/database'
 
 // Cron job to process pending customers at the start of each billing cycle
@@ -164,7 +165,7 @@ export async function GET(request: NextRequest) {
             id: crypto.randomUUID(),
             user_id: userId,
             customer_id: customer.id,
-            token: crypto.randomUUID().replace(/-/g, ''),
+            token: generateToken(),
             status: 'scheduled' as const,
             scheduled_for: scheduledFor.toISOString(),
             created_at: new Date().toISOString(),
