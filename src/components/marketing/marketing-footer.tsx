@@ -4,8 +4,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Star, Mail } from 'lucide-react'
 import { getAppUrl } from '@/lib/utils'
+import { useConsent } from '@/components/consent/consent-context'
 
 export function MarketingFooter() {
+  const { resetConsent } = useConsent()
+
   return (
     <footer className="bg-gray-900 text-white">
       {/* CTA Section */}
@@ -139,6 +142,13 @@ export function MarketingFooter() {
               <Link href="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Cookie Policy
               </Link>
+              <button
+                type="button"
+                onClick={resetConsent}
+                className="text-gray-400 hover:text-white text-sm transition-colors cursor-pointer"
+              >
+                Cookie Preferences
+              </button>
               <Link href="/sitemap.xml" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Sitemap
               </Link>
