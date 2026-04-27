@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendSMS, createNudgeMessage, createCustomNudgeMessage } from '@/lib/twilio'
 import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
 import { countCreditsSentInPeriod } from '@/lib/credit-usage'
+import { buildReviewUrl } from '@/lib/review-url'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -223,8 +224,11 @@ export async function GET(request: NextRequest) {
           continue
         }
 
-        // Create the sentiment gate URL
-        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
+        // Create the sentiment gate URL with a slug for trust signal
+        const sentimentGateUrl = buildReviewUrl(
+          (request as any).token,
+          (request as any).profiles.business_name
+        )
 
         // Get the user's custom nudge template
         const userTemplate = templateMap.get((request as any).profiles.id)
