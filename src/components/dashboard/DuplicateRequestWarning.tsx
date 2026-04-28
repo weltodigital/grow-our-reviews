@@ -252,9 +252,9 @@ export function DuplicateRequestWarning({
                 onClick={handleProceed}
                 className={
                   duplicateCheck.warningLevel === 'error'
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    ? 'bg-red-600 hover:bg-red-700 !text-white'
                     : duplicateCheck.warningLevel === 'warning'
-                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    ? 'bg-orange-600 hover:bg-orange-700 !text-white'
                     : ''
                 }
               >
