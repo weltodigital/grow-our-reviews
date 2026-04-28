@@ -67,60 +67,31 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
-        console.log('Signup response data:', {
-          user: data.user,
-          session: data.session,
-          userCreatedAt: data.user.created_at,
-          currentTime: new Date().toISOString(),
-          timeDiff: data.user.created_at ? new Date().getTime() - new Date(data.user.created_at).getTime() : 'N/A',
-          emailConfirmedAt: data.user.email_confirmed_at,
-          lastSignInAt: data.user.last_sign_in_at
-        })
+        // Supabase obfuscates the response when the email is already registered
+        // and confirmed: it returns a fake user with identities = []. Real new
+        // signups (and re-signups of unconfirmed accounts) have a populated
+        // identities array.
+        const isAlreadyConfirmed = (data.user.identities?.length ?? 0) === 0
 
-        // Key insight: Supabase updates created_at on duplicate signups, making timestamp unreliable
-        // Instead, check for patterns that indicate an existing user:
-
-        // Pattern 1: User has no session AND no email confirmation (likely existing unconfirmed user)
-        // Pattern 2: User has email_confirmed_at set (definitely existing confirmed user)
-        // Pattern 3: User has last_sign_in_at set (definitely existing user who signed in before)
-
-        const hasEmailConfirmation = Boolean(data.user.email_confirmed_at)
-        const hasSignInHistory = Boolean(data.user.last_sign_in_at)
-        const hasNoSession = !data.session
-
-        // If user has confirmation or sign-in history, they're definitely existing
-        if (hasEmailConfirmation || hasSignInHistory) {
+        if (isAlreadyConfirmed) {
           setError('This email is already registered. Please sign in instead, or use a different email address.')
           return
         }
 
-        // If no session and no confirmation, this could be:
-        // 1. Legitimate new signup
-        // 2. Re-signup with existing unconfirmed account
-        // Check timestamp to differentiate
-        if (hasNoSession && !hasEmailConfirmation) {
-          // If user was created more than 1 minute ago, they probably already exist
-          const userCreatedMoreThanMinuteAgo = data.user.created_at &&
-            new Date(data.user.created_at) < new Date(Date.now() - 60000)
-
-          if (userCreatedMoreThanMinuteAgo) {
-            // This is an existing unconfirmed account
-            setError('This email has an unconfirmed account. Please check your email for the confirmation link, or use the button below to resend it.')
-            setShowResendOption(true)
-            return
-          } else {
-            console.log('Legitimate new signup detected')
-          }
-        }
-
-        // Check if user needs to confirm email (legitimate new signup or re-send confirmation)
         if (data.session) {
-          // User is immediately logged in, redirect to onboarding
+          // Email confirmation disabled at the project level — go straight in.
           router.push('/onboarding')
-        } else {
-          // User needs to confirm email first
-          setSuccessMessage('Please check your email to confirm your account, then you\'ll be redirected to complete your subscription setup. Don\'t forget to check your spam or junk folder if you don\'t see it in your inbox.')
+          return
         }
+
+        // No session means confirmation is pending. We can't reliably tell from
+        // the response alone whether this was a brand-new signup or a re-signup
+        // of an unconfirmed account (Supabase refreshes created_at and may
+        // silently rate-limit the auto-resend), so always offer the resend
+        // button. New signups get it as a "didn't arrive?" fallback; re-signups
+        // get a guaranteed way to recover an expired confirmation link.
+        setSuccessMessage("Please check your email to confirm your account. Don't see it in your inbox or spam folder? Use the button below to resend.")
+        setShowResendOption(true)
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -228,11 +199,13 @@ export default function SignUpPage() {
                   </Link>
                 </div>
               )}
+            </div>
+          )}
+          {successMessage && (
+            <div className="text-sm text-green-700 bg-green-50 border border-green-200 p-3 rounded">
+              {successMessage}
               {showResendOption && (
-                <div className="mt-3 pt-3 border-t border-red-200">
-                  <p className="text-sm text-gray-600 mb-2">
-                    Need a new confirmation email?
-                  </p>
+                <div className="mt-3 pt-3 border-t border-green-200">
                   <Button
                     type="button"
                     variant="outline"
@@ -245,11 +218,6 @@ export default function SignUpPage() {
                   </Button>
                 </div>
               )}
-            </div>
-          )}
-          {successMessage && (
-            <div className="text-sm text-green-600 bg-green-50 border border-green-200 p-3 rounded">
-              {successMessage}
             </div>
           )}
           <Button type="submit" className="w-full !text-black" disabled={isLoading}>
