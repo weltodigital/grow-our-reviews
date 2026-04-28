@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 
 /**
- * Minimal proxy that keeps Supabase auth cookies in sync across server requests.
+ * Minimal middleware that keeps Supabase auth cookies in sync across server
+ * requests.
  *
  * Per @supabase/ssr docs, this is the canonical pattern: read the request's
  * cookies, ask supabase to refresh the session if needed, and write any
@@ -13,8 +14,11 @@ import type { Database } from '@/types/database'
  * in src/lib/auth.ts handles all redirects (login, onboarding, billing).
  * Keeping this file focused on cookie sync avoids the failure modes that
  * sank previous middleware iterations.
+ *
+ * Note: Next 16 deprecated `middleware.ts` in favour of `proxy.ts`, but
+ * middleware.ts is still functional and more battle-tested today.
  */
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient<Database>(
