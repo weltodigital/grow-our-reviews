@@ -154,7 +154,7 @@ function CheckoutSuccessContent() {
                 <p className="text-sm text-gray-600 mb-4">
                   Your subscription is being processed in the background. You can continue to your dashboard.
                 </p>
-                <Button onClick={handleContinue} className="w-full">
+                <Button onClick={handleContinue} className="w-full !text-black">
                   Continue to Dashboard
                 </Button>
               </>

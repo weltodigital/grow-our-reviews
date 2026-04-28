@@ -286,7 +286,7 @@ export default function BusinessSearch({
                           type="button"
                           size="sm"
                           onClick={handleSaveEditedName}
-                          className="h-8 px-2 text-xs"
+                          className="h-8 px-2 text-xs !text-black"
                         >
                           <Check className="h-3 w-3" />
                         </Button>

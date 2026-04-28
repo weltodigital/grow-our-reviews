@@ -406,7 +406,7 @@ export function RequestDetailsModal({
               Close
             </Button>
             {request.status === 'failed' && (
-              <Button>
+              <Button className="!text-black">
                 Retry SMS
               </Button>
             )}

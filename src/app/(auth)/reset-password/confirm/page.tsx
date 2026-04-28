@@ -182,7 +182,7 @@ function ConfirmResetPasswordForm() {
               {error}
             </div>
           )}
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full !text-black" disabled={isLoading}>
             {isLoading ? 'Updating password...' : 'Update password'}
           </Button>
         </form>
