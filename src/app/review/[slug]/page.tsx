@@ -1,12 +1,15 @@
 import { ReviewContent } from '@/components/review/review-content'
 
 interface PageProps {
-  params: Promise<{ token: string }>
+  // Legacy single-segment URL: /review/<token>. The path is named [slug] only
+  // to match the parameter name used by /review/[slug]/[token] — Next.js
+  // requires the same dynamic-segment name at the same depth across routes.
+  params: Promise<{ slug: string }>
 }
 
 export default async function ReviewPage({ params }: PageProps) {
-  const { token } = await params
-  return <ReviewContent token={token} />
+  const { slug } = await params
+  return <ReviewContent token={slug} />
 }
 
 // Optimize for mobile performance
