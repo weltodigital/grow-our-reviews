@@ -109,11 +109,15 @@ export async function GET(request: NextRequest) {
     const userIds = [...new Set(reviewRequests.map((req: any) => req.user_id))]
     const customerIds = [...new Set(reviewRequests.map((req: any) => req.customer_id))]
 
-    // Fetch profiles and customers separately
+    // Fetch profiles and customers separately. Skip cancelled users so their
+    // queued/scheduled requests don't keep firing SMS after they've stopped
+    // paying — the request rows stay in the DB as 'scheduled' and will resume
+    // sending if the user reactivates.
     const { data: profiles, error: profilesError } = await (supabase as any)
       .from('profiles')
       .select('id, business_name, google_review_url')
       .in('id', userIds)
+      .in('subscription_status', ['active', 'trialing'])
 
     const { data: customers, error: customersError } = await (supabase as any)
       .from('customers')
