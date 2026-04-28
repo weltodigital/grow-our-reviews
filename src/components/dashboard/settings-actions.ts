@@ -1,7 +1,6 @@
 'use server'
 
 import { createServerSupabase } from '@/lib/auth'
-import { slugify } from '@/lib/slugify'
 import type { Database } from '@/types/database'
 
 interface BusinessInfoData {
@@ -264,47 +263,6 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
 
   if (data.sign_off && data.sign_off.length > 50) {
     return { error: 'Sign-off must be 50 characters or less' }
-  }
-
-  // Validate total message length using the user's real business name (which
-  // is fixed) and a worst-case customer name. Keep this in sync with the
-  // SmsPreview component so the on-screen character count matches the value
-  // checked here on save.
-  const { data: profile } = await (supabase as any)
-    .from('profiles')
-    .select('business_name')
-    .eq('id', user.id)
-    .single()
-  const realBusinessName = (profile?.business_name as string | null) || ''
-
-  const testCustomerName = 'Christopher'
-  const slug = slugify(realBusinessName)
-  const testUrl = slug
-    ? `https://app.growourreviews.com/review/${slug}/k7Bx2mPq9R`
-    : `https://app.growourreviews.com/review/k7Bx2mPq9R`
-
-  const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, realBusinessName)
-
-  // Calculate message length based on type
-  let testMessage = ''
-  if (data.type === 'nudge') {
-    // Nudge format: {greeting} {customer_name}, {request_line}: {url}
-    testMessage = `${data.greeting} ${testCustomerName}, ${data.request_line}: ${testUrl}`
-    if (data.sign_off?.trim()) {
-      testMessage += `\n${data.sign_off}`
-    }
-  } else {
-    // Initial format: {greeting} {customer_name}, {opening_line}\n{request_line}:
-    testMessage = `${data.greeting} ${testCustomerName}, ${processedOpeningLine}\n${data.request_line}:\n${testUrl}`
-    if (data.sign_off?.trim()) {
-      testMessage += `\n${data.sign_off}`
-    }
-  }
-
-  if (testMessage.length > 160) {
-    return {
-      error: `Message too long (${testMessage.length} chars). Must be under 160 characters to avoid SMS splitting. Try shortening your text.`
-    }
   }
 
   // Strip any URLs from user input
