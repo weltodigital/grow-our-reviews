@@ -102,7 +102,7 @@ function ResetPasswordForm() {
               {error}
             </div>
           )}
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full !text-black" disabled={isLoading}>
             {isLoading ? 'Sending reset link...' : 'Send reset link'}
           </Button>
         </form>
