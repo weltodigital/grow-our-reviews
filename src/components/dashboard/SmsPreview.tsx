@@ -28,7 +28,9 @@ export default function SmsPreview({
   signOff,
   businessName,
   templateType,
-  customerName = 'Sarah'
+  // Default to the same worst-case name that updateSmsTemplate uses on save,
+  // so the displayed character count matches the value validated on save.
+  customerName = 'Christopher'
 }: SmsPreviewProps) {
   // Replace {business_name} placeholder in opening line
   const processedOpeningLine = openingLine.replace(/\{business_name\}/g, businessName)

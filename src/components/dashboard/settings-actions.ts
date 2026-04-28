@@ -1,6 +1,7 @@
 'use server'
 
 import { createServerSupabase } from '@/lib/auth'
+import { slugify } from '@/lib/slugify'
 import type { Database } from '@/types/database'
 
 interface BusinessInfoData {
@@ -265,12 +266,24 @@ export async function updateSmsTemplate(data: SmsTemplateData) {
     return { error: 'Sign-off must be 50 characters or less' }
   }
 
-  // Validate total message length (simulate with common values and shorter tokens)
-  const testCustomerName = 'Christopher'
-  const testBusinessName = 'Professional Services Ltd'
-  const testUrl = 'https://app.growourreviews.com/review/abc123def456ghi789jk'  // 32-char token (actual length)
+  // Validate total message length using the user's real business name (which
+  // is fixed) and a worst-case customer name. Keep this in sync with the
+  // SmsPreview component so the on-screen character count matches the value
+  // checked here on save.
+  const { data: profile } = await (supabase as any)
+    .from('profiles')
+    .select('business_name')
+    .eq('id', user.id)
+    .single()
+  const realBusinessName = (profile?.business_name as string | null) || ''
 
-  const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, testBusinessName)
+  const testCustomerName = 'Christopher'
+  const slug = slugify(realBusinessName)
+  const testUrl = slug
+    ? `https://app.growourreviews.com/review/${slug}/k7Bx2mPq9R`
+    : `https://app.growourreviews.com/review/k7Bx2mPq9R`
+
+  const processedOpeningLine = data.opening_line.replace(/\{business_name\}/g, realBusinessName)
 
   // Calculate message length based on type
   let testMessage = ''
