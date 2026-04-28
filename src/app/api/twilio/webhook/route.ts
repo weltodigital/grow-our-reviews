@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Inbound SMS processed' })
     } else if (messageStatus && messageSid) {
       // This is a delivery status update - handle as before
-      return await handleDeliveryStatus(messageSid, messageStatus, errorCode, errorMessage, supabase, request)
+      return await handleDeliveryStatus(messageSid, messageStatus, errorCode, errorMessage, toNumber, supabase)
     }
 
     return NextResponse.json(
@@ -236,7 +236,7 @@ async function handleGeneralReply(phoneNumber: string, messageBody: string, supa
 }
 
 // Handle delivery status updates (existing functionality)
-async function handleDeliveryStatus(messageSid: string, messageStatus: string, errorCode: string, errorMessage: string, supabase: any, request: NextRequest) {
+async function handleDeliveryStatus(messageSid: string, messageStatus: string, errorCode: string, errorMessage: string, recipientPhone: string, supabase: any) {
   // Find the review request by message SID
   const { data: reviewRequest, error: findError } = await supabase
     .from('review_requests')
@@ -270,23 +270,60 @@ async function handleDeliveryStatus(messageSid: string, messageStatus: string, e
 
     case 'failed':
     case 'undelivered':
-      // Message failed to deliver - store failure details
-      newStatus = 'failed'
-      updateData = {
-        status: newStatus,
-        sms_error_code: errorCode || null,
-        sms_error_message: errorMessage || null,
-        sms_failed_at: new Date().toISOString(),
-        retry_count: ((reviewRequest as any).retry_count || 0) + 1
-      }
-      console.error(`SMS failed for request ${(reviewRequest as any).id}: ${errorMessage} (Code: ${errorCode})`)
+      // Twilio error 21610 = "Attempt to send to unsubscribed recipient".
+      // Treat this as a hard opt-out signal, not a generic delivery failure:
+      // mark the request as suppressed (not failed), and persist the
+      // suppression so the dashboard + cron block future sends to this number
+      // for this business. Covers the case where Twilio caught the opt-out at
+      // the carrier level but our inbound-STOP webhook never recorded it.
+      if (errorCode === '21610') {
+        newStatus = 'suppressed'
+        updateData = {
+          status: newStatus,
+          sms_error_code: errorCode,
+          sms_error_message: errorMessage || null,
+          sms_failed_at: new Date().toISOString(),
+        }
 
-      // Track health metrics
-      try {
-        const { healthMetrics } = await import('@/lib/health-metrics')
-        await healthMetrics.increment('sms_failed')
-      } catch (healthError) {
-        console.error('Failed to track SMS failure metrics:', healthError)
+        if (recipientPhone) {
+          const { error: suppressError } = await supabase
+            .from('sms_suppressions')
+            .upsert({
+              phone_number: recipientPhone,
+              user_id: (reviewRequest as any).user_id,
+              reason: 'twilio_opt_out_block',
+              source_message: errorMessage || 'Twilio rejected with code 21610',
+              suppressed_at: new Date().toISOString(),
+            }, {
+              onConflict: 'phone_number,user_id'
+            })
+          if (suppressError) {
+            console.error(`Failed to record suppression after 21610 for request ${(reviewRequest as any).id}:`, suppressError)
+          } else {
+            console.log(`Recorded suppression after 21610 for request ${(reviewRequest as any).id}`)
+          }
+        }
+
+        console.log(`Request ${(reviewRequest as any).id} marked suppressed: customer opted out (Twilio 21610)`)
+      } else {
+        // Generic delivery failure — keep the existing retry flow.
+        newStatus = 'failed'
+        updateData = {
+          status: newStatus,
+          sms_error_code: errorCode || null,
+          sms_error_message: errorMessage || null,
+          sms_failed_at: new Date().toISOString(),
+          retry_count: ((reviewRequest as any).retry_count || 0) + 1
+        }
+        console.error(`SMS failed for request ${(reviewRequest as any).id}: ${errorMessage} (Code: ${errorCode})`)
+
+        // Track health metrics
+        try {
+          const { healthMetrics } = await import('@/lib/health-metrics')
+          await healthMetrics.increment('sms_failed')
+        } catch (healthError) {
+          console.error('Failed to track SMS failure metrics:', healthError)
+        }
       }
       break
 

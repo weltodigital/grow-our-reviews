@@ -118,6 +118,11 @@ export function RequestsTable({
 
     switch (request.status) {
       case 'failed':
+        // Twilio code 21610 = recipient unsubscribed. Retry will always fail
+        // because the carrier blocks the number, so don't offer the button.
+        if (request.sms_error_code === '21610') {
+          return null
+        }
         return (
           <Button
             size="sm"
@@ -226,7 +231,11 @@ export function RequestsTable({
                             scheduledFor={request.scheduled_for}
                             queuedReason={request.queued_reason || undefined}
                           />
-                          {request.status === 'failed' && request.sms_error_message && (
+                          {request.status === 'suppressed' || (request.status === 'failed' && request.sms_error_code === '21610') ? (
+                            <div className="text-xs text-gray-600 max-w-xs">
+                              Customer replied STOP and is unsubscribed from your messages. We won&apos;t send to this number again.
+                            </div>
+                          ) : request.status === 'failed' && request.sms_error_message ? (
                             <div className="text-xs text-red-600 max-w-xs">
                               {request.sms_error_code && (
                                 <span className="font-mono bg-red-50 px-1 rounded">
@@ -235,7 +244,7 @@ export function RequestsTable({
                               )}{' '}
                               {request.sms_error_message}
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
@@ -292,7 +301,11 @@ export function RequestsTable({
                       scheduledFor={request.scheduled_for}
                       queuedReason={request.queued_reason || undefined}
                     />
-                    {request.status === 'failed' && request.sms_error_message && (
+                    {request.status === 'suppressed' || (request.status === 'failed' && request.sms_error_code === '21610') ? (
+                      <div className="text-xs text-gray-600 mt-1 max-w-xs">
+                        Customer replied STOP and is unsubscribed.
+                      </div>
+                    ) : request.status === 'failed' && request.sms_error_message ? (
                       <div className="text-xs text-red-600 mt-1 max-w-xs">
                         {request.sms_error_code && (
                           <span className="font-mono bg-red-50 px-1 rounded">
@@ -301,7 +314,7 @@ export function RequestsTable({
                         )}{' '}
                         {request.sms_error_message}
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </div>
 

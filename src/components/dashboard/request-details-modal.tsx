@@ -164,7 +164,16 @@ export function RequestDetailsModal({
 
   const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${request.token}`
 
+  // Twilio code 21610 = recipient opted out at the carrier level. Treat the
+  // legacy 'failed' rows from before the suppressed-status fix the same way
+  // as the new 'suppressed' rows for display purposes.
+  const isOptOut = request.status === 'suppressed'
+    || (request.status === 'failed' && request.sms_error_code === '21610')
+
   const getStatusDescription = (status: string) => {
+    if (isOptOut) {
+      return 'Customer replied STOP and is unsubscribed from your messages. Future requests to this number will be blocked automatically.'
+    }
     switch (status) {
       case 'scheduled':
         return 'SMS is scheduled to be sent automatically'
@@ -405,7 +414,7 @@ export function RequestDetailsModal({
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            {request.status === 'failed' && (
+            {request.status === 'failed' && !isOptOut && (
               <Button className="!text-black">
                 Retry SMS
               </Button>

@@ -99,7 +99,7 @@ export function StatusBadge({ status, showIcon = true, scheduledFor, queuedReaso
         }
       case 'suppressed':
         return {
-          label: 'Suppressed',
+          label: 'Customer Unsubscribed',
           icon: Shield,
           className: 'bg-gray-100 text-gray-600 border-gray-300',
         }
