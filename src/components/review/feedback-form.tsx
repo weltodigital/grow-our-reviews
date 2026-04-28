@@ -100,10 +100,10 @@ export function FeedbackForm({
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center pb-6">
           <div className="mb-4">
-            <div className="text-2xl font-bold text-blue-600 mb-2">
+            <div className="text-2xl font-bold mb-2" style={{ color: 'var(--accent-dark)' }}>
               {businessName}
             </div>
-            <div className="h-1 w-16 bg-blue-600 mx-auto rounded"></div>
+            <div className="h-1 w-16 mx-auto rounded" style={{ backgroundColor: 'var(--accent)' }}></div>
           </div>
 
           <div className="flex justify-center mb-4">
@@ -174,7 +174,7 @@ export function FeedbackForm({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1"
+                className="flex-1 !text-black"
               >
                 {isSubmitting ? (
                   <>
