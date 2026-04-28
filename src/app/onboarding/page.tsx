@@ -104,7 +104,7 @@ export default function OnboardingPage() {
               <div className="space-y-3">
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full !text-black"
                   disabled={isLoading || !businessName.trim()}
                 >
                   {isLoading ? 'Setting up...' : (selectedBusiness ? 'Complete Setup' : 'Continue Setup')}
