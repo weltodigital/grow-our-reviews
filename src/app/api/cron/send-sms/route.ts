@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendSMS, createInitialReviewMessage, createCustomInitialMessage } from '@/lib/twilio'
+import { buildReviewUrl } from '@/lib/review-url'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -231,11 +232,11 @@ export async function GET(request: NextRequest) {
           continue // Skip to next request
         }
 
-        // Create the sentiment gate URL
-        const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(request as any).token}`
-
-        // Log the URL being sent for debugging
-        console.log(`Sending SMS with URL: ${sentimentGateUrl} for customer: ${(request as any).customers.name}`)
+        // Create the sentiment gate URL with a slug for trust signal
+        const sentimentGateUrl = buildReviewUrl(
+          (request as any).token,
+          (request as any).profiles.business_name
+        )
 
         // Get the user's custom template
         const userTemplate = templateMap.get((request as any).profiles.id)

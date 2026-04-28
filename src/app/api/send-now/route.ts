@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/auth'
 import { sendSMS, createInitialReviewMessage, createCustomInitialMessage } from '@/lib/twilio'
+import { buildReviewUrl } from '@/lib/review-url'
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,8 +58,11 @@ export async function POST(request: NextRequest) {
       .eq('is_active', true)
       .single()
 
-    // Create the sentiment gate URL
-    const sentimentGateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/${(reviewRequest as any).token}`
+    // Create the sentiment gate URL with a slug for trust signal
+    const sentimentGateUrl = buildReviewUrl(
+      (reviewRequest as any).token,
+      (reviewRequest as any).profiles.business_name
+    )
 
     // Create the SMS message using custom template if available
     const message = createCustomInitialMessage({
