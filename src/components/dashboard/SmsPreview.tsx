@@ -1,5 +1,16 @@
 'use client'
 
+import { slugify } from '@/lib/slugify'
+
+const PREVIEW_TOKEN = 'k7Bx2mPq9R'
+
+function buildPreviewUrl(businessName: string): string {
+  const slug = slugify(businessName)
+  return slug
+    ? `https://app.growourreviews.com/review/${slug}/${PREVIEW_TOKEN}`
+    : `https://app.growourreviews.com/review/${PREVIEW_TOKEN}`
+}
+
 interface SmsPreviewProps {
   greeting: string
   openingLine: string
@@ -21,13 +32,14 @@ export default function SmsPreview({
 }: SmsPreviewProps) {
   // Replace {business_name} placeholder in opening line
   const processedOpeningLine = openingLine.replace(/\{business_name\}/g, businessName)
+  const previewUrl = buildPreviewUrl(businessName)
 
   // Assemble the message based on template type
   const assembleMessage = () => {
     if (templateType === 'nudge') {
       // Nudge format: {greeting} {customer_name}, {requestLine}: {link}
       const messageLines = []
-      messageLines.push(`${greeting} ${customerName}, ${requestLine}: https://app.growourreviews.com/review/abc123def456ghi789jk`)
+      messageLines.push(`${greeting} ${customerName}, ${requestLine}: ${previewUrl}`)
 
       if (signOff && signOff.trim()) {
         messageLines.push(signOff)
@@ -39,7 +51,7 @@ export default function SmsPreview({
       const messageLines = []
       messageLines.push(`${greeting} ${customerName}, ${processedOpeningLine}`)
       messageLines.push(`${requestLine}:`)
-      messageLines.push('https://app.growourreviews.com/review/abc123def456ghi789jk')
+      messageLines.push(previewUrl)
 
       if (signOff && signOff.trim()) {
         messageLines.push(signOff)

@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { ArrowLeft, Send, Clock, Settings, MessageCircle, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { createReviewRequest } from '@/app/dashboard/send/actions'
+import { slugify } from '@/lib/slugify'
 import SmsPreview from './SmsPreview'
 import { DuplicateRequestWarning } from './DuplicateRequestWarning'
 import type { Database } from '@/types/database'
@@ -193,7 +194,13 @@ export default function SendRequestForm({ profile, smsTemplate }: SendRequestFor
               <div className="pt-4 border-t border-green-200">
                 <div className="text-sm text-green-600 mb-2">Preview link (for testing):</div>
                 <code className="text-xs bg-white px-2 py-1 rounded border break-all">
-                  {process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/review/{success.token}
+                  {(() => {
+                    const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+                    const slug = slugify(profile.business_name || '')
+                    return slug
+                      ? `${base}/review/${slug}/${success.token}`
+                      : `${base}/review/${success.token}`
+                  })()}
                 </code>
               </div>
             </div>
