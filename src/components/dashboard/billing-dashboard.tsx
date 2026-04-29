@@ -453,7 +453,14 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
             <div className="text-xs text-gray-500 space-y-1">
               <p>• Update payment methods and billing address</p>
               <p>• Download invoices and billing history</p>
-              <p>• Change or cancel your subscription</p>
+              <p>• Cancel your subscription</p>
+              <p className="pt-2">
+                To downgrade your plan, please email{' '}
+                <a href="mailto:hello@growourreviews.com" className="underline" style={{ color: 'var(--accent-dark)' }}>
+                  hello@growourreviews.com
+                </a>{' '}
+                and we&apos;ll switch you over.
+              </p>
             </div>
           </CardContent>
         </Card>
