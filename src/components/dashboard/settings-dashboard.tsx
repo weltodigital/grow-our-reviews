@@ -151,10 +151,10 @@ export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashb
             <div>
               <strong>Questions?</strong> Contact us at{' '}
               <a
-                href="mailto:support@growourreviews.com"
+                href="mailto:hello@growourreviews.com"
                 className="text-green-600 hover:text-green-700"
               >
-                support@growourreviews.com
+                hello@growourreviews.com
               </a>
             </div>
           </CardContent>

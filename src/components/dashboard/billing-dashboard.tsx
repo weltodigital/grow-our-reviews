@@ -516,7 +516,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
                 asChild
                 className="!text-black"
               >
-                <a href="mailto:support@growourreviews.com?subject=Custom Plan Request&body=Hi, I'm currently on the Growth plan and would like to discuss increasing my monthly message credit limit. Please get in touch to discuss custom options.">
+                <a href="mailto:hello@growourreviews.com?subject=Custom Plan Request&body=Hi, I'm currently on the Growth plan and would like to discuss increasing my monthly message credit limit. Please get in touch to discuss custom options.">
                   Contact Support
                 </a>
               </Button>
@@ -543,11 +543,11 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               <p className="text-gray-600">
                 Email{' '}
                 <a
-                  href="mailto:support@growourreviews.com"
+                  href="mailto:hello@growourreviews.com"
                   className="hover:underline"
                   style={{ color: 'var(--accent-dark)' }}
                 >
-                  support@growourreviews.com
+                  hello@growourreviews.com
                 </a>
               </p>
             </div>

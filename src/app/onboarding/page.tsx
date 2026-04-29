@@ -132,7 +132,7 @@ export default function OnboardingPage() {
           <p className="text-xs text-gray-500">
             Can't find your business in the search?{' '}
             <a
-              href="mailto:support@growourreviews.com"
+              href="mailto:hello@growourreviews.com"
               className="hover:underline"
               style={{ color: 'var(--accent)' }}
             >

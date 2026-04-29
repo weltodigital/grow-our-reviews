@@ -285,7 +285,7 @@ export function AccountSettings({
             Have questions about your account or need technical support?
           </p>
           <Button variant="outline" size="sm" asChild>
-            <a href="mailto:support@growourreviews.com">
+            <a href="mailto:hello@growourreviews.com">
               <Mail className="h-4 w-4 mr-2" />
               Contact Support
             </a>

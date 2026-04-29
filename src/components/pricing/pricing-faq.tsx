@@ -104,7 +104,7 @@ export function PricingFaq() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="mailto:billing@growourreviews.com"
+                href="mailto:hello@growourreviews.com"
                 className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors text-sm font-medium"
               >
                 Email us
