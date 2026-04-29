@@ -16,6 +16,27 @@ function CheckoutSuccessContent() {
   const sessionId = searchParams.get('session_id')
   const supabase = createClient()
 
+  // Fire the Meta Pixel StartTrial event exactly once, when the webhook has
+  // confirmed the subscription is active. Any earlier (e.g. on signup form
+  // submit) would attribute drop-off-prone users; firing on 'timeout' would
+  // count partial successes that the webhook hasn't actually reconciled yet.
+  // Pixel is gated on cookie consent (Trackers.tsx); fbq is undefined for
+  // users who rejected, so the call silently no-ops — which is correct.
+  useEffect(() => {
+    if (status !== 'success') return
+    const fbq = (window as any).fbq
+    if (typeof fbq !== 'function') return
+    fbq('track', 'StartTrial', {
+      currency: 'GBP',
+      // value should reflect the trial's worth to you — typically the first
+      // billing-cycle revenue (e.g. Starter plan price). predicted_ltv is your
+      // honest expected lifetime value per converted user. Adjust to match
+      // your actual pricing & retention numbers.
+      value: 0,
+      predicted_ltv: 0,
+    })
+  }, [status])
+
   useEffect(() => {
     if (!supabase) return
 
