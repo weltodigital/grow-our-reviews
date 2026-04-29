@@ -531,24 +531,26 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
           <CardTitle>Need Help?</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-sm">
-            <p>
-              <strong>Questions about your subscription?</strong> Use the "Manage Billing"
-              button above to access your Stripe customer portal.
-            </p>
-            <p>
-              <strong>Technical support:</strong> Contact us at{' '}
-              <a
-                href="mailto:support@growourreviews.com"
-                className="text-green-600 hover:text-green-700"
-              >
-                support@growourreviews.com
-              </a>
-            </p>
-            <p>
-              <strong>Billing questions:</strong> All billing is handled securely by Stripe.
-              You can manage everything through the customer portal.
-            </p>
+          <div className="space-y-4 text-sm">
+            <div>
+              <div className="font-medium text-gray-900 mb-1">Subscription & billing</div>
+              <p className="text-gray-600">
+                Use the &ldquo;Manage Billing&rdquo; button above to access your Stripe customer portal for invoices, payment methods, and cancellation.
+              </p>
+            </div>
+            <div>
+              <div className="font-medium text-gray-900 mb-1">Technical support</div>
+              <p className="text-gray-600">
+                Email{' '}
+                <a
+                  href="mailto:support@growourreviews.com"
+                  className="hover:underline"
+                  style={{ color: 'var(--accent-dark)' }}
+                >
+                  support@growourreviews.com
+                </a>
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
