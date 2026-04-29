@@ -2,6 +2,7 @@
 
 import { createServerSupabase } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { calculateBillingCycleDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 
 interface OnboardingData {
@@ -66,7 +67,7 @@ export async function completeOnboarding(data: OnboardingData) {
         email: user.email!,
         business_name: data.businessName.trim(),
         google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
-        billing_cycle_date: new Date().getDate(), // Set to current day of month
+        billing_cycle_date: calculateBillingCycleDate(new Date()),
         updated_at: new Date().toISOString(),
       })
 
