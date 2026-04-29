@@ -27,13 +27,9 @@ function CheckoutSuccessContent() {
     const fbq = (window as any).fbq
     if (typeof fbq !== 'function') return
     fbq('track', 'StartTrial', {
+      value: 49.00,
       currency: 'GBP',
-      // value should reflect the trial's worth to you — typically the first
-      // billing-cycle revenue (e.g. Starter plan price). predicted_ltv is your
-      // honest expected lifetime value per converted user. Adjust to match
-      // your actual pricing & retention numbers.
-      value: 0,
-      predicted_ltv: 0,
+      predicted_ltv: '294.00',
     })
   }, [status])
 
