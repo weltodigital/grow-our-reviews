@@ -59,7 +59,7 @@ export async function createCheckoutSession({
       },
     ],
     subscription_data: {
-      trial_period_days: trialDays,
+      ...(trialDays && trialDays > 0 ? { trial_period_days: trialDays } : {}),
       metadata: {
         userId,
       },
