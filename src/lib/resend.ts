@@ -1,8 +1,16 @@
 import { Resend } from 'resend'
+import { PRICING_PLANS, getPlanByLimit, type PlanKey } from './pricing'
 
 const resendApiKey = process.env.RESEND_API_KEY
 
 export const resend = resendApiKey ? new Resend(resendApiKey) : null
+
+// Returns the next tier up from the given plan (Lite → Starter → Growth → null)
+function nextPlanUp(planKey: PlanKey): PlanKey | null {
+  if (planKey === 'lite') return 'starter'
+  if (planKey === 'starter') return 'growth'
+  return null
+}
 
 export async function sendWelcomeEmail(to: string, businessName: string) {
   if (!resend) {
@@ -122,11 +130,12 @@ export async function sendSubscriptionConfirmationEmail(to: string, businessName
 
         <h2>What you get:</h2>
         <ul>
-          <li>Unlimited review requests (within your plan limits)</li>
+          <li>Review requests up to your plan's monthly limit</li>
           <li>Automatic sentiment filtering</li>
           <li>Private feedback collection</li>
+          <li>Automatic follow-up nudges</li>
           <li>Dashboard analytics</li>
-          ${planName === 'Growth' ? '<li>Automatic follow-up nudges</li><li>Priority support</li>' : ''}
+          ${planName === 'Growth' ? '<li>Priority support</li>' : '<li>Email support</li>'}
         </ul>
 
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Go to Dashboard →</a></p>
@@ -162,9 +171,11 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
     return { success: false, error: 'Email service not configured' }
   }
 
-  const planName = currentLimit === 150 ? 'Starter' : 'Growth'
-  const nextPlanName = currentLimit === 150 ? 'Growth' : null
-  const nextPlanLimit = currentLimit === 150 ? '300' : null
+  const currentPlanKey = getPlanByLimit(currentLimit)
+  const planName = PRICING_PLANS[currentPlanKey].name
+  const nextPlanKey = nextPlanUp(currentPlanKey)
+  const nextPlanName = nextPlanKey ? PRICING_PLANS[nextPlanKey].name : null
+  const nextPlanLimit = nextPlanKey ? String(PRICING_PLANS[nextPlanKey].monthlyRequestLimit) : null
 
   try {
     const { data, error } = await resend.emails.send({
@@ -178,7 +189,7 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
 
         <p>You've used all <strong>${requestsUsed}/${currentLimit}</strong> review requests in your ${planName} plan for this month.</p>
 
-        ${currentLimit === 150 ? `
+        ${nextPlanKey ? `
         <p>To continue sending review requests, you can upgrade to the <strong>${nextPlanName}</strong> plan and get ${nextPlanLimit} requests per month.</p>
 
         <h2>Why upgrade?</h2>
@@ -204,7 +215,7 @@ export async function sendPlanLimitReachedEmail(to: string, businessName: string
         <p><a href="mailto:ed@growourreviews.com" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Contact Support →</a></p>
         `}
 
-        <p>Your plan will reset next month${currentLimit === 150 ? ', or you can upgrade anytime to continue sending requests immediately' : ' with a fresh allocation of requests'}.</p>
+        <p>Your plan will reset next month${nextPlanKey ? ', or you can upgrade anytime to continue sending requests immediately' : ' with a fresh allocation of requests'}.</p>
 
         <p>Questions about upgrading? Just reply to this email and I'll help you choose the right plan.</p>
 

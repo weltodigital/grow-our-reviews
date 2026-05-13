@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { Niche } from '@/data/niches'
 import { PatternConfig, SectionContent } from '@/data/pseo-patterns'
+import { PLAN_DISPLAY_ORDER, PRICING_PLANS } from '@/lib/pricing'
 
 interface SectionProps {
   niche: Niche
@@ -527,38 +528,26 @@ export function PseoPricingSection({
   niche: Niche
   heading: string
 }) {
-  const plans = [
-    {
-      name: 'Starter',
-      price: 49,
-      requests: 150,
-      features: [
-        'Up to 150 message credits per month',
-        'SMS review requests',
-        'Automatic follow-up nudges',
-        'Sentiment gate (review filtering)',
-        'Simple dashboard',
-        'Email support',
-      ],
-      recommended: false,
-    },
-    {
-      name: 'Growth',
-      price: 79,
-      requests: 300,
-      features: ['Up to 300 message credits per month', 'Everything in Starter', 'Priority support'],
-      recommended: true,
-    },
-  ]
+  const plans = PLAN_DISPLAY_ORDER.map((key) => {
+    const p = PRICING_PLANS[key]
+    return {
+      name: p.name,
+      price: p.price,
+      requests: p.monthlyRequestLimit,
+      features: [...p.features],
+      recommended: p.popular,
+    }
+  })
   return (
     <SectionWrapper id="pricing">
       <div className="text-center mb-12">
         <h2 className="mb-4">{heading}</h2>
         <p className="page-subtitle mx-auto">
-          14-day free trial. Card required. Cancel from the dashboard anytime.
+          14-day free trial on the plan you choose. Card required. Cancel from the dashboard
+          anytime.
         </p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {plans.map((plan) => (
           <div
             key={plan.name}

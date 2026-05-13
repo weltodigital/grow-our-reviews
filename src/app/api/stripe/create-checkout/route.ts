@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { createCheckoutSession } from '@/lib/stripe'
-import { PRICING_PLANS, type PlanKey } from '@/lib/pricing'
+import { getPlanByPriceId, PRICING_PLANS, type PlanKey } from '@/lib/pricing'
 import type { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
@@ -116,16 +116,11 @@ export async function POST(request: NextRequest) {
       selectedPlan = PRICING_PLANS[planKey]
       planType = planKey
     } else if (priceId) {
-      // Determine plan from priceId
-      const starterPriceId = process.env.STRIPE_STARTER_PRICE_ID
-      const growthPriceId = process.env.STRIPE_GROWTH_PRICE_ID
-
-      if (priceId === starterPriceId) {
-        selectedPlan = PRICING_PLANS.starter
-        planType = 'starter'
-      } else if (priceId === growthPriceId) {
-        selectedPlan = PRICING_PLANS.growth
-        planType = 'growth'
+      // Determine plan from priceId via the central lookup helper
+      const resolved = getPlanByPriceId(priceId)
+      if (resolved) {
+        selectedPlan = PRICING_PLANS[resolved]
+        planType = resolved
       }
     }
 

@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { constructWebhookEvent, getPriceInfo } from '@/lib/stripe'
-import { PRICING_PLANS, getPlanByLimit, calculateTrialEndDate } from '@/lib/pricing'
+import { PRICING_PLANS, getPlan, getPlanByLimit, calculateTrialEndDate } from '@/lib/pricing'
 import { calculateBillingCycleDate } from '@/lib/billing-cycle'
 import type { Database } from '@/types/database'
 import Stripe from 'stripe'
@@ -316,7 +316,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
                   }
 
                   // Send subscription confirmation email directly
-                  const planName = priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth'
+                  const planName = getPlan(getPlanByLimit(priceInfo.monthlyRequestLimit)).name
                   console.log('🔧 Debug: Attempting to send subscription email for plan:', planName)
 
                   const subscriptionResult = await sendSubscriptionConfirmationEmail(
@@ -438,7 +438,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
             console.log('Sending upgrade confirmation email to:', profile.email)
             const { sendSubscriptionConfirmationEmail } = await import('@/lib/resend')
 
-            const planName = priceInfo.monthlyRequestLimit === 150 ? 'Starter' : 'Growth'
+            const planName = getPlan(getPlanByLimit(priceInfo.monthlyRequestLimit)).name
             const result = await sendSubscriptionConfirmationEmail(
               profile.email,
               profile.business_name || 'there',
@@ -565,7 +565,7 @@ async function processWebhookEvent(event: any, supabase: any, correlationId: str
           if (profile) {
             try {
               const retryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')
-              const planName = profile.monthly_request_limit === 150 ? 'Starter' : 'Growth'
+              const planName = getPlan(getPlanByLimit(profile.monthly_request_limit)).name
 
               await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/payment-failed`, {
                 method: 'POST',

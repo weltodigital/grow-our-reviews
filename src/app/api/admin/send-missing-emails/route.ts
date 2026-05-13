@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { protectAdminEndpoint } from '@/lib/admin-auth'
 import { sendWelcomeEmail, sendSubscriptionConfirmationEmail } from '@/lib/resend'
+import { getPlan, getPlanByLimit } from '@/lib/pricing'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (emailType === 'subscription' || emailType === 'both') {
-      const planName = profile.monthly_request_limit === 300 ? 'Growth' : 'Starter'
+      const planName = getPlan(getPlanByLimit(profile.monthly_request_limit)).name
       const subscriptionResult = await sendSubscriptionConfirmationEmail(
         profile.email,
         profile.business_name,
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       profile: {
         email: profile.email,
         businessName: profile.business_name,
-        plan: profile.monthly_request_limit === 300 ? 'Growth' : 'Starter'
+        plan: getPlan(getPlanByLimit(profile.monthly_request_limit)).name,
       },
       results
     })

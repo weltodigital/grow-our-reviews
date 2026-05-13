@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database'
 import { protectAdminEndpoint } from '@/lib/admin-auth'
+import { getPlan, getPlanByLimit } from '@/lib/pricing'
 
 interface TrialAnalytics {
   overview: {
@@ -161,7 +162,7 @@ async function calculateTrialAnalytics(
         userId: profile.id,
         email: profile.email,
         convertedAt: profile.created_at,
-        plan: profile.monthly_request_limit === 150 ? 'Starter' : 'Growth',
+        plan: getPlan(getPlanByLimit(profile.monthly_request_limit)).name,
         trialUsage: userReqs.length
       }
     })

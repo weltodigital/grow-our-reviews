@@ -6,30 +6,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, CreditCard, Shield, Clock, XCircle } from 'lucide-react'
-import { PRICING_PLANS } from '@/lib/pricing'
+import { PLAN_DISPLAY_ORDER, PRICING_PLANS, type PlanKey } from '@/lib/pricing'
 import { createClient } from '@/lib/supabase'
 
 export default function BillingSetupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'growth'>('starter')
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey>('starter')
   const [userProfile, setUserProfile] = useState<any>(null)
-  const [dataStats, setDataStats] = useState<{customerCount: number, requestCount: number} | null>(null)
+  const [dataStats, setDataStats] = useState<{ customerCount: number; requestCount: number } | null>(
+    null,
+  )
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    // Check if user is authenticated
     const checkAuth = async () => {
       if (!supabase) return
 
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (!session) {
         router.push('/login')
         return
       }
 
-      // Check if user already has a subscription
       const { data: profile } = await supabase
         .from('profiles')
         .select('subscription_status, stripe_customer_id, business_name, created_at, cancellation_reason')
@@ -39,30 +41,28 @@ export default function BillingSetupPage() {
       if (profile) {
         setUserProfile(profile)
 
-        // Only redirect if they have BOTH a subscription status AND a stripe customer ID
-        // This prevents redirecting users who have default 'trialing' status but no actual billing setup
-        if (((profile as any).subscription_status === 'active' || (profile as any).subscription_status === 'trialing') && (profile as any).stripe_customer_id) {
+        if (
+          ((profile as any).subscription_status === 'active' ||
+            (profile as any).subscription_status === 'trialing') &&
+          (profile as any).stripe_customer_id
+        ) {
           router.push('/dashboard')
           return
         }
 
-        // If user is cancelled (returning customer), fetch their data stats
         if ((profile as any).subscription_status === 'cancelled') {
           try {
             const [customersResult, requestsResult] = await Promise.all([
-              supabase
-                .from('customers')
-                .select('id', { count: 'exact' })
-                .eq('user_id', session.user.id),
+              supabase.from('customers').select('id', { count: 'exact' }).eq('user_id', session.user.id),
               supabase
                 .from('review_requests')
                 .select('id', { count: 'exact' })
-                .eq('user_id', session.user.id)
+                .eq('user_id', session.user.id),
             ])
 
             setDataStats({
               customerCount: customersResult.count || 0,
-              requestCount: requestsResult.count || 0
+              requestCount: requestsResult.count || 0,
             })
           } catch (error) {
             console.error('Error fetching data stats:', error)
@@ -74,7 +74,7 @@ export default function BillingSetupPage() {
     checkAuth()
   }, [router, supabase])
 
-  const handleStartTrial = async (plan: 'starter' | 'growth') => {
+  const handleStartTrial = async (plan: PlanKey) => {
     setIsLoading(true)
     setError('')
 
@@ -83,26 +83,24 @@ export default function BillingSetupPage() {
         throw new Error('Service temporarily unavailable')
       }
 
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (!session) {
         router.push('/login')
         return
       }
 
-      // Get the price ID for the selected plan
-      const planConfig = PRICING_PLANS[plan]
-
-      // Create Stripe checkout session
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          priceId: plan === 'starter' ? process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_GROWTH_PRICE_ID,
+          planKey: plan,
           successUrl: `${window.location.origin}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/billing/setup`,
-          trialDays: userProfile?.subscription_status === 'cancelled' ? 0 : 14, // No trial for returning customers
+          trialDays: userProfile?.subscription_status === 'cancelled' ? 0 : 14,
         }),
       })
 
@@ -112,10 +110,7 @@ export default function BillingSetupPage() {
       }
 
       const { url } = await response.json()
-
-      // Redirect to Stripe Checkout
       window.location.href = url
-
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.')
     } finally {
@@ -123,39 +118,26 @@ export default function BillingSetupPage() {
     }
   }
 
-  const planFeatures = {
-    starter: [
-      'Up to 150 message credits per month',
-      'SMS review requests',
-      'Automatic follow-up nudges (enable/disable)',
-      'Sentiment-based routing',
-      'Analytics dashboard',
-      'Email support',
-    ],
-    growth: [
-      'Up to 300 message credits per month',
-      'Everything in Starter',
-      'Priority support',
-    ],
-  }
+  const isCancelled = userProfile?.subscription_status === 'cancelled'
+  const isPaymentFailed = isCancelled && (userProfile as any).cancellation_reason === 'payment_failed'
+  const selectedPlanName = PRICING_PLANS[selectedPlan].name
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          {userProfile?.subscription_status === 'cancelled' ? (
+          {isCancelled ? (
             <>
-              {(userProfile as any).cancellation_reason === 'payment_failed' ? (
+              {isPaymentFailed ? (
                 <>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    Payment Issue - Let's Fix This 🔧
+                    Payment Issue - Let&apos;s Fix This 🔧
                   </h1>
                   <p className="text-gray-600 mb-4">
-                    Your payment method was declined, but your data is completely safe. Update your payment method or choose a new plan to restore access.
+                    Your payment method was declined, but your data is completely safe. Update your
+                    payment method or choose a new plan to restore access.
                   </p>
-
-                  {/* Payment Failed Info */}
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
                     <div className="flex items-center justify-center gap-2 text-red-700 font-medium mb-2">
                       <XCircle className="h-5 w-5" />
@@ -178,12 +160,12 @@ export default function BillingSetupPage() {
                     Welcome back, {userProfile.business_name}! 👋
                   </h1>
                   <p className="text-gray-600 mb-4">
-                    Your data is safe and ready to go. Reactivate your subscription to continue where you left off.
+                    Your data is safe and ready to go. Reactivate your subscription to continue where
+                    you left off.
                   </p>
                 </>
               )}
 
-              {/* Data Preview for Returning Customers */}
               {dataStats && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
                   <div className="flex items-center justify-center gap-2 text-green-700 font-medium mb-2">
@@ -197,7 +179,7 @@ export default function BillingSetupPage() {
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <span className="font-semibold text-lg">{dataStats.requestCount}</span>
-                      <span>review requests & responses</span>
+                      <span>review requests &amp; responses</span>
                     </div>
                   </div>
                 </div>
@@ -205,18 +187,14 @@ export default function BillingSetupPage() {
             </>
           ) : (
             <>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Complete Your Setup
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Setup</h1>
               <p className="text-gray-600 mb-4">
                 Choose your plan to start your 14-day free trial
               </p>
-
-              {/* Trial Benefits for New Users */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
                 <div className="flex items-center justify-center gap-2 text-blue-700 font-medium mb-2">
                   <Shield className="h-5 w-5" />
-                  14-Day Free Trial
+                  14-Day Free Trial on the plan you choose
                 </div>
                 <div className="grid md:grid-cols-3 gap-4 text-sm text-blue-600">
                   <div className="flex items-center gap-2">
@@ -238,86 +216,53 @@ export default function BillingSetupPage() {
         </div>
 
         {/* Plan Selection */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Starter Plan */}
-          <Card
-            className={`relative cursor-pointer transition-all ${
-              selectedPlan === 'starter'
-                ? 'ring-2 border-2'
-                : 'hover:border-gray-300'
-            }`}
-            style={selectedPlan === 'starter' ? {
-              borderColor: 'var(--accent)'
-            } : {}}
-            onClick={() => setSelectedPlan('starter')}
-          >
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-xl">Starter</CardTitle>
-                  <CardDescription>Perfect for small businesses</CardDescription>
-                </div>
-                <Badge variant="secondary">Most Popular</Badge>
-              </div>
-              <div className="mt-4">
-                <span className="text-3xl font-bold">£{PRICING_PLANS.starter.price}</span>
-                <span className="text-gray-500">/month</span>
-                <p className="text-xs text-gray-500 mt-1">
-                  £{(PRICING_PLANS.starter.price / PRICING_PLANS.starter.monthlyRequestLimit).toFixed(2)} per credit
-                </p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {planFeatures.starter.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Growth Plan */}
-          <Card
-            className={`relative cursor-pointer transition-all ${
-              selectedPlan === 'growth'
-                ? 'ring-2 border-2'
-                : 'hover:border-gray-300'
-            }`}
-            style={selectedPlan === 'growth' ? {
-              borderColor: 'var(--accent)'
-            } : {}}
-            onClick={() => setSelectedPlan('growth')}
-          >
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-xl">Growth</CardTitle>
-                  <CardDescription>For growing businesses</CardDescription>
-                </div>
-                <Badge className="bg-purple-100 text-purple-700">Best Value</Badge>
-              </div>
-              <div className="mt-4">
-                <span className="text-3xl font-bold">£{PRICING_PLANS.growth.price}</span>
-                <span className="text-gray-500">/month</span>
-                <p className="text-xs text-gray-500 mt-1">
-                  £{(PRICING_PLANS.growth.price / PRICING_PLANS.growth.monthlyRequestLimit).toFixed(2)} per credit
-                </p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {planFeatures.growth.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          {PLAN_DISPLAY_ORDER.map((key) => {
+            const plan = PRICING_PLANS[key]
+            const isSelected = selectedPlan === key
+            const costPerCredit = (plan.price / plan.monthlyRequestLimit).toFixed(2)
+            const description =
+              key === 'lite'
+                ? 'For low-volume businesses'
+                : key === 'starter'
+                  ? 'Most popular for busy trades'
+                  : 'For high-volume businesses'
+            return (
+              <Card
+                key={key}
+                className={`relative cursor-pointer transition-all ${
+                  isSelected ? 'ring-2 border-2' : 'hover:border-gray-300'
+                }`}
+                style={isSelected ? { borderColor: 'var(--accent)' } : {}}
+                onClick={() => setSelectedPlan(key)}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-xl">{plan.name}</CardTitle>
+                      <CardDescription>{description}</CardDescription>
+                    </div>
+                    {plan.popular && <Badge variant="secondary">Most Popular</Badge>}
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-3xl font-bold">£{plan.price}</span>
+                    <span className="text-gray-500">/month</span>
+                    <p className="text-xs text-gray-500 mt-1">£{costPerCredit} per credit</p>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-sm">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
 
         {/* Error Display */}
@@ -338,19 +283,21 @@ export default function BillingSetupPage() {
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
-                {userProfile?.subscription_status === 'cancelled' ? 'Reactivating...' : 'Setting up your trial...'}
+                {isCancelled ? 'Reactivating...' : 'Setting up your trial...'}
               </>
+            ) : isCancelled ? (
+              isPaymentFailed ? (
+                `Fix Payment & Restore ${selectedPlanName}`
+              ) : (
+                `Reactivate ${selectedPlanName} Plan`
+              )
             ) : (
-              userProfile?.subscription_status === 'cancelled'
-                ? ((userProfile as any).cancellation_reason === 'payment_failed'
-                   ? `Fix Payment & Restore ${selectedPlan === 'starter' ? 'Starter' : 'Growth'}`
-                   : `Reactivate ${selectedPlan === 'starter' ? 'Starter' : 'Growth'} Plan`)
-                : `Start ${selectedPlan === 'starter' ? 'Starter' : 'Growth'} Trial`
+              `Start ${selectedPlanName} Trial`
             )}
           </Button>
 
-          {userProfile?.subscription_status === 'cancelled' ? (
-            (userProfile as any).cancellation_reason === 'payment_failed' ? (
+          {isCancelled ? (
+            isPaymentFailed ? (
               <p className="text-sm text-gray-500 mt-4">
                 This will update your payment method and restore your subscription immediately.
                 <br />
@@ -365,7 +312,7 @@ export default function BillingSetupPage() {
             )
           ) : (
             <p className="text-sm text-gray-500 mt-4">
-              Your 14-day free trial starts now. You'll only be charged after the trial ends.
+              Your 14-day free trial starts now. You&apos;ll only be charged after the trial ends.
               <br />
               Cancel anytime through your billing dashboard.
             </p>

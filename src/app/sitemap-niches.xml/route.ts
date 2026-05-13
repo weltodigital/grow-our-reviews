@@ -5,7 +5,7 @@ import { patterns } from '@/data/pseo-patterns'
 const BASE = 'https://www.growourreviews.com'
 
 export async function GET() {
-  const today = '2026-05-12'
+  const today = new Date().toISOString().split('T')[0]
 
   // Pattern index pages
   const indexUrls = patterns.map((p) => ({

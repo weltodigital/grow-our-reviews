@@ -45,6 +45,7 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Paid Subscriptions</h3>
             <ul className="list-disc pl-6 mb-4 text-gray-700">
+              <li><strong>Lite Plan:</strong> £19 per month for up to 30 SMS requests</li>
               <li><strong>Starter Plan:</strong> £49 per month for up to 150 SMS requests</li>
               <li><strong>Growth Plan:</strong> £79 per month for up to 300 SMS requests</li>
             </ul>

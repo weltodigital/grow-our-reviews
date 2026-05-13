@@ -10,6 +10,13 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 
 // Stripe configuration for our pricing
 export const STRIPE_CONFIG = {
+  lite: {
+    priceId: process.env.STRIPE_LITE_PRICE_ID!,
+    amount: 1900, // £19.00 in pence
+    currency: 'gbp',
+    interval: 'month',
+    monthlyRequestLimit: 30,
+  },
   starter: {
     priceId: process.env.STRIPE_STARTER_PRICE_ID!,
     amount: 4900, // £49.00 in pence
@@ -27,6 +34,16 @@ export const STRIPE_CONFIG = {
 } as const
 
 export type StripePlanKey = keyof typeof STRIPE_CONFIG
+
+// Reverse-lookup: get plan key from a Stripe price ID. Use this in webhooks
+// instead of inferring plan from monthlyRequestLimit (brittle once Lite exists).
+export function getStripePlanKeyByPriceId(priceId: string | null | undefined): StripePlanKey | null {
+  if (!priceId) return null
+  if (priceId === STRIPE_CONFIG.lite.priceId) return 'lite'
+  if (priceId === STRIPE_CONFIG.starter.priceId) return 'starter'
+  if (priceId === STRIPE_CONFIG.growth.priceId) return 'growth'
+  return null
+}
 
 // Create checkout session with customizable trial
 export async function createCheckoutSession({

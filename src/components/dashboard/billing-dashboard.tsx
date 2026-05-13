@@ -14,7 +14,7 @@ import {
   Zap
 } from 'lucide-react'
 import Link from 'next/link'
-import { PRICING_PLANS, formatPrice, getPlanByLimit } from '@/lib/pricing'
+import { PLAN_DISPLAY_ORDER, PRICING_PLANS, formatPrice, getPlanByLimit, type PlanKey } from '@/lib/pricing'
 import { getNextBillingDate } from '@/lib/billing-cycle'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
@@ -91,8 +91,10 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
     }
   }
 
-  const handleUpgrade = async () => {
+  const [changingTo, setChangingTo] = useState<PlanKey | null>(null)
+  const handlePlanChange = async (targetPlan: PlanKey) => {
     setIsLoading(true)
+    setChangingTo(targetPlan)
     setError('')
 
     try {
@@ -101,28 +103,23 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          targetPlan: 'growth'
-        })
+        body: JSON.stringify({ targetPlan }),
       })
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || 'Failed to start upgrade process')
+        throw new Error(error.error || 'Failed to change plan')
       }
 
       const data = await response.json()
-
       if (data.redirect) {
-        // Direct subscription update succeeded
         window.location.href = data.redirect
       } else if (data.url) {
-        // Checkout session created
         window.location.href = data.url
       }
-
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.')
+      setChangingTo(null)
     } finally {
       setIsLoading(false)
     }
@@ -454,76 +451,84 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
               <p>• Update payment methods and billing address</p>
               <p>• Download invoices and billing history</p>
               <p>• Cancel your subscription</p>
-              <p className="pt-2">
-                To downgrade your plan, please email{' '}
-                <a href="mailto:hello@growourreviews.com" className="underline" style={{ color: 'var(--accent-dark)' }}>
-                  hello@growourreviews.com
-                </a>{' '}
-                and we&apos;ll switch you over.
-              </p>
             </div>
           </CardContent>
         </Card>
 
-      {/* Upgrade Options */}
-      {currentPlan === 'starter' && (
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-green-900">Need More Message Credits?</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-800 mb-2">
-                  Upgrade to Growth plan for {PRICING_PLANS.growth.monthlyRequestLimit} monthly message credits
-                </p>
-                <p className="text-sm text-green-700">
-                  Just {formatPrice(getCostPerRequest('growth'))} per credit vs {formatPrice(getCostPerRequest('starter'))} on Starter
-                </p>
-              </div>
-              <Button
-                onClick={handleUpgrade}
-                disabled={isLoading}
-                className="bg-green-600 hover:bg-green-700 text-white !text-black"
-              >
-                {isLoading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                ) : null}
-                Upgrade Now
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Growth Plan - Need More Credits */}
-      {currentPlan === 'growth' && (
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-green-900">Need More Than {PRICING_PLANS.growth.monthlyRequestLimit} Message Credits?</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-800 mb-2">
-                  Looking for a custom plan with higher limits? We can help create a solution that fits your business needs.
-                </p>
-                <p className="text-sm text-green-700">
-                  Contact our team to discuss custom pricing and limits for high-volume businesses.
-                </p>
-              </div>
-              <Button
-                asChild
-                className="!text-black"
-              >
-                <a href="mailto:hello@growourreviews.com?subject=Custom Plan Request&body=Hi, I'm currently on the Growth plan and would like to discuss increasing my monthly message credit limit. Please get in touch to discuss custom options.">
-                  Contact Support
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Change Plan */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Change your plan</CardTitle>
+          <p className="text-sm text-gray-500">
+            Switch between any plan at any time. Upgrades are charged pro-rata for the rest of
+            this billing period; downgrades apply a credit to your next invoice.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-4">
+            {PLAN_DISPLAY_ORDER.map((key) => {
+              const plan = PRICING_PLANS[key]
+              const isCurrent = currentPlan === key
+              const isLowerTier = plan.monthlyRequestLimit < planConfig.monthlyRequestLimit
+              const buttonLabel = isCurrent
+                ? 'Current plan'
+                : isLowerTier
+                  ? `Downgrade to ${plan.name}`
+                  : `Upgrade to ${plan.name}`
+              return (
+                <div
+                  key={key}
+                  className={`rounded-lg p-4 border ${
+                    isCurrent ? 'border-2' : 'border-gray-200'
+                  }`}
+                  style={isCurrent ? { borderColor: 'var(--accent)' } : {}}
+                >
+                  <div className="flex items-baseline justify-between mb-1">
+                    <h4 className="font-semibold text-base">{plan.name}</h4>
+                    {plan.popular && !isCurrent && (
+                      <Badge variant="secondary" className="text-xs">
+                        Most Popular
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="mb-2">
+                    <span className="text-2xl font-bold">{formatPrice(plan.price)}</span>
+                    <span className="text-sm text-gray-500">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {plan.monthlyRequestLimit} message credits / month
+                  </p>
+                  <p className="text-xs text-gray-500 mb-4">
+                    {formatPrice(plan.price / plan.monthlyRequestLimit)} per credit
+                  </p>
+                  <Button
+                    onClick={() => handlePlanChange(key)}
+                    disabled={isCurrent || isLoading}
+                    variant={isCurrent ? 'outline' : 'default'}
+                    className="w-full !text-black"
+                  >
+                    {isLoading && changingTo === key ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
+                    ) : null}
+                    {buttonLabel}
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+          <p className="text-xs text-gray-500 mt-4">
+            Need a plan with higher limits than Growth?{' '}
+            <a
+              href="mailto:hello@growourreviews.com?subject=Custom Plan Request"
+              className="underline"
+              style={{ color: 'var(--accent-dark)' }}
+            >
+              Contact us
+            </a>{' '}
+            and we&apos;ll put something together.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Support */}
       <Card>
@@ -557,7 +562,4 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
     </div>
   )
 
-  function getCostPerRequest(plan: 'starter' | 'growth'): number {
-    return PRICING_PLANS[plan].price / PRICING_PLANS[plan].monthlyRequestLimit
-  }
 }

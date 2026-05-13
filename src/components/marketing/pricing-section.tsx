@@ -1,38 +1,20 @@
 'use client'
 
-import Link from 'next/link'
 import { CheckCircle } from 'lucide-react'
-import { formatPrice } from '@/lib/pricing'
+import { formatPrice, PRICING_PLANS, PLAN_DISPLAY_ORDER } from '@/lib/pricing'
 import { getAppUrl } from '@/lib/utils'
 
 export function PricingSection() {
-  const plans = [
-    {
-      name: 'Starter',
-      price: 49,
-      requests: 150,
-      features: [
-        'Up to 150 message credits per month',
-        'SMS review requests',
-        'Automatic follow-up nudges (enable/disable)',
-        'Sentiment gate (review filtering)',
-        'Simple dashboard',
-        'Email support'
-      ],
-      recommended: false
-    },
-    {
-      name: 'Growth',
-      price: 79,
-      requests: 300,
-      features: [
-        'Up to 300 message credits per month',
-        'Everything in Starter',
-        'Priority support'
-      ],
-      recommended: true
+  const plans = PLAN_DISPLAY_ORDER.map((key) => {
+    const p = PRICING_PLANS[key]
+    return {
+      name: p.name,
+      price: p.price,
+      requests: p.monthlyRequestLimit,
+      features: [...p.features],
+      recommended: p.popular,
     }
-  ]
+  })
 
   return (
     <section id="pricing" className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
@@ -44,7 +26,7 @@ export function PricingSection() {
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 max-w-4xl mx-auto">
+        <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <div
               key={index}

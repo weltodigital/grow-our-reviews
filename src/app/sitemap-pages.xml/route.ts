@@ -10,7 +10,7 @@ interface UrlEntry {
 }
 
 export async function GET() {
-  const today = '2026-05-12'
+  const today = new Date().toISOString().split('T')[0]
   const urls: UrlEntry[] = [
     { loc: `${BASE}/`, lastmod: today, changefreq: 'monthly', priority: '1.0' },
     { loc: `${BASE}/privacy`, lastmod: '2025-01-01', changefreq: 'yearly', priority: '0.3' },
