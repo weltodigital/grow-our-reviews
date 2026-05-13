@@ -11,6 +11,7 @@ import { PricingSection } from '@/components/marketing/pricing-section'
 import { LocalSeoCallout } from '@/components/marketing/local-seo-callout'
 import { FaqSection } from '@/components/marketing/faq-section'
 import { MarketingFooter } from '@/components/marketing/marketing-footer'
+import { NicheLinksSection } from '@/components/marketing/niche-links-section'
 import { NavBubble } from '@/components/navigation/NavBubble'
 import { supabase } from '@/lib/supabase'
 
@@ -41,6 +42,7 @@ function HomePageContent() {
         <LocalSeoCallout />
         <FaqSection />
       </main>
+      <NicheLinksSection />
       <MarketingFooter />
     </div>
   )
