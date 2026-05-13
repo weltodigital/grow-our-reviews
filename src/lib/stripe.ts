@@ -45,19 +45,25 @@ export function getStripePlanKeyByPriceId(priceId: string | null | undefined): S
   return null
 }
 
-// Create checkout session with customizable trial
+// Create checkout session with customizable trial. Pass `customerId` for
+// returning customers (e.g. reactivation after a trial); only use
+// `customerEmail` when we don't yet have a Stripe customer record — that
+// way Stripe can correctly evaluate promo codes with first-time-customer
+// restrictions and we don't fragment the customer history.
 export async function createCheckoutSession({
   priceId,
   successUrl,
   cancelUrl,
   customerEmail,
+  customerId,
   userId,
   trialDays = 7,
 }: {
   priceId: string
   successUrl: string
   cancelUrl: string
-  customerEmail: string
+  customerEmail?: string
+  customerId?: string
   userId: string
   trialDays?: number
 }) {
@@ -65,10 +71,9 @@ export async function createCheckoutSession({
     throw new Error('Stripe is not configured')
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const baseParams: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
     payment_method_types: ['card'],
-    customer_email: customerEmail,
     line_items: [
       {
         price: priceId,
@@ -87,7 +92,16 @@ export async function createCheckoutSession({
     success_url: successUrl,
     cancel_url: cancelUrl,
     allow_promotion_codes: true,
-  })
+  }
+
+  // Stripe forbids passing both `customer` and `customer_email`.
+  if (customerId) {
+    baseParams.customer = customerId
+  } else if (customerEmail) {
+    baseParams.customer_email = customerEmail
+  }
+
+  const session = await stripe.checkout.sessions.create(baseParams)
 
   return session
 }
