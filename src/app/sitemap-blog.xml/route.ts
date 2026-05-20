@@ -4,6 +4,7 @@ const BASE = 'https://www.growourreviews.com'
 
 // Mirrors article keys from src/app/blog/[slug]/page.tsx
 const BLOG_ARTICLES: { slug: string; lastmod: string }[] = [
+  { slug: 'cannon-steels-case-study', lastmod: '2026-05-20' },
   { slug: 'checkatrade-mybuilder-google-reviews-2026', lastmod: '2026-03-16' },
   { slug: 'why-competitor-gets-more-work-than-you', lastmod: '2026-02-15' },
   { slug: 'best-time-to-ask-for-google-review', lastmod: '2026-02-10' },
@@ -19,7 +20,7 @@ export async function GET() {
   const urls = [
     {
       loc: `${BASE}/blog`,
-      lastmod: '2026-03-16',
+      lastmod: '2026-05-20',
       changefreq: 'weekly',
       priority: '0.8',
     },

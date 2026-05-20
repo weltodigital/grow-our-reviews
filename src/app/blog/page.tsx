@@ -17,6 +17,15 @@ export const metadata: Metadata = {
 // Blog article data - in a real app this would come from a CMS or database
 const blogArticles = [
   {
+    slug: "cannon-steels-case-study",
+    title: "How Cannon Steels Got More Google Reviews in One Month Than They Had in Years",
+    description: "Cannon Steels went from 23 Google reviews to 32 in just one month using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.",
+    category: "Case Studies",
+    publishDate: "2026-05-20",
+    readingTime: 6,
+    featured: true,
+  },
+  {
     slug: "checkatrade-mybuilder-google-reviews-2026",
     title: "Checkatrade, MyBuilder, or Google Reviews: Where Should Tradespeople Focus in 2026?",
     description: "Comparing Checkatrade, MyBuilder, and Google Reviews for UK tradespeople in 2026. Which platform gives you the best return on your time and money?",

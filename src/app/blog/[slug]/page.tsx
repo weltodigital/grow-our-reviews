@@ -10,9 +10,18 @@ import UnfairGoogleReviewTradesmanGuide from "@/content/blog/unfair-google-revie
 import GoogleReviewsVsCheckatrade from "@/content/blog/google-reviews-vs-checkatrade";
 import GoogleReviewResponseTemplatesTradesmen from "@/content/blog/google-review-response-templates-tradesmen";
 import CheckatradeMyBuilderGoogleReviews2026 from "@/content/blog/checkatrade-mybuilder-google-reviews-2026";
+import CannonSteelsCaseStudy from "@/content/blog/cannon-steels-case-study";
 
 // This would normally come from a CMS or database
 const articles = {
+  "cannon-steels-case-study": {
+    title: "How Cannon Steels Got More Google Reviews in One Month Than They Had in Years",
+    description: "Cannon Steels went from 23 Google reviews to 32 in just one month using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.",
+    category: "Case Studies",
+    publishDate: "2026-05-20",
+    readingTime: 6,
+    content: CannonSteelsCaseStudy,
+  },
   "checkatrade-mybuilder-google-reviews-2026": {
     title: "Checkatrade, MyBuilder, or Google Reviews: Where Should Tradespeople Focus in 2026?",
     description: "Comparing Checkatrade, MyBuilder, and Google Reviews for UK tradespeople in 2026. Which platform gives you the best return on your time and money? Here's the honest breakdown.",

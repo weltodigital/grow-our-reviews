@@ -4,12 +4,22 @@ import { PatternConfig } from './pseo-patterns'
 export interface BlogArticleRef {
   slug: string
   title: string
-  category: 'Getting More Work' | 'Google Reviews' | 'Local SEO' | 'Reputation Management'
+  category:
+    | 'Getting More Work'
+    | 'Google Reviews'
+    | 'Local SEO'
+    | 'Reputation Management'
+    | 'Case Studies'
 }
 
 // Mirrors the article registry in src/app/blog/[slug]/page.tsx.
 // Kept here to avoid pulling the heavy MDX components into PSEO pages.
 export const blogArticles: BlogArticleRef[] = [
+  {
+    slug: 'cannon-steels-case-study',
+    title: 'How Cannon Steels Got More Google Reviews in One Month Than They Had in Years',
+    category: 'Case Studies',
+  },
   {
     slug: 'checkatrade-mybuilder-google-reviews-2026',
     title: 'Checkatrade, MyBuilder, or Google Reviews: Where Should Tradespeople Focus in 2026?',
