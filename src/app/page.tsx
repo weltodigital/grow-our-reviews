@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { HowItWorksSection } from '@/components/marketing/how-it-works-section'
 import { WhyReviewsMatterSection } from '@/components/marketing/why-reviews-matter-section'
+import { TestimonialSection } from '@/components/marketing/testimonial-section'
 import { FeaturesSection } from '@/components/marketing/features-section'
 import { SoundFamiliarSection } from '@/components/marketing/sound-familiar-section'
 import { PricingSection } from '@/components/marketing/pricing-section'
@@ -36,6 +37,7 @@ function HomePageContent() {
         <HeroSection />
         <HowItWorksSection />
         <WhyReviewsMatterSection />
+        <TestimonialSection />
         <FeaturesSection />
         <SoundFamiliarSection />
         <PricingSection />
