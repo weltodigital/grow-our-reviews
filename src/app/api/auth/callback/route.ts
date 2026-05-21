@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     // so it's safe to return a fresh response here.
     if (error.message.includes('PKCE code verifier') || error.message.includes('code_verifier')) {
       console.log('PKCE error detected - likely cross-device signup. Redirecting to client-side handler.')
-      return NextResponse.redirect(requestUrl.origin + `/auth/confirm-signup?code=${code}&next=${encodeURIComponent(next)}`)
+      return NextResponse.redirect(requestUrl.origin + `/confirm-signup?code=${code}&next=${encodeURIComponent(next)}`)
     }
 
     response.headers.set('Location', requestUrl.origin + '/login?error=auth_callback_error')
