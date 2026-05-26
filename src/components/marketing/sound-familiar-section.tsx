@@ -4,10 +4,10 @@ import { getAppUrl } from '@/lib/utils'
 
 export function SoundFamiliarSection() {
   const problems = [
-    "You've served hundreds of happy customers this year. You've got 11 Google reviews. The competitor down the road has 60 reviews and is winning all the business — even though you know your service is better.",
+    "You've served hundreds of happy customers this year. You've got 11 Google reviews. The competitor down the road has 60 reviews and is winning all the business, even though you know your service is better.",
     "You keep meaning to ask customers for reviews, but you're already on to the next thing. By the time you remember, the moment's passed and they're long gone.",
     "A customer once left you a 2-star review because of a misunderstanding. It's still sitting there at the top of your Google profile, putting potential customers off before they even contact you.",
-    "You've spent thousands on Google Ads, directories, and social media — but you've never invested in the one thing that actually makes people choose you over a competitor: your Google reviews."
+    "You've spent thousands on Google Ads, directories, and social media, but you've never invested in the one thing that actually makes people choose you over a competitor: your Google reviews."
   ]
 
   return (

@@ -11,7 +11,7 @@ export function LocalSeoCallout() {
             Every week without fresh Google reviews is a week your competitors are outranking you.
           </h2>
           <p className="page-subtitle mx-auto mb-8" style={{ color: 'var(--accent-dark)' }}>
-            Google's local search algorithm updates constantly. Businesses with recent, consistent reviews climb higher. Those without them fall behind. The sooner you start, the sooner more customers find you — and choose you.
+            Google's local search algorithm updates constantly. Businesses with recent, consistent reviews climb higher. Those without them fall behind. The sooner you start, the sooner more customers find you, and choose you.
           </p>
           <a
             href={getAppUrl('/signup')}
@@ -28,7 +28,7 @@ export function LocalSeoCallout() {
               e.currentTarget.style.backgroundColor = 'var(--bg-primary)'
             }}
           >
-            Start Your Free Trial — It's Free for 14 Days
+            Start Your Free Trial. It's Free for 14 Days
           </a>
         </div>
       </div>

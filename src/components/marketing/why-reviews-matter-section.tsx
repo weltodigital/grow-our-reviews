@@ -5,7 +5,7 @@ export function WhyReviewsMatterSection() {
     {
       icon: Star,
       title: 'How many reviews you have',
-      description: 'More reviews signal a trusted, established business. A competitor with 80 reviews will almost always outrank one with 8 — even if your product or service is better.'
+      description: 'More reviews signal a trusted, established business. A competitor with 80 reviews will almost always outrank one with 8, even if your product or service is better.'
     },
     {
       icon: Clock,
@@ -68,7 +68,7 @@ export function WhyReviewsMatterSection() {
 
             <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--accent-light)' }}>
               <p className="text-gray-700 leading-relaxed">
-                This is why being good at what you do isn't enough on its own. You need your happy customers to actually say so — on Google, regularly. That's exactly what Grow Our Reviews automates for you.
+                This is why being good at what you do isn't enough on its own. You need your happy customers to actually say so on Google, regularly. That's exactly what Grow Our Reviews automates for you.
               </p>
             </div>
           </div>

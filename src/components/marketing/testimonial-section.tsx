@@ -26,7 +26,7 @@ export function TestimonialSection() {
 
             <blockquote className="text-lg text-gray-700 mb-6 italic leading-relaxed">
               &quot;We had 23 Google reviews after decades in business. In one month
-              with Grow Our Reviews, we added 9 more — all 5 stars. The bulk upload
+              with Grow Our Reviews, we added 9 more, all 5 stars. The bulk upload
               made it effortless. I just uploaded our customer list and the reviews
               started coming in.&quot;
             </blockquote>

@@ -4,26 +4,26 @@ export function FeaturesSection() {
   const features = [
     {
       icon: Shield,
-      title: 'Sentiment Gate — Protect Your Star Rating',
+      title: 'Sentiment Gate: Protect Your Star Rating',
       description: "Your Google rating directly affects your ranking. Our smart filter asks customers to rate their experience first. 4-5 stars? They go straight to Google. 1-3 stars? They see a private feedback form instead. Your public rating stays high, your ranking stays strong, and you still get useful feedback to improve.",
       benefits: ['Negative feedback stays private', 'Your Google rating is protected', 'Improve your service with honest feedback']
     },
     {
       icon: RefreshCw,
       title: 'Auto Reviews Coming In',
-      description: "Google rewards businesses that get reviews consistently — not just in bursts. If a customer doesn't respond to the first request, we send one gentle nudge. That's it. No spam, no hassle. Just a steady drip of fresh reviews that tells Google your business is active and trusted.",
+      description: "Google rewards businesses that get reviews consistently, not just in bursts. If a customer doesn't respond to the first request, we send one gentle nudge. That's it. No spam, no hassle. Just a steady drip of fresh reviews that tells Google your business is active and trusted.",
       benefits: ['One polite reminder, nothing more', 'Customisable timing', 'Keeps your review flow consistent']
     },
     {
       icon: BarChart3,
-      title: 'Simple Dashboard — Know What\'s Working',
+      title: 'Simple Dashboard: Know What\'s Working',
       description: "See how many review requests you've sent, how many customers clicked, and how many left a review. Track your progress week by week and watch your Google presence grow.",
       benefits: ['Real-time tracking', 'Click and conversion rates', 'See all customer feedback in one place']
     },
     {
       icon: Users,
-      title: 'Built for Busy Business Owners — Not Tech Companies',
-      description: "No apps to install, no complicated setup, no jargon. If you can send a text message, you can use Grow Our Reviews. Enter a name and number after each customer — or bulk upload your whole list — and we handle the rest. Works for any business that wants more 5-star Google reviews.",
+      title: 'Built for Busy Business Owners, Not Tech Companies',
+      description: "No apps to install, no complicated setup, no jargon. If you can send a text message, you can use Grow Our Reviews. Enter a name and number after each customer, or bulk upload your whole list, and we handle the rest. Works for any business that wants more 5-star Google reviews.",
       benefits: ['10 seconds per customer', 'Works on any device, anywhere', 'No technical knowledge needed']
     }
   ]
@@ -34,7 +34,7 @@ export function FeaturesSection() {
         <div className="section-header">
           <h2>Everything you need to grow your reviews</h2>
           <p className="page-subtitle mx-auto">
-            Powerful features designed for local businesses who want more Google reviews — and more sales — without the hassle.
+            Powerful features designed for local businesses who want more Google reviews, and more sales, without the hassle.
           </p>
         </div>
 

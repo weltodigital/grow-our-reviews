@@ -9,7 +9,7 @@ export function FaqSection() {
   const faqs = [
     {
       question: 'How do Google reviews affect my local search ranking?',
-      answer: 'Google uses three main factors to rank businesses in local search: relevance, distance, and prominence. Reviews are the biggest part of prominence. Businesses with more reviews, higher ratings, and recent review activity rank higher in the Google Map Pack — the box at the top of search results that gets the most clicks. More reviews means more visibility, which means more customers and more sales.'
+      answer: 'Google uses three main factors to rank businesses in local search: relevance, distance, and prominence. Reviews are the biggest part of prominence. Businesses with more reviews, higher ratings, and recent review activity rank higher in the Google Map Pack, the box at the top of search results that gets the most clicks. More reviews means more visibility, which means more customers and more sales.'
     },
     {
       question: 'How does it work?',

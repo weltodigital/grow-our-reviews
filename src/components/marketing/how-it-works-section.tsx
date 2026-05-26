@@ -10,7 +10,7 @@ export function HowItWorksSection() {
     {
       icon: CheckCircle,
       title: 'Serve a customer, enter the details',
-      description: "Takes 10 seconds. Just type your customer's name and phone number — or bulk upload a list.",
+      description: "Takes 10 seconds. Just type your customer's name and phone number, or bulk upload a list.",
       detail: ''
     },
     {
@@ -22,7 +22,7 @@ export function HowItWorksSection() {
     {
       icon: Star,
       title: 'Your Google ranking climbs',
-      description: 'Happy customers leave 5-star reviews on Google. Unhappy ones give you private feedback instead — so your public rating stays strong and your local search ranking improves.',
+      description: 'Happy customers leave 5-star reviews on Google. Unhappy ones give you private feedback instead, so your public rating stays strong and your local search ranking improves.',
       detail: ''
     }
   ]

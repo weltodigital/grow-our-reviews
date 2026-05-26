@@ -18,7 +18,7 @@ export function HeroSection() {
             <span style={{ color: 'var(--accent)' }}>Win More Customers.</span>
           </h1>
           <p className="hero-subtitle mt-6 mx-auto">
-            Google reviews are the #1 factor in local search rankings. When people search for a business like yours, the ones with the most recent 5-star reviews show up first — and get chosen first. Grow Our Reviews automates the whole process, so more customers find you, trust you, and buy from you.
+            Google reviews are the #1 factor in local search rankings. When people search for a business like yours, the ones with the most recent 5-star reviews show up first, and get chosen first. Grow Our Reviews automates the whole process, so more customers find you, trust you, and buy from you.
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-x-6">
