@@ -5,7 +5,7 @@ export function WhyReviewsMatterSection() {
     {
       icon: Star,
       title: 'How many reviews you have',
-      description: 'More reviews signal a trusted, established business. A competitor with 80 reviews will almost always outrank one with 8 — even if both do identical work.'
+      description: 'More reviews signal a trusted, established business. A competitor with 80 reviews will almost always outrank one with 8 — even if your product or service is better.'
     },
     {
       icon: Clock,
@@ -31,7 +31,7 @@ export function WhyReviewsMatterSection() {
           <div className="space-y-8">
             <div className="space-y-4">
               <p className="text-lg text-gray-600">
-                When someone searches 'plumber near me', Google decides who shows up.
+                When someone searches for a business like yours, Google decides who shows up.
               </p>
               <p className="text-lg text-gray-600">
                 The top 3 results in Google's local Map Pack get over 75% of all clicks. And the biggest factor Google uses to rank those results? Reviews.
@@ -68,7 +68,7 @@ export function WhyReviewsMatterSection() {
 
             <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--accent-light)' }}>
               <p className="text-gray-700 leading-relaxed">
-                This is why 'doing great work' isn't enough. You need your happy customers to actually say so — on Google, regularly. That's exactly what Grow Our Reviews automates for you.
+                This is why being good at what you do isn't enough on its own. You need your happy customers to actually say so — on Google, regularly. That's exactly what Grow Our Reviews automates for you.
               </p>
             </div>
           </div>
@@ -81,7 +81,7 @@ export function WhyReviewsMatterSection() {
               {/* Mock Google Map Pack */}
               <div className="space-y-3">
                 <div className="border-l-4 pl-4 py-3" style={{ borderLeftColor: 'var(--accent)', backgroundColor: 'var(--accent-light)' }}>
-                  <div className="font-semibold text-gray-900">Elite Plumbing Services</div>
+                  <div className="font-semibold text-gray-900">Your Business</div>
                   <div className="flex items-center space-x-2 mt-1">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
@@ -94,7 +94,7 @@ export function WhyReviewsMatterSection() {
                 </div>
 
                 <div className="border-l-4 border-gray-300 pl-4 py-3 bg-gray-50">
-                  <div className="font-semibold text-gray-900">Quick Fix Plumbing</div>
+                  <div className="font-semibold text-gray-900">Competitor A</div>
                   <div className="flex items-center space-x-2 mt-1">
                     <div className="flex">
                       {[...Array(4)].map((_, i) => (
@@ -108,7 +108,7 @@ export function WhyReviewsMatterSection() {
                 </div>
 
                 <div className="border-l-4 border-gray-300 pl-4 py-3 bg-gray-50">
-                  <div className="font-semibold text-gray-900">Reliable Plumbers Ltd</div>
+                  <div className="font-semibold text-gray-900">Competitor B</div>
                   <div className="flex items-center space-x-2 mt-1">
                     <div className="flex">
                       {[...Array(4)].map((_, i) => (

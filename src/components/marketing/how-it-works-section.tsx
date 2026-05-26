@@ -9,8 +9,8 @@ export function HowItWorksSection() {
   const steps = [
     {
       icon: CheckCircle,
-      title: 'Finish a job, enter the details',
-      description: "Takes 10 seconds. Just type your customer's name and phone number.",
+      title: 'Serve a customer, enter the details',
+      description: "Takes 10 seconds. Just type your customer's name and phone number — or bulk upload a list.",
       detail: ''
     },
     {

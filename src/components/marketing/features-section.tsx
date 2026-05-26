@@ -22,9 +22,9 @@ export function FeaturesSection() {
     },
     {
       icon: Users,
-      title: 'Built for Tradespeople — Not Tech Companies',
-      description: "No apps to install, no complicated setup, no jargon. If you can send a text message, you can use Grow Our Reviews. Enter a name and number after each job and we handle the rest. Works for plumbers, electricians, builders, roofers, landscapers, cleaners — any trade.",
-      benefits: ['10-second setup per job', 'Works on your phone between jobs', 'No technical knowledge needed']
+      title: 'Built for Busy Business Owners — Not Tech Companies',
+      description: "No apps to install, no complicated setup, no jargon. If you can send a text message, you can use Grow Our Reviews. Enter a name and number after each customer — or bulk upload your whole list — and we handle the rest. Works for any business that wants more 5-star Google reviews.",
+      benefits: ['10 seconds per customer', 'Works on any device, anywhere', 'No technical knowledge needed']
     }
   ]
 
@@ -34,7 +34,7 @@ export function FeaturesSection() {
         <div className="section-header">
           <h2>Everything you need to grow your reviews</h2>
           <p className="page-subtitle mx-auto">
-            Powerful features designed specifically for tradespeople who want more Google reviews without the hassle.
+            Powerful features designed for local businesses who want more Google reviews — and more sales — without the hassle.
           </p>
         </div>
 
@@ -75,12 +75,12 @@ export function FeaturesSection() {
         <div className="mt-16 rounded-2xl p-8 text-white" style={{ backgroundColor: 'var(--accent)' }}>
           <div className="text-center">
             <h3 className="text-2xl font-bold">
-              Why tradespeople choose Grow Our Reviews
+              Why local businesses choose Grow Our Reviews
             </h3>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="text-3xl font-bold">Quick setup</div>
-                <div className="text-white opacity-80">per job</div>
+                <div className="text-white opacity-80">per customer</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">Higher rankings</div>

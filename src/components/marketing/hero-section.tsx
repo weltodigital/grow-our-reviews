@@ -15,10 +15,10 @@ export function HeroSection() {
         <div className="text-center">
           <h1 className="hero-h1">
             Get Found on Google.{' '}
-            <span style={{ color: 'var(--accent)' }}>Win More Local Work.</span>
+            <span style={{ color: 'var(--accent)' }}>Win More Customers.</span>
           </h1>
           <p className="hero-subtitle mt-6 mx-auto">
-            Google reviews are the #1 factor in local search rankings. When someone searches 'plumber near me', businesses with more recent 5-star reviews show up first. Grow Our Reviews automates the whole process — so your phone rings more.
+            Google reviews are the #1 factor in local search rankings. When people search for a business like yours, the ones with the most recent 5-star reviews show up first — and get chosen first. Grow Our Reviews automates the whole process, so more customers find you, trust you, and buy from you.
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-x-6">
@@ -85,9 +85,9 @@ export function HeroSection() {
                     <div className="text-left">
                       <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>SMS from Grow Our Reviews</div>
                       <div className="text-sm p-3 rounded-2xl rounded-bl-md max-w-[90%] break-words" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-text)' }}>
-                        Hi Sarah, thanks for choosing Smith Plumbing!<br />
+                        Hi Sarah, thanks for choosing Smith & Co!<br />
                         We'd love your feedback 👇<br />
-                        <span className="underline break-all" style={{ color: 'var(--accent-dark)' }}>https://app.growourreviews.com/review/smith-plumbing/k7Bx2mPq9R</span>
+                        <span className="underline break-all" style={{ color: 'var(--accent-dark)' }}>https://app.growourreviews.com/review/smith-and-co/k7Bx2mPq9R</span>
                       </div>
                     </div>
                   </div>
