@@ -12,24 +12,31 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 export const STRIPE_CONFIG = {
   lite: {
     priceId: process.env.STRIPE_LITE_PRICE_ID!,
-    amount: 1900, // £19.00 in pence
+    amount: 900, // £9.00 in pence
     currency: 'gbp',
     interval: 'month',
-    monthlyRequestLimit: 30,
+    monthlyRequestLimit: 20,
   },
   starter: {
     priceId: process.env.STRIPE_STARTER_PRICE_ID!,
-    amount: 4900, // £49.00 in pence
+    amount: 2900, // £29.00 in pence
     currency: 'gbp',
     interval: 'month',
-    monthlyRequestLimit: 150,
+    monthlyRequestLimit: 100,
   },
   growth: {
     priceId: process.env.STRIPE_GROWTH_PRICE_ID!,
-    amount: 7900, // £79.00 in pence
+    amount: 4900, // £49.00 in pence
     currency: 'gbp',
     interval: 'month',
-    monthlyRequestLimit: 300,
+    monthlyRequestLimit: 200,
+  },
+  pro: {
+    priceId: process.env.STRIPE_PRO_PRICE_ID!,
+    amount: 9900, // £99.00 in pence
+    currency: 'gbp',
+    interval: 'month',
+    monthlyRequestLimit: 500,
   },
 } as const
 
@@ -42,6 +49,7 @@ export function getStripePlanKeyByPriceId(priceId: string | null | undefined): S
   if (priceId === STRIPE_CONFIG.lite.priceId) return 'lite'
   if (priceId === STRIPE_CONFIG.starter.priceId) return 'starter'
   if (priceId === STRIPE_CONFIG.growth.priceId) return 'growth'
+  if (priceId === STRIPE_CONFIG.pro.priceId) return 'pro'
   return null
 }
 

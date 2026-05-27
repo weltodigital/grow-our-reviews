@@ -465,7 +465,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {PLAN_DISPLAY_ORDER.map((key) => {
               const plan = PRICING_PLANS[key]
               const isCurrent = currentPlan === key
@@ -517,7 +517,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
             })}
           </div>
           <p className="text-xs text-gray-500 mt-4">
-            Need a plan with higher limits than Growth?{' '}
+            Need a plan with higher limits than Pro?{' '}
             <a
               href="mailto:hello@growourreviews.com?subject=Custom Plan Request"
               className="underline"

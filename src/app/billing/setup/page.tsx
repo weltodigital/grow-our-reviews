@@ -216,7 +216,7 @@ export default function BillingSetupPage() {
         </div>
 
         {/* Plan Selection */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {PLAN_DISPLAY_ORDER.map((key) => {
             const plan = PRICING_PLANS[key]
             const isSelected = selectedPlan === key
@@ -226,7 +226,9 @@ export default function BillingSetupPage() {
                 ? 'For low-volume businesses'
                 : key === 'starter'
                   ? 'Most popular for busy trades'
-                  : 'For high-volume businesses'
+                  : key === 'growth'
+                    ? 'For high-volume businesses'
+                    : 'For agencies and multi-site operators'
             return (
               <Card
                 key={key}

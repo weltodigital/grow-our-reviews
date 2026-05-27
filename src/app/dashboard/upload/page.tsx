@@ -1,5 +1,6 @@
 import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { BulkUpload } from '@/components/dashboard/bulk-upload'
+import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
 
 async function getUserStats(userId: string) {
   try {
@@ -27,7 +28,7 @@ async function getUserStats(userId: string) {
       .not('sent_at', 'is', null)
 
     const requestsSent = requestsThisMonth?.length || 0
-    const monthlyLimit = (profile as any)?.monthly_request_limit || 150
+    const monthlyLimit = (profile as any)?.monthly_request_limit || DEFAULT_TRIAL_LIMIT
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 
     return {

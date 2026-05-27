@@ -2,6 +2,7 @@ import { requireUserWithProfile, createServerSupabase } from '@/lib/auth'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { SmsFailureAlert } from '@/components/dashboard/SmsFailureAlert'
 import { GoogleReviewsCard } from '@/components/dashboard/google-reviews-card'
+import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
 import { getCurrentBillingPeriod, getDaysUntilReset, getNextBillingDate } from '@/lib/billing-cycle'
 import { countCreditsSentInPeriod } from '@/lib/credit-usage'
 import { extractPlaceId } from '@/lib/google-reviews'
@@ -112,7 +113,7 @@ async function getDashboardStats(userId: string) {
     const clicks = clicksThisPeriod.count || 0
     const reviews = reviewsThisPeriod.count || 0
     const feedback = feedbackThisPeriod.count || 0
-    const monthlyLimit = profile.monthly_request_limit || 150
+    const monthlyLimit = profile.monthly_request_limit || DEFAULT_TRIAL_LIMIT
 
     // CTR is clicks over originals, not over total SMS (nudges don't get their own click link).
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0

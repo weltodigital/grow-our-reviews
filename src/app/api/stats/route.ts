@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 import { getCurrentBillingPeriod, getDaysUntilReset } from '@/lib/billing-cycle'
+import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
 
 export async function GET(request: NextRequest) {
   let response: NextResponse
@@ -166,7 +167,7 @@ export async function GET(request: NextRequest) {
     const clicks = clicksThisPeriod.count || 0
     const reviews = reviewsThisPeriod.count || 0
     const feedback = feedbackThisPeriod.count || 0
-    const monthlyLimit = profile.monthly_request_limit || 150
+    const monthlyLimit = profile.monthly_request_limit || DEFAULT_TRIAL_LIMIT
 
     // Calculate click through rate
     const clickThroughRate = requestsSent > 0 ? (clicks / requestsSent) * 100 : 0

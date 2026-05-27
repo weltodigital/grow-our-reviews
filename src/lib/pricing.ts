@@ -2,12 +2,12 @@
 export const PRICING_PLANS = {
   lite: {
     name: 'Lite',
-    price: 19,
+    price: 9,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 30,
+    monthlyRequestLimit: 20,
     features: [
-      'Up to 30 message credits per month',
+      'Up to 20 message credits per month',
       'SMS review requests',
       'Automatic follow-up nudges (can enable/disable)',
       'Sentiment gate (review filtering)',
@@ -19,12 +19,12 @@ export const PRICING_PLANS = {
   },
   starter: {
     name: 'Starter',
-    price: 49,
+    price: 29,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 150,
+    monthlyRequestLimit: 100,
     features: [
-      'Up to 150 message credits per month',
+      'Up to 100 message credits per month',
       'SMS review requests',
       'Automatic follow-up nudges (can enable/disable)',
       'Sentiment gate (review filtering)',
@@ -36,16 +36,30 @@ export const PRICING_PLANS = {
   },
   growth: {
     name: 'Growth',
-    price: 79,
+    price: 49,
     currency: 'GBP',
     interval: 'month',
-    monthlyRequestLimit: 300,
+    monthlyRequestLimit: 200,
     features: [
-      'Up to 300 message credits per month',
+      'Up to 200 message credits per month',
       'Everything in Starter',
       'Priority support',
     ],
     stripeProductId: process.env.STRIPE_GROWTH_PRICE_ID,
+    popular: false,
+  },
+  pro: {
+    name: 'Pro',
+    price: 99,
+    currency: 'GBP',
+    interval: 'month',
+    monthlyRequestLimit: 500,
+    features: [
+      'Up to 500 message credits per month',
+      'Everything in Growth',
+      'Priority support',
+    ],
+    stripeProductId: process.env.STRIPE_PRO_PRICE_ID,
     popular: false,
   },
 } as const
@@ -54,7 +68,7 @@ export type PlanKey = keyof typeof PRICING_PLANS
 export type Plan = typeof PRICING_PLANS[PlanKey]
 
 // Plans in display order (cheapest → most expensive).
-export const PLAN_DISPLAY_ORDER: PlanKey[] = ['lite', 'starter', 'growth']
+export const PLAN_DISPLAY_ORDER: PlanKey[] = ['lite', 'starter', 'growth', 'pro']
 
 // Trial configuration. There is no single trial default plan — each user
 // selects a plan at signup and the trial gives them that plan's credits.
@@ -73,11 +87,13 @@ export const DEFAULT_TRIAL_LIMIT = PRICING_PLANS.starter.monthlyRequestLimit
 // Get the plan key matching a monthly request limit. Used to display the
 // current plan when only `monthly_request_limit` is on the profile row.
 export function getPlanByLimit(limit: number): PlanKey {
-  // Exact-match the configured limit first — handles all three plans cleanly.
+  // Exact-match the configured limit first — handles all plans cleanly.
   if (limit === PRICING_PLANS.lite.monthlyRequestLimit) return 'lite'
   if (limit === PRICING_PLANS.starter.monthlyRequestLimit) return 'starter'
   if (limit === PRICING_PLANS.growth.monthlyRequestLimit) return 'growth'
-  // Fallbacks for legacy or partial-limit rows (e.g. 50-credit historical trials).
+  if (limit === PRICING_PLANS.pro.monthlyRequestLimit) return 'pro'
+  // Fallbacks for legacy or partial-limit rows.
+  if (limit >= PRICING_PLANS.pro.monthlyRequestLimit) return 'pro'
   if (limit >= PRICING_PLANS.growth.monthlyRequestLimit) return 'growth'
   if (limit >= PRICING_PLANS.starter.monthlyRequestLimit) return 'starter'
   if (limit >= PRICING_PLANS.lite.monthlyRequestLimit) return 'lite'
@@ -91,6 +107,7 @@ export function getPlanByPriceId(priceId: string | null | undefined): PlanKey | 
   if (priceId === PRICING_PLANS.lite.stripeProductId) return 'lite'
   if (priceId === PRICING_PLANS.starter.stripeProductId) return 'starter'
   if (priceId === PRICING_PLANS.growth.stripeProductId) return 'growth'
+  if (priceId === PRICING_PLANS.pro.stripeProductId) return 'pro'
   return null
 }
 
@@ -124,6 +141,7 @@ export function getCostPerRequest(planKey: PlanKey): number {
 // Get plan recommendations based on usage. Returns the smallest plan whose
 // monthlyRequestLimit comfortably covers the observed usage.
 export function getRecommendedPlan(monthlyUsage: number): PlanKey {
+  if (monthlyUsage > PRICING_PLANS.growth.monthlyRequestLimit * 0.8) return 'pro'
   if (monthlyUsage > PRICING_PLANS.starter.monthlyRequestLimit * 0.8) return 'growth'
   if (monthlyUsage > PRICING_PLANS.lite.monthlyRequestLimit * 0.8) return 'starter'
   return 'lite'

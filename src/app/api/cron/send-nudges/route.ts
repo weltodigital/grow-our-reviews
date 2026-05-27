@@ -4,6 +4,7 @@ import { sendSMS, createNudgeMessage, createCustomNudgeMessage } from '@/lib/twi
 import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
 import { countCreditsSentInPeriod } from '@/lib/credit-usage'
 import { buildReviewUrl } from '@/lib/review-url'
+import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
     await Promise.all(
       userIds.map(async (uid: string) => {
         const sample = eligibleRequests.find((r: any) => r.profiles.id === uid) as any
-        const limit = sample?.profiles?.monthly_request_limit ?? 150
+        const limit = sample?.profiles?.monthly_request_limit ?? DEFAULT_TRIAL_LIMIT
         const cycleDate = sample?.profiles?.billing_cycle_date
 
         let periodStart: Date

@@ -5,10 +5,11 @@ const resendApiKey = process.env.RESEND_API_KEY
 
 export const resend = resendApiKey ? new Resend(resendApiKey) : null
 
-// Returns the next tier up from the given plan (Lite → Starter → Growth → null)
+// Returns the next tier up from the given plan (Lite → Starter → Growth → Pro → null)
 function nextPlanUp(planKey: PlanKey): PlanKey | null {
   if (planKey === 'lite') return 'starter'
   if (planKey === 'starter') return 'growth'
+  if (planKey === 'growth') return 'pro'
   return null
 }
 
@@ -135,7 +136,7 @@ export async function sendSubscriptionConfirmationEmail(to: string, businessName
           <li>Private feedback collection</li>
           <li>Automatic follow-up nudges</li>
           <li>Dashboard analytics</li>
-          ${planName === 'Growth' ? '<li>Priority support</li>' : '<li>Email support</li>'}
+          ${planName === 'Growth' || planName === 'Pro' ? '<li>Priority support</li>' : '<li>Email support</li>'}
         </ul>
 
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Go to Dashboard →</a></p>

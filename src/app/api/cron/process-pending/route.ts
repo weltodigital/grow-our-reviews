@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
 import { generateToken } from '@/lib/generate-token'
+import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
 import type { Database } from '@/types/database'
 
 // Cron job to process pending customers at the start of each billing cycle
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
           .not('status', 'eq', 'failed')
 
         const requestsSent = requestsThisMonth?.length || 0
-        const monthlyLimit = userData.profile.monthly_request_limit || 150
+        const monthlyLimit = userData.profile.monthly_request_limit || DEFAULT_TRIAL_LIMIT
         const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 
         const customersToProcess = userData.customers.slice(0, requestsRemaining)

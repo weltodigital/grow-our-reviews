@@ -4,6 +4,7 @@ import { getCurrentBillingPeriod, getNextBillingDate } from '@/lib/billing-cycle
 import { countNudgesSentInPeriod } from '@/lib/credit-usage'
 import { generateToken } from '@/lib/generate-token'
 import { createAbuseDetector } from '@/lib/abuse-detector'
+import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
 import type { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
     ])
 
     const requestsSent = (originalsThisMonth?.length || 0) + nudgesThisMonth
-    const monthlyLimit = (profile as any)?.monthly_request_limit || 150
+    const monthlyLimit = (profile as any)?.monthly_request_limit || DEFAULT_TRIAL_LIMIT
     const requestsRemaining = Math.max(0, monthlyLimit - requestsSent)
 
     // Calculate next reset date for error messaging
