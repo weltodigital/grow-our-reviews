@@ -12,7 +12,7 @@ import { createClient } from '@/lib/supabase'
 export default function BillingSetupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [selectedPlan, setSelectedPlan] = useState<PlanKey>('starter')
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey>('growth')
   const [userProfile, setUserProfile] = useState<any>(null)
   const [dataStats, setDataStats] = useState<{ customerCount: number; requestCount: number } | null>(
     null,
@@ -225,9 +225,9 @@ export default function BillingSetupPage() {
               key === 'lite'
                 ? 'For low-volume businesses'
                 : key === 'starter'
-                  ? 'Most popular for busy trades'
+                  ? 'For growing local businesses'
                   : key === 'growth'
-                    ? 'For high-volume businesses'
+                    ? 'Most popular for busy businesses'
                     : 'For agencies and multi-site operators'
             return (
               <Card

@@ -5,7 +5,7 @@ import type { Database } from '@/types/database'
 import Stripe from 'stripe'
 
 // Plan-change endpoint. Despite the legacy `/upgrade` path, this handles any
-// direction (upgrade or downgrade) between Lite, Starter, and Growth.
+// direction (upgrade or downgrade) between Lite, Starter, Growth, and Pro.
 export async function POST(request: NextRequest) {
   try {
     const { targetPlan } = (await request.json()) as { targetPlan: PlanKey }

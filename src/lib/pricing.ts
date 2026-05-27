@@ -32,7 +32,7 @@ export const PRICING_PLANS = {
       'Email support',
     ],
     stripeProductId: process.env.STRIPE_STARTER_PRICE_ID,
-    popular: true,
+    popular: false,
   },
   growth: {
     name: 'Growth',
@@ -46,7 +46,7 @@ export const PRICING_PLANS = {
       'Priority support',
     ],
     stripeProductId: process.env.STRIPE_GROWTH_PRICE_ID,
-    popular: false,
+    popular: true,
   },
   pro: {
     name: 'Pro',
@@ -73,16 +73,16 @@ export const PLAN_DISPLAY_ORDER: PlanKey[] = ['lite', 'starter', 'growth', 'pro'
 // Trial configuration. There is no single trial default plan — each user
 // selects a plan at signup and the trial gives them that plan's credits.
 // `defaultPlan` is the fallback used when a plan can't be inferred from the
-// signup flow (e.g. legacy routes), set to Starter to preserve prior behaviour.
+// signup flow (e.g. legacy routes).
 export const TRIAL_CONFIG = {
   durationDays: 14,
   requiresCard: true,
-  defaultPlan: 'starter' as PlanKey,
+  defaultPlan: 'growth' as PlanKey,
 } as const
 
 // Default monthly request limit (fallback only — most users get the limit of
 // the plan they actually chose).
-export const DEFAULT_TRIAL_LIMIT = PRICING_PLANS.starter.monthlyRequestLimit
+export const DEFAULT_TRIAL_LIMIT = PRICING_PLANS.growth.monthlyRequestLimit
 
 // Get the plan key matching a monthly request limit. Used to display the
 // current plan when only `monthly_request_limit` is on the profile row.
