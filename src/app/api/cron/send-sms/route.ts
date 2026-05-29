@@ -112,12 +112,15 @@ export async function GET(request: NextRequest) {
     // Fetch profiles and customers separately. Skip cancelled users so their
     // queued/scheduled requests don't keep firing SMS after they've stopped
     // paying — the request rows stay in the DB as 'scheduled' and will resume
-    // sending if the user reactivates.
+    // sending if the user reactivates. Also require stripe_customer_id so
+    // abandoned signups (no Stripe customer) never trigger SMS even if their
+    // subscription_status is somehow set.
     const { data: profiles, error: profilesError } = await (supabase as any)
       .from('profiles')
       .select('id, business_name, google_review_url')
       .in('id', userIds)
       .in('subscription_status', ['active', 'trialing'])
+      .not('stripe_customer_id', 'is', null)
 
     const { data: customers, error: customersError } = await (supabase as any)
       .from('customers')

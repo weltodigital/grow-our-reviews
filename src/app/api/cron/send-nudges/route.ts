@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
       .eq('nudge_sent', false)
       .eq('profiles.nudge_enabled', true)
       .in('profiles.subscription_status', ['active', 'trialing']) // Skip cancelled users
+      .not('profiles.stripe_customer_id', 'is', null) // Skip abandoned signups (no Stripe customer)
       .is('clicked_at', null) // Only send nudges if customer hasn't clicked yet
       .not('sent_at', 'is', null)
       .limit(50) // Process in batches

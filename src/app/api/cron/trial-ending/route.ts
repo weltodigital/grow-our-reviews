@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
       .from('profiles')
       .select('id, business_name, trial_ends_at, trial_ending_email_sent')
       .eq('subscription_status', 'trialing')
+      .not('stripe_customer_id', 'is', null) // Skip abandoned signups (no Stripe customer)
       .gte('trial_ends_at', startTime.toISOString())
       .lte('trial_ends_at', endTime.toISOString())
       .neq('trial_ending_email_sent', true)

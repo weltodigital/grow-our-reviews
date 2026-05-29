@@ -40,22 +40,30 @@ export function OnboardingForm() {
     setError('')
 
     try {
+      // On success, `completeOnboarding` calls `redirect('/billing/setup')`
+      // server-side, which throws a NEXT_REDIRECT error. That error has to
+      // propagate up to Next.js — do not swallow it in the catch below.
       const result = await completeOnboarding({
         businessName: businessName.trim(),
         googleReviewUrl: selectedBusiness?.reviewUrl || null,
       })
 
-      if (result.error) {
+      if (result?.error) {
         if (result.error === 'Not authenticated') {
           setError('Your session has expired. Redirecting you to sign in again…')
           setTimeout(() => router.push('/login'), 1500)
         } else {
           setError(result.error)
         }
-      } else {
-        router.push('/billing/setup')
       }
-    } catch (err) {
+    } catch (err: any) {
+      // Re-throw Next.js redirect errors so the framework can handle the
+      // navigation. Otherwise the user sees a generic error and stays on
+      // /onboarding with their profile already saved — exactly the abandoned
+      // signup state this fix is meant to prevent.
+      if (err?.digest?.startsWith('NEXT_REDIRECT')) {
+        throw err
+      }
       setError('Something went wrong. Please try again.')
     } finally {
       setIsLoading(false)

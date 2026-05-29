@@ -3,7 +3,6 @@
 import { createServerSupabase } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { calculateBillingCycleDate } from '@/lib/billing-cycle'
-import type { Database } from '@/types/database'
 
 interface OnboardingData {
   businessName: string
@@ -110,7 +109,12 @@ export async function completeOnboarding(data: OnboardingData) {
     // Don't fail onboarding if templates fail - they can be created later
   }
 
-  // Welcome email will be sent after Stripe checkout completion via webhook
-
-  return { success: true }
+  // Welcome email will be sent after Stripe checkout completion via webhook.
+  //
+  // Redirect server-side rather than returning success and letting the client
+  // do `router.push`. Previously, if the tab closed in the gap between this
+  // action returning and the browser navigating, the user was stranded with a
+  // profile but no Stripe customer. `redirect()` throws NEXT_REDIRECT, which
+  // the client form re-throws so Next.js handles the navigation.
+  redirect('/billing/setup')
 }

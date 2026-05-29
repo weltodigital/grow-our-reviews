@@ -41,11 +41,14 @@ export async function GET(request: Request) {
     const now = new Date()
     const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
 
-    // Get trials ending in next 3 days
+    // Get trials ending in next 3 days. Require stripe_customer_id so
+    // abandoned signups (no Stripe customer) never receive trial-warning
+    // emails even if their subscription_status is somehow set.
     const { data: profiles, error } = await supabase
       .from('profiles')
       .select('id, email, trial_ends_at, stripe_customer_id, created_at')
       .eq('subscription_status', 'trialing')
+      .not('stripe_customer_id', 'is', null)
       .not('trial_ends_at', 'is', null)
       .lte('trial_ends_at', threeDaysFromNow.toISOString())
 

@@ -11,8 +11,8 @@ CREATE TABLE profiles (
   monthly_request_limit INTEGER DEFAULT 150,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
-  subscription_status TEXT DEFAULT 'trialing',
-  trial_ends_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '14 days'),
+  subscription_status TEXT,
+  trial_ends_at TIMESTAMPTZ,
   trial_reminder_sent TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
