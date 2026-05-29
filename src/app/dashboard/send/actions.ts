@@ -144,23 +144,38 @@ export async function createReviewRequest(data: CreateReviewRequestData) {
   const requestsThisMonth = (originalsThisMonth || 0) + nudgesThisMonth
 
   if (requestsThisMonth && requestsThisMonth >= (profile as any).monthly_request_limit) {
-    // Send plan limit reached email (don't wait for it to complete)
+    // No-card trial users get a subscribe-now message and email; paid users
+    // get the existing next-tier-up upgrade flow.
+    const isTrialUser =
+      (profile as any).subscription_status === 'trialing' &&
+      !(profile as any).stripe_customer_id
+
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/plan-limit-reached`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: profile.email,
-          businessName: profile.business_name,
-          currentLimit: profile.monthly_request_limit,
-          requestsUsed: requestsThisMonth,
-        }),
-      })
+      if (isTrialUser) {
+        const { sendTrialCreditsUsedEmail } = await import('@/lib/resend')
+        await sendTrialCreditsUsedEmail(
+          profile.email,
+          profile.business_name || 'there',
+          (profile as any).monthly_request_limit
+        )
+      } else {
+        const { sendPlanLimitReachedEmail } = await import('@/lib/resend')
+        await sendPlanLimitReachedEmail(
+          profile.email,
+          profile.business_name || 'there',
+          (profile as any).monthly_request_limit,
+          requestsThisMonth
+        )
+      }
     } catch (error) {
-      console.error('Failed to send plan limit email:', error)
+      console.error('Failed to send limit-reached email:', error)
       // Don't fail the request if email fails
+    }
+
+    if (isTrialUser) {
+      return {
+        error: `You've used all ${(profile as any).monthly_request_limit} of your free trial credits. Pick a plan in Billing to keep sending — your monthly cycle starts as soon as you subscribe.`,
+      }
     }
 
     return { error: `You've reached your monthly limit of ${(profile as any).monthly_request_limit} requests. Your credits reset on ${nextResetDate.toLocaleDateString('en-GB')}. Upgrade your plan to send more now.` }

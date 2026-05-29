@@ -104,10 +104,12 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Get user's profile and current usage
+    // Get user's profile and current usage. Selecting subscription_status
+    // and stripe_customer_id too so we can branch the limit-reached message
+    // between no-card trial users and paid plan users.
     const { data: profile } = await supabase
       .from('profiles')
-      .select('monthly_request_limit, billing_cycle_date')
+      .select('monthly_request_limit, billing_cycle_date, subscription_status, stripe_customer_id, business_name')
       .eq('id', user.id)
       .single()
 
@@ -185,30 +187,38 @@ export async function POST(request: NextRequest) {
     }
 
     if (customersToProcess.length === 0) {
-      // Send plan limit reached email if user has hit their monthly limit
+      const isTrialUser =
+        (profile as any)?.subscription_status === 'trialing' &&
+        !(profile as any)?.stripe_customer_id
+
       if (requestsSent >= monthlyLimit) {
         try {
-          await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/plan-limit-reached`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: user.email,
-              businessName: (profile as any)?.business_name || 'there',
-              currentLimit: monthlyLimit,
-              requestsUsed: requestsSent
-            }),
-          })
+          if (isTrialUser) {
+            const { sendTrialCreditsUsedEmail } = await import('@/lib/resend')
+            await sendTrialCreditsUsedEmail(
+              user.email!,
+              (profile as any)?.business_name || 'there',
+              monthlyLimit
+            )
+          } else {
+            const { sendPlanLimitReachedEmail } = await import('@/lib/resend')
+            await sendPlanLimitReachedEmail(
+              user.email!,
+              (profile as any)?.business_name || 'there',
+              monthlyLimit,
+              requestsSent
+            )
+          }
         } catch (error) {
-          console.error('Failed to send plan limit email:', error)
+          console.error('Failed to send limit-reached email:', error)
         }
       }
 
-      return NextResponse.json(
-        { error: `No requests remaining in your plan. Your credits reset on ${nextResetDate.toLocaleDateString('en-GB')}.` },
-        { status: 400 }
-      )
+      const errorMessage = isTrialUser
+        ? `You've used all ${monthlyLimit} of your free trial credits. Pick a plan in Billing to keep sending — your monthly cycle starts as soon as you subscribe.`
+        : `No requests remaining in your plan. Your credits reset on ${nextResetDate.toLocaleDateString('en-GB')}.`
+
+      return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
     // First, insert all customers

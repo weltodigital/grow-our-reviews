@@ -166,6 +166,58 @@ export async function sendSubscriptionConfirmationEmail(to: string, businessName
   }
 }
 
+// Sent when a no-card trial user has used all of their trial credits before
+// the trial ends. Different from sendPlanLimitReachedEmail because the
+// next-tier-up framing makes no sense: the user has no plan yet — they need
+// to pick one, not upgrade one.
+export async function sendTrialCreditsUsedEmail(to: string, businessName: string, currentLimit: number) {
+  if (!resend) {
+    console.warn('Resend not configured - skipping trial credits used email')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  const billingUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/billing/setup`
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
+      to: [to],
+      subject: 'You\'ve used your trial credits — ready to keep going?',
+      html: `
+        <h1>You're getting through your trial credits — nice</h1>
+
+        <p>Hi ${businessName},</p>
+
+        <p>You've used all <strong>${currentLimit}</strong> of your free trial credits. That's the trial done — the good news is you clearly like the product enough to actually use it.</p>
+
+        <p>Pick a plan to keep sending. You'll be charged today and your monthly cycle starts now, so you get a fresh allocation of credits immediately. Cancel anytime from your dashboard if it stops being useful.</p>
+
+        <p><a href="${billingUrl}" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Pick your plan →</a></p>
+
+        <p>Any questions on which plan fits your volume — just reply to this email and I'll point you in the right direction.</p>
+
+        <p>Best regards,<br>
+        Ed at Grow Our Reviews</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="color: #6b7280; font-size: 14px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/dashboard/settings">Manage your email preferences</a>
+        </p>
+      `
+    })
+
+    if (error) {
+      console.error('Failed to send trial credits used email:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error sending trial credits used email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}
+
 export async function sendPlanLimitReachedEmail(to: string, businessName: string, currentLimit: number, requestsUsed: number) {
   if (!resend) {
     console.warn('Resend not configured - skipping plan limit email')
