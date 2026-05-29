@@ -14,6 +14,7 @@ CREATE TABLE profiles (
   subscription_status TEXT,
   trial_ends_at TIMESTAMPTZ,
   trial_reminder_sent TIMESTAMPTZ,
+  recovery_email_sent_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
