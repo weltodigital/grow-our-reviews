@@ -358,6 +358,63 @@ export async function sendPaymentFailedEmail(to: string, businessName: string, p
   }
 }
 
+// Fired from completeOnboarding when a new profile is created. Lands in
+// ed@growourreviews.com so the founder sees every trial signup as it lands.
+export async function sendNewSignupNotification({
+  email,
+  businessName,
+  googleReviewUrl,
+}: {
+  email: string
+  businessName: string
+  googleReviewUrl: string | null
+}) {
+  if (!resend) {
+    console.warn('Resend not configured - skipping new signup notification')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Grow Our Reviews <ed@growourreviews.com>',
+      to: ['ed@growourreviews.com'],
+      subject: `New signup: ${businessName}`,
+      html: `
+        <h2>New trial signup</h2>
+        <p>A new user just completed onboarding and started their 7-day trial.</p>
+        <table style="border-collapse: collapse; margin-top: 16px;">
+          <tr>
+            <td style="padding: 6px 12px 6px 0; color: #6b7280;">Business</td>
+            <td style="padding: 6px 0; font-weight: 600;">${businessName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; color: #6b7280;">Email</td>
+            <td style="padding: 6px 0;"><a href="mailto:${email}">${email}</a></td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; color: #6b7280;">Google Reviews URL</td>
+            <td style="padding: 6px 0;">${googleReviewUrl ? `<a href="${googleReviewUrl}">${googleReviewUrl}</a>` : '<span style="color: #9ca3af;">not provided</span>'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; color: #6b7280;">Time</td>
+            <td style="padding: 6px 0;">${new Date().toISOString()}</td>
+          </tr>
+        </table>
+      `,
+    })
+
+    if (error) {
+      console.error('Failed to send new signup notification:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error sending new signup notification:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}
+
 // Send internal alerts for critical system issues
 export async function sendInternalAlert(type: string, subject: string, message: string) {
   if (!resend) {

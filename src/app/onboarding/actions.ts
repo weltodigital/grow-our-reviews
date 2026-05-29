@@ -131,6 +131,23 @@ export async function completeOnboarding(data: OnboardingData) {
     // Don't fail onboarding if templates fail - they can be created later
   }
 
+  // Notify ed@ of new signups only on first-time onboarding — re-running
+  // onboarding on an existing profile (e.g. updating google_review_url)
+  // shouldn't generate a duplicate notification.
+  if (!existingProfile) {
+    try {
+      const { sendNewSignupNotification } = await import('@/lib/resend')
+      await sendNewSignupNotification({
+        email: user.email!,
+        businessName: data.businessName.trim(),
+        googleReviewUrl: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
+      })
+    } catch (error) {
+      console.error('Failed to send new signup notification:', error)
+      // Don't fail onboarding if the notification fails
+    }
+  }
+
   // Drop the user straight into the dashboard. Their no-card trial is now
   // active in our DB; billing only happens at trial end via the auth guard
   // bouncing them to /billing/setup once `trial_ends_at` is in the past.
