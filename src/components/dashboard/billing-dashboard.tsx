@@ -14,7 +14,7 @@ import {
   Zap
 } from 'lucide-react'
 import Link from 'next/link'
-import { PLAN_DISPLAY_ORDER, PRICING_PLANS, formatPrice, getPlanByLimit, type PlanKey } from '@/lib/pricing'
+import { PLAN_DISPLAY_ORDER, PRICING_PLANS, TRIAL_CONFIG, formatPrice, getPlanByLimit, type PlanKey } from '@/lib/pricing'
 import { getNextBillingDate } from '@/lib/billing-cycle'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
@@ -127,17 +127,16 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
 
   const isTrialing = profile.subscription_status === 'trialing'
 
-  // Fix trial end date calculation
-  // If user has Stripe subscription, use trial_ends_at from Stripe
-  // If user is on default trial (no Stripe), calculate from created_at + 14 days
+  // Trial end date: prefer trial_ends_at (set explicitly at onboarding for
+  // no-card trials, or set by the Stripe webhook for card-anchored trials).
+  // Fall back to created_at + TRIAL_CONFIG.durationDays for legacy rows.
   let trialEndsAt: Date | null = null
   const trialStartsAt = profile.created_at ? new Date(profile.created_at) : null
 
   if (profile.trial_ends_at) {
     trialEndsAt = new Date(profile.trial_ends_at)
   } else if (trialStartsAt) {
-    // Fallback: calculate trial end as created_at + 14 days if no trial_ends_at
-    trialEndsAt = new Date(trialStartsAt.getTime() + (14 * 24 * 60 * 60 * 1000))
+    trialEndsAt = new Date(trialStartsAt.getTime() + TRIAL_CONFIG.durationDays * 24 * 60 * 60 * 1000)
   }
 
   // Calculate trial progress based on actual dates
@@ -169,7 +168,7 @@ export function BillingDashboard({ user, profile, billingStats }: BillingDashboa
   // Calculate total trial length and days used
   const totalTrialDays = (trialStartsAt && trialEndsAt)
     ? Math.ceil((trialEndsAt.getTime() - trialStartsAt.getTime()) / (1000 * 60 * 60 * 24))
-    : 14
+    : TRIAL_CONFIG.durationDays
   const trialDaysUsed = Math.max(0, totalTrialDays - trialDaysRemaining)
 
   const trialHasEnded = trialEndsAt && trialEndsAt < now

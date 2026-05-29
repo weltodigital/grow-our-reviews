@@ -46,20 +46,27 @@ function ConfirmSignupForm() {
           console.log('Signup confirmation successful for:', data.session.user?.email)
           setStatus('success')
 
-          // Check the user's profile to determine where to redirect
+          // Check the user's profile to determine where to redirect. Trial
+          // users (no card, just signed up) land on /dashboard as long as
+          // their trial is still running.
           const { data: profile } = await supabase
             .from('profiles')
-            .select('business_name, google_review_url, stripe_customer_id, subscription_status')
+            .select('business_name, google_review_url, stripe_customer_id, subscription_status, trial_ends_at')
             .eq('id', data.session.user.id)
-            .single() as { data: { business_name: string | null; google_review_url: string | null; stripe_customer_id: string | null; subscription_status: string | null } | null }
+            .single() as { data: { business_name: string | null; google_review_url: string | null; stripe_customer_id: string | null; subscription_status: string | null; trial_ends_at: string | null } | null }
 
-          // Determine redirect destination based on completion status
+          const now = new Date()
+          const trialIsActive =
+            profile?.subscription_status === 'trialing' &&
+            profile.trial_ends_at !== null &&
+            new Date(profile.trial_ends_at) > now
+          const subscriptionIsActive =
+            profile?.subscription_status === 'active' && !!profile?.stripe_customer_id
+
           let redirectPath = next
-          if (!profile) {
+          if (!profile || !profile.business_name) {
             redirectPath = '/onboarding'
-          } else if (!profile.business_name) {
-            redirectPath = '/onboarding'
-          } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing'].includes(profile.subscription_status)) {
+          } else if (!trialIsActive && !subscriptionIsActive) {
             redirectPath = '/billing/setup'
           }
 

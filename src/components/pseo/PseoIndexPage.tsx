@@ -135,7 +135,7 @@ export function PseoIndexPage({ pattern }: Props) {
               <p className="page-subtitle mx-auto mb-8">
                 Grow Our Reviews works for any business that finishes work for a customer
                 and could ask for a review afterwards. If that's you, the trial is free for
-                14 days.
+                7 days — no card required.
               </p>
               <a
                 href="https://app.growourreviews.com/signup"

@@ -51,11 +51,12 @@ export async function GET(request: NextRequest) {
     const endTime = new Date(twoDaysFromNow)
     endTime.setHours(23, 59, 59, 999)
 
+    // Include no-card trial users (no Stripe customer) — they're the ones
+    // who most need this email since nothing auto-charges them at trial end.
     const { data: profiles, error: fetchError } = await (supabase as any)
       .from('profiles')
       .select('id, business_name, trial_ends_at, trial_ending_email_sent')
       .eq('subscription_status', 'trialing')
-      .not('stripe_customer_id', 'is', null) // Skip abandoned signups (no Stripe customer)
       .gte('trial_ends_at', startTime.toISOString())
       .lte('trial_ends_at', endTime.toISOString())
       .neq('trial_ending_email_sent', true)

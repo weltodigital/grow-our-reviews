@@ -59,9 +59,23 @@ export async function GET(request: NextRequest) {
     // post-confirmation destination.
     const { data: profile } = await supabase
       .from('profiles')
-      .select('business_name, google_review_url, stripe_customer_id, subscription_status, created_at')
+      .select('business_name, google_review_url, stripe_customer_id, subscription_status, trial_ends_at, created_at')
       .eq('id', data.user.id)
-      .single() as { data: { business_name: string | null; google_review_url: string | null; stripe_customer_id: string | null; subscription_status: string | null; created_at: string } | null }
+      .single() as { data: { business_name: string | null; google_review_url: string | null; stripe_customer_id: string | null; subscription_status: string | null; trial_ends_at: string | null; created_at: string } | null }
+
+    // Trial users have no stripe_customer_id but a valid subscription_status
+    // and trial_ends_at in the future — they go to the dashboard. Only fall
+    // back to /billing/setup when there's no active trial AND no Stripe
+    // subscription.
+    const now = new Date()
+    const trialIsActive =
+      profile?.subscription_status === 'trialing' &&
+      profile.trial_ends_at !== null &&
+      new Date(profile.trial_ends_at) > now
+    const subscriptionIsActive =
+      (profile?.subscription_status === 'active' ||
+        profile?.subscription_status === 'cancelled') &&
+      !!profile?.stripe_customer_id
 
     console.log('Auth callback debug:', {
       userId: data.user.id,
@@ -71,7 +85,10 @@ export async function GET(request: NextRequest) {
         hasGoogleUrl: !!profile.google_review_url,
         hasStripeId: !!profile.stripe_customer_id,
         subscriptionStatus: profile.subscription_status,
+        trialEndsAt: profile.trial_ends_at,
         createdAt: profile.created_at,
+        trialIsActive,
+        subscriptionIsActive,
       } : null
     })
 
@@ -79,8 +96,8 @@ export async function GET(request: NextRequest) {
     if (!profile || !profile.business_name) {
       console.log('No profile or incomplete onboarding - redirecting to onboarding')
       finalPath = '/onboarding'
-    } else if (!profile.stripe_customer_id || !profile.subscription_status || !['active', 'trialing', 'cancelled'].includes(profile.subscription_status)) {
-      console.log('No active subscription - redirecting to billing setup')
+    } else if (!trialIsActive && !subscriptionIsActive) {
+      console.log('No active trial or subscription - redirecting to billing setup')
       finalPath = '/billing/setup'
     }
 

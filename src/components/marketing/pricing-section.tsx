@@ -22,7 +22,7 @@ export function PricingSection() {
         <div className="section-header">
           <h2>Simple, transparent pricing</h2>
           <p className="page-subtitle mx-auto">
-            Start with a 14-day free trial. Credit card required, cancel anytime.
+            Start with a 7-day free trial. No credit card required.
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export function PricingSection() {
                     }
                   }}
                 >
-                  Start 14-Day Free Trial
+                  Start 7-Day Free Trial
                 </a>
               </div>
             </div>
@@ -128,15 +128,15 @@ export function PricingSection() {
         <div className="mt-8 text-center">
           <div className="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto">
             <h4 className="font-semibold text-gray-900 mb-2">
-              14-Day Free Trial Includes:
+              7-Day Free Trial Includes:
             </h4>
             <div className="text-sm text-gray-600 space-y-1">
-              <p>✓ Full access to all features for 14 days</p>
+              <p>✓ Full access to all features for 7 days</p>
+              <p>✓ No credit card required at signup</p>
               <p>✓ No setup fees or hidden costs</p>
-              <p>✓ Cancel anytime with one click</p>
             </div>
             <p className="text-xs text-gray-500 mt-3">
-              Credit card required. You'll only be charged after your 14-day trial ends.
+              At the end of your trial, pick a plan to continue. Cancel anytime — no questions asked.
             </p>
           </div>
         </div>

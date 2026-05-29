@@ -111,16 +111,15 @@ export async function GET(request: NextRequest) {
 
     // Fetch profiles and customers separately. Skip cancelled users so their
     // queued/scheduled requests don't keep firing SMS after they've stopped
-    // paying — the request rows stay in the DB as 'scheduled' and will resume
-    // sending if the user reactivates. Also require stripe_customer_id so
-    // abandoned signups (no Stripe customer) never trigger SMS even if their
-    // subscription_status is somehow set.
+    // paying. We deliberately don't require stripe_customer_id here — under
+    // the no-card 7-day trial, trial users have a valid subscription_status
+    // of 'trialing' and need to be able to send SMS without a Stripe customer.
+    // The auth guard already blocks trial users whose trial has expired.
     const { data: profiles, error: profilesError } = await (supabase as any)
       .from('profiles')
       .select('id, business_name, google_review_url')
       .in('id', userIds)
       .in('subscription_status', ['active', 'trialing'])
-      .not('stripe_customer_id', 'is', null)
 
     const { data: customers, error: customersError } = await (supabase as any)
       .from('customers')

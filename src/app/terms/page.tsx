@@ -40,7 +40,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Account Registration and Subscription</h2>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Free Trial</h3>
             <p className="text-gray-700 mb-4">
-              We offer a 14-day free trial with credit card required. You will only be charged after your trial period ends. Trial accounts include full access to your chosen plan's features.
+              We offer a 7-day free trial with no credit card required at signup. Trial accounts include full access to the product subject to a monthly credit cap. To continue using the service after the trial ends, you'll need to pick a plan and enter payment details.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Paid Subscriptions</h3>

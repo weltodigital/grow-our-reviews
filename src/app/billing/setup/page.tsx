@@ -100,7 +100,7 @@ export default function BillingSetupPage() {
           planKey: plan,
           successUrl: `${window.location.origin}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/billing/setup`,
-          trialDays: userProfile?.subscription_status === 'cancelled' ? 0 : 14,
+          trialDays: 0,
         }),
       })
 
@@ -187,23 +187,19 @@ export default function BillingSetupPage() {
             </>
           ) : (
             <>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Setup</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Pick a plan to continue</h1>
               <p className="text-gray-600 mb-4">
-                Choose your plan to start your 14-day free trial
+                Your free trial has ended. Choose a plan to keep your reviews flowing.
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-                <div className="flex items-center justify-center gap-2 text-blue-700 font-medium mb-2">
-                  <Shield className="h-5 w-5" />
-                  14-Day Free Trial on the plan you choose
-                </div>
                 <div className="grid md:grid-cols-3 gap-4 text-sm text-blue-600">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span>Full access for 14 days</span>
+                    <span>Charged today, then monthly</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CreditCard className="h-4 w-4" />
-                    <span>No charges during trial</span>
+                    <span>30-day money-back guarantee</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4" />
@@ -285,7 +281,7 @@ export default function BillingSetupPage() {
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
-                {isCancelled ? 'Reactivating...' : 'Setting up your trial...'}
+                {isCancelled ? 'Reactivating...' : 'Setting up your subscription...'}
               </>
             ) : isCancelled ? (
               isPaymentFailed ? (
@@ -294,7 +290,7 @@ export default function BillingSetupPage() {
                 `Reactivate ${selectedPlanName} Plan`
               )
             ) : (
-              `Start ${selectedPlanName} Trial`
+              `Continue with ${selectedPlanName}`
             )}
           </Button>
 
@@ -314,7 +310,7 @@ export default function BillingSetupPage() {
             )
           ) : (
             <p className="text-sm text-gray-500 mt-4">
-              Your 14-day free trial starts now. You&apos;ll only be charged after the trial ends.
+              You&apos;ll be charged today and your monthly billing cycle starts now.
               <br />
               Cancel anytime through your billing dashboard.
             </p>

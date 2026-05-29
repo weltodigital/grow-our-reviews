@@ -3,6 +3,7 @@
 import { createServerSupabase } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { calculateBillingCycleDate } from '@/lib/billing-cycle'
+import { TRIAL_CONFIG } from '@/lib/pricing'
 
 interface OnboardingData {
   businessName: string
@@ -45,20 +46,38 @@ export async function completeOnboarding(data: OnboardingData) {
 
   let upsertError;
 
+  // Grant the no-card 7-day trial here. Pre-existing profiles that already
+  // have a stripe_customer_id keep their Stripe-driven values; only profiles
+  // that don't have a real subscription yet get stamped.
+  const now = new Date()
+  const trialEndsAt = new Date(now.getTime() + TRIAL_CONFIG.durationDays * 24 * 60 * 60 * 1000)
+
   if (existingProfile) {
-    // Update existing profile - only update onboarding fields, preserve billing data
+    // Update existing profile. Preserve billing data if Stripe has already
+    // taken over — but if this profile is still pre-Stripe (no customer ID),
+    // top up the trial so a returning unfinished user gets a fresh window.
+    const updateData: any = {
+      business_name: data.businessName.trim(),
+      google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
+      updated_at: now.toISOString(),
+    }
+
+    if (!(existingProfile as any).stripe_customer_id) {
+      updateData.subscription_status = 'trialing'
+      updateData.trial_ends_at = trialEndsAt.toISOString()
+      updateData.monthly_request_limit = TRIAL_CONFIG.creditLimit
+    }
+
     const { error } = await (supabase as any)
       .from('profiles')
-      .update({
-        business_name: data.businessName.trim(),
-        google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', user.id)
 
     upsertError = error;
   } else {
-    // Create new profile with all required fields
+    // Create new profile with trial state already populated. The auth guard
+    // checks subscription_status and trial_ends_at — if either is missing
+    // the user is bounced to /billing/setup, so set both explicitly here.
     const { error } = await (supabase as any)
       .from('profiles')
       .insert({
@@ -66,8 +85,11 @@ export async function completeOnboarding(data: OnboardingData) {
         email: user.email!,
         business_name: data.businessName.trim(),
         google_review_url: data.googleReviewUrl ? data.googleReviewUrl.trim() : null,
-        billing_cycle_date: calculateBillingCycleDate(new Date()),
-        updated_at: new Date().toISOString(),
+        billing_cycle_date: calculateBillingCycleDate(now),
+        subscription_status: 'trialing',
+        trial_ends_at: trialEndsAt.toISOString(),
+        monthly_request_limit: TRIAL_CONFIG.creditLimit,
+        updated_at: now.toISOString(),
       })
 
     upsertError = error;
@@ -109,12 +131,8 @@ export async function completeOnboarding(data: OnboardingData) {
     // Don't fail onboarding if templates fail - they can be created later
   }
 
-  // Welcome email will be sent after Stripe checkout completion via webhook.
-  //
-  // Redirect server-side rather than returning success and letting the client
-  // do `router.push`. Previously, if the tab closed in the gap between this
-  // action returning and the browser navigating, the user was stranded with a
-  // profile but no Stripe customer. `redirect()` throws NEXT_REDIRECT, which
-  // the client form re-throws so Next.js handles the navigation.
-  redirect('/billing/setup')
+  // Drop the user straight into the dashboard. Their no-card trial is now
+  // active in our DB; billing only happens at trial end via the auth guard
+  // bouncing them to /billing/setup once `trial_ends_at` is in the past.
+  redirect('/dashboard')
 }

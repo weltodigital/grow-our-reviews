@@ -543,8 +543,8 @@ export function PseoPricingSection({
       <div className="text-center mb-12">
         <h2 className="mb-4">{heading}</h2>
         <p className="page-subtitle mx-auto">
-          14-day free trial on the plan you choose. Card required. Cancel from the dashboard
-          anytime.
+          7-day free trial — no credit card required at signup. Pick a plan when your trial
+          ends to keep going.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
@@ -681,7 +681,7 @@ export function PseoCtaSection({ niche, pattern }: SectionProps) {
           <ArrowRight className="h-4 w-4" />
         </a>
         <p className="mt-6 text-sm" style={{ color: 'var(--text-tertiary)' }}>
-          14-day free trial · No setup fees · Cancel anytime
+          7-day free trial · No card required · Cancel anytime
         </p>
       </div>
     </SectionWrapper>

@@ -64,7 +64,7 @@ export function HeroSection() {
           <div className="mt-12 flex items-center justify-center space-x-8 text-sm" style={{ color: 'var(--text-tertiary)' }}>
             <div className="flex items-center space-x-2">
               <Shield className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-              <span>14-day free trial</span>
+              <span>7-day free trial · no card</span>
             </div>
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5" style={{ color: 'var(--accent)' }} />

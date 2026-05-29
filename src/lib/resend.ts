@@ -63,58 +63,6 @@ export async function sendWelcomeEmail(to: string, businessName: string) {
   }
 }
 
-// Sent once to users who completed onboarding but never reached Stripe
-// Checkout. The cron at api/cron/abandoned-signup-recovery picks them up
-// 24h-30d after signup, gated by profiles.recovery_email_sent_at so it never
-// repeats.
-export async function sendAbandonedSignupRecoveryEmail(to: string, businessName: string) {
-  if (!resend) {
-    console.warn('Resend not configured - skipping abandoned signup recovery email')
-    return { success: false, error: 'Email service not configured' }
-  }
-
-  const billingUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.growourreviews.com'}/billing/setup`
-
-  try {
-    const { data, error } = await resend.emails.send({
-      from: 'Grow Our Reviews <ed@growourreviews.com>',
-      to: [to],
-      subject: 'Finish setting up Grow Our Reviews',
-      html: `
-        <h1>You're one step away from collecting reviews</h1>
-
-        <p>Hi ${businessName},</p>
-
-        <p>I noticed you got ${businessName} set up in Grow Our Reviews but didn't pick a plan to start your free trial. Wanted to drop you a quick line in case you got pulled away mid-signup — happens to all of us.</p>
-
-        <p>Picking a plan takes about 30 seconds, you get the full 14 days free, and you won't be charged a penny until the trial ends. Cancel any time from your dashboard.</p>
-
-        <p><a href="${billingUrl}" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Pick your plan and start your trial →</a></p>
-
-        <p>If anything's holding you back — pricing, how the SMS works, whether it'll suit your business — just reply to this email and I'll help.</p>
-
-        <p>Best regards,<br>
-        Ed at Grow Our Reviews</p>
-
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-        <p style="color: #6b7280; font-size: 14px;">
-          You're receiving this because you started signing up for Grow Our Reviews. If you'd rather not finish setting up, you can ignore this email — we won't send another reminder.
-        </p>
-      `
-    })
-
-    if (error) {
-      console.error('Failed to send abandoned signup recovery email:', error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error('Error sending abandoned signup recovery email:', error)
-    return { success: false, error: 'Failed to send email' }
-  }
-}
-
 export async function sendTrialEndingEmail(to: string, businessName: string, trialEndsAt: string) {
   if (!resend) {
     console.warn('Resend not configured - skipping trial ending email')
@@ -133,7 +81,7 @@ export async function sendTrialEndingEmail(to: string, businessName: string, tri
 
         <p>Hi ${businessName},</p>
 
-        <p>Just a friendly reminder that your 14-day free trial ends on <strong>${trialEndDate}</strong>.</p>
+        <p>Just a friendly reminder that your free trial ends on <strong>${trialEndDate}</strong>.</p>
 
         <p>To continue getting more Google reviews after your trial ends, you'll need to choose a plan.</p>
 

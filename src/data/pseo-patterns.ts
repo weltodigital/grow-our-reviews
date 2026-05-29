@@ -84,7 +84,7 @@ const pattern1: PatternConfig = {
     'Grow Our Reviews sends a polite SMS request to your customer after every job — so the reviews come in while you carry on working. Pick your industry to see exactly how it fits.',
   title: (n) => `Automated Google Reviews for ${n.name} | Grow Our Reviews`,
   metaDescription: (n) =>
-    `Automate your Google review collection as a ${n.singular.toLowerCase()}. Send review requests to ${n.customerWord}s after every ${n.jobWord}. More reviews, better local rankings, more work. Free 14-day trial.`,
+    `Automate your Google review collection as a ${n.singular.toLowerCase()}. Send review requests to ${n.customerWord}s after every ${n.jobWord}. More reviews, better local rankings, more work. Free 7-day trial — no card required.`,
   h1: (n) => `Automated Google Reviews for ${n.name}`,
   heroEyebrow: 'Review Automation',
   heroSubtitle: (n) =>
@@ -153,7 +153,7 @@ const pattern2: PatternConfig = {
     'Most owners juggle three problems: not enough reviews coming in, no clean way to handle unhappy customers, and no single place to see how the profile is performing. Pick your industry below.',
   title: (n) => `Google Review Management for ${n.name} | Grow Our Reviews`,
   metaDescription: (n) =>
-    `Automate Google review management for your ${n.businessType}. Collect new reviews on autopilot, route unhappy ${n.customerWord}s to private feedback, and see your whole profile in one dashboard. Free 14-day trial.`,
+    `Automate Google review management for your ${n.businessType}. Collect new reviews on autopilot, route unhappy ${n.customerWord}s to private feedback, and see your whole profile in one dashboard. Free 7-day trial — no card required.`,
   h1: (n) => `Google Review Management for ${n.name}`,
   heroEyebrow: 'Hands-Off Management',
   heroSubtitle: (n) =>
@@ -296,7 +296,7 @@ const pattern4: PatternConfig = {
     'Every industry asks for reviews differently. Our software ships with the right defaults for your trade — pick your industry to see what changes.',
   title: (n) => `Review Software for ${n.name} | Grow Our Reviews`,
   metaDescription: (n) =>
-    `Simple review software built for ${n.name.toLowerCase()}. SMS requests, sentiment-gated routing, private feedback inbox, conversion stats, and CSV bulk import — everything a ${n.businessType} needs in one app. 14-day free trial.`,
+    `Simple review software built for ${n.name.toLowerCase()}. SMS requests, sentiment-gated routing, private feedback inbox, conversion stats, and CSV bulk import — everything a ${n.businessType} needs in one app. 7-day free trial — no card required.`,
   h1: (n) => `Review Software for ${n.name}`,
   heroEyebrow: 'Purpose-Built Software',
   heroSubtitle: (n) =>
@@ -365,7 +365,7 @@ const pattern5: PatternConfig = {
     'It\'s a tool. You add a customer, it sends them an SMS, the review lands on your Google profile. Pick your industry to see how it slots into your day.',
   title: (n) => `${n.singular} Google Review Tool | Grow Our Reviews`,
   metaDescription: (n) =>
-    `A simple Google review tool for ${n.name.toLowerCase()}. Add a ${n.customerWord}, send a request, get a review. No CRM bloat — just the tool that does the one job. Try it free for 14 days.`,
+    `A simple Google review tool for ${n.name.toLowerCase()}. Add a ${n.customerWord}, send a request, get a review. No CRM bloat — just the tool that does the one job. Try it free for 7 days — no card required.`,
   h1: (n) => `${n.singular} Google Review Tool`,
   heroEyebrow: 'One Tool. One Job.',
   heroSubtitle: (n) =>

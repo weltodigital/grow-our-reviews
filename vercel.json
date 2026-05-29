@@ -23,10 +23,6 @@
     {
       "path": "/api/cron/trial-warnings",
       "schedule": "0 9,17 * * *"
-    },
-    {
-      "path": "/api/cron/abandoned-signup-recovery",
-      "schedule": "0 10 * * *"
     }
   ]
 }

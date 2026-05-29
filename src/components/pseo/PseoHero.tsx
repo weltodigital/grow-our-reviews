@@ -50,7 +50,7 @@ export function PseoHero({ niche, pattern }: Props) {
             </Link>
           </div>
           <p className="mt-6 text-sm" style={{ color: 'var(--text-tertiary)' }}>
-            14-day free trial · No setup fees · Cancel anytime
+            7-day free trial · No card required · Cancel anytime
           </p>
         </div>
       </div>

@@ -58,7 +58,7 @@ export function MarketingFooter() {
               </a>
             </div>
             <p className="text-sm text-gray-400 mt-4">
-              14-day free trial • Credit card required • Cancel anytime
+              7-day free trial • No credit card required • Cancel anytime
             </p>
           </div>
         </div>

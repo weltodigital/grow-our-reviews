@@ -67,30 +67,42 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Check if user has completed onboarding and billing setup
+        // Check if user has completed onboarding and has an active trial or
+        // subscription. Under the no-card trial flow, trialing users with no
+        // Stripe customer are allowed into the dashboard as long as their
+        // trial_ends_at hasn't passed.
         const { data: profile } = await supabase
           .from('profiles')
-          .select('business_name, google_review_url, stripe_customer_id, subscription_status')
+          .select('business_name, google_review_url, stripe_customer_id, subscription_status, trial_ends_at')
           .eq('id', data.user.id)
-          .single() as { data: { business_name: string | null, google_review_url: string | null, stripe_customer_id: string | null, subscription_status: string | null } | null }
+          .single() as { data: { business_name: string | null, google_review_url: string | null, stripe_customer_id: string | null, subscription_status: string | null, trial_ends_at: string | null } | null }
+
+        const now = new Date()
+        const trialIsActive =
+          profile?.subscription_status === 'trialing' &&
+          profile.trial_ends_at !== null &&
+          new Date(profile.trial_ends_at) > now
+        const subscriptionIsActive =
+          (profile?.subscription_status === 'active' ||
+            profile?.subscription_status === 'cancelled') &&
+          !!profile?.stripe_customer_id
 
         console.log('Login redirect logic - profile status:', {
           hasBusinessName: !!profile?.business_name,
           hasGoogleUrl: !!profile?.google_review_url,
           hasStripeId: !!profile?.stripe_customer_id,
-          subscriptionStatus: profile?.subscription_status
+          subscriptionStatus: profile?.subscription_status,
+          trialIsActive,
+          subscriptionIsActive,
         })
 
         if (!profile?.business_name) {
-          // Incomplete onboarding - send to onboarding (google_review_url is optional)
           console.log('Incomplete onboarding - redirecting to /onboarding')
           router.push('/onboarding')
-        } else if (!profile?.stripe_customer_id || !profile?.subscription_status || !['active', 'trialing', 'cancelled'].includes(profile.subscription_status)) {
-          // Completed onboarding but no active subscription - send to billing setup
-          console.log('No active subscription - redirecting to /billing/setup')
+        } else if (!trialIsActive && !subscriptionIsActive) {
+          console.log('No active trial or subscription - redirecting to /billing/setup')
           router.push('/billing/setup')
         } else {
-          // Everything complete - send to dashboard (including cancelled users for read-only access)
           console.log('All complete - redirecting to /dashboard')
           router.push('/dashboard')
         }

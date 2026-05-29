@@ -70,19 +70,25 @@ export type Plan = typeof PRICING_PLANS[PlanKey]
 // Plans in display order (cheapest → most expensive).
 export const PLAN_DISPLAY_ORDER: PlanKey[] = ['lite', 'starter', 'growth', 'pro']
 
-// Trial configuration. There is no single trial default plan — each user
-// selects a plan at signup and the trial gives them that plan's credits.
-// `defaultPlan` is the fallback used when a plan can't be inferred from the
-// signup flow (e.g. legacy routes).
+// Trial configuration. The trial is 7 days, no card required: users sign up
+// and are dropped straight into the dashboard with `creditLimit` credits for
+// the duration. At trial end the auth guard pushes them to /billing/setup
+// where they pick a plan and enter card details to continue.
+//
+// `defaultPlan` is the plan pre-selected on /billing/setup after the trial
+// expires (and when the signup flow can't otherwise infer a choice).
 export const TRIAL_CONFIG = {
-  durationDays: 14,
-  requiresCard: true,
+  durationDays: 7,
+  requiresCard: false,
+  creditLimit: 30,
   defaultPlan: 'growth' as PlanKey,
 } as const
 
-// Default monthly request limit (fallback only — most users get the limit of
-// the plan they actually chose).
-export const DEFAULT_TRIAL_LIMIT = PRICING_PLANS.growth.monthlyRequestLimit
+// Default monthly request limit. Used as the trial limit at onboarding and
+// as a safety fallback when a profile is missing `monthly_request_limit`.
+// Capped at the trial credit limit so no buggy state ever exposes more
+// credits than the smallest legitimate allocation.
+export const DEFAULT_TRIAL_LIMIT = TRIAL_CONFIG.creditLimit
 
 // Get the plan key matching a monthly request limit. Used to display the
 // current plan when only `monthly_request_limit` is on the profile row.

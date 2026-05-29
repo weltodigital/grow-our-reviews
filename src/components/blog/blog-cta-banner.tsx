@@ -9,7 +9,7 @@ export function BlogCTABanner() {
           Automate your Google review collection
         </h3>
         <p className="text-lg text-gray-700 mb-6 max-w-2xl mx-auto">
-          Grow Our Reviews sends your customers a review request after every job. More Google reviews, better local rankings, more work. Try it free for 14 days.
+          Grow Our Reviews sends your customers a review request after every job. More Google reviews, better local rankings, more work. Try it free for 7 days.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
@@ -21,7 +21,7 @@ export function BlogCTABanner() {
           </Link>
         </div>
         <p className="text-sm text-gray-600 mt-3">
-          No credit card required for 14 days
+          No credit card required
         </p>
       </div>
     </div>

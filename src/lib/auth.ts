@@ -243,8 +243,22 @@ export async function requireUserWithProfile(sessionId?: string): Promise<{ user
     }
   }
 
-  // Final check after potential reconciliation
-  if (!validProfile.stripe_customer_id || !validProfile.subscription_status || !['active', 'trialing'].includes(validProfile.subscription_status as string)) {
+  // Final check after potential reconciliation.
+  //
+  // Access rules under the 7-day no-card trial:
+  //   - subscription_status='active' (Stripe paying customer) → allow
+  //   - subscription_status='trialing' AND trial_ends_at is in the future → allow
+  //     (covers both Stripe-trialing users with a card AND new-flow trial users
+  //      with no stripe_customer_id yet)
+  //   - everything else (no status, expired trial, cancelled, past_due) →
+  //     redirect to /billing/setup so they pick a plan and enter a card
+  const now = new Date()
+  const status = validProfile.subscription_status as string | null
+  const trialEndsAt = validProfile.trial_ends_at ? new Date(validProfile.trial_ends_at) : null
+  const trialIsActive = status === 'trialing' && trialEndsAt !== null && trialEndsAt > now
+  const subscriptionIsActive = status === 'active' && !!validProfile.stripe_customer_id
+
+  if (!subscriptionIsActive && !trialIsActive) {
     redirect('/billing/setup')
     throw new Error('Redirected to billing setup')
   }

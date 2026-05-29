@@ -144,7 +144,7 @@ export default function SignUpPage() {
       <CardHeader>
         <CardTitle>Create your account</CardTitle>
         <CardDescription>
-          Start your 14-day free trial. Credit card required - cancel anytime.
+          Start your 7-day free trial. No credit card required.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -221,7 +221,7 @@ export default function SignUpPage() {
             </div>
           )}
           <Button type="submit" className="w-full !text-black" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Start free trial'}
+            {isLoading ? 'Creating account...' : 'Start 7-day free trial'}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">

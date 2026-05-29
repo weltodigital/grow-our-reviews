@@ -65,7 +65,7 @@ export async function createCheckoutSession({
   customerEmail,
   customerId,
   userId,
-  trialDays = 7,
+  trialDays = 0,
 }: {
   priceId: string
   successUrl: string
