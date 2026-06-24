@@ -120,7 +120,9 @@ export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashb
         />
 
         {/* Two-Factor Authentication */}
-        <TwoFactorSettings />
+        <div id="two-factor" className="scroll-mt-6">
+          <TwoFactorSettings />
+        </div>
 
         {/* Help Section */}
         <Card>

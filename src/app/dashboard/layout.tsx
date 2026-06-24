@@ -4,6 +4,7 @@ import { DashboardHeader } from '@/components/dashboard/header'
 import { LogoutButton } from '@/components/dashboard/logout-button'
 import GoogleReviewUrlBanner from '@/components/dashboard/GoogleReviewUrlBanner'
 import TrialCreditsBanner from '@/components/dashboard/TrialCreditsBanner'
+import TwoFactorBanner from '@/components/dashboard/TwoFactorBanner'
 import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
 import { countNudgesSentInPeriod } from '@/lib/credit-usage'
 
@@ -88,6 +89,9 @@ export default async function DashboardLayout({
 
           {/* Google Review URL Banner */}
           <GoogleReviewUrlBanner profile={profile} />
+
+          {/* Prompt to enable two-factor authentication (hides once enabled) */}
+          <TwoFactorBanner />
 
           {/* Page content */}
           <main>
