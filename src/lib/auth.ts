@@ -63,9 +63,23 @@ export async function getUser() {
 }
 
 export async function requireAuth() {
-  const user = await getUser()
+  const supabase = await createServerSupabase()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
+    redirect('/login')
+  }
+
+  // Enforce 2FA server-side. A user who has entered only their password holds
+  // an aal1 session; if they have a verified second factor, nextLevel is 'aal2'.
+  // Without this check they could skip the TOTP step on the login screen by
+  // navigating straight to a protected page. Bounce them back to /login, which
+  // detects the partial session and shows the code prompt.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+  if (aal && aal.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) {
     redirect('/login')
   }
 

@@ -10,6 +10,7 @@ import { BusinessInfoSettings } from './business-info-settings'
 import { SmsTimingSettings } from './sms-timing-settings'
 import { NudgeSettings } from './nudge-settings'
 import { AccountSettings } from './account-settings'
+import { TwoFactorSettings } from './two-factor-settings'
 import SmsTemplateEditor from './SmsTemplateEditor'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
@@ -117,6 +118,9 @@ export function SettingsDashboard({ user, profile, smsTemplates }: SettingsDashb
           onSettingsChange={handleSettingsChange}
           onSettingsSaved={handleSettingsSaved}
         />
+
+        {/* Two-Factor Authentication */}
+        <TwoFactorSettings />
 
         {/* Help Section */}
         <Card>

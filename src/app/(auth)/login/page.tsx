@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,72 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [showResendOption, setShowResendOption] = useState(false)
   const [resendMessage, setResendMessage] = useState('')
+  // Two-factor challenge state. When the signed-in user has a verified TOTP
+  // factor we hold them on a code-entry step instead of redirecting.
+  const [mfaRequired, setMfaRequired] = useState(false)
+  const [mfaCode, setMfaCode] = useState('')
+  const [mfaFactorId, setMfaFactorId] = useState('')
+  const [mfaChallengeId, setMfaChallengeId] = useState('')
   const router = useRouter()
+
+  // If we arrive with an existing aal1 session that still needs aal2 (e.g. the
+  // server bounced a partially-authenticated user back here), skip the password
+  // form and go straight to the code prompt.
+  useEffect(() => {
+    if (!supabase) return
+    let cancelled = false
+    ;(async () => {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      if (cancelled || !aal || aal.nextLevel !== 'aal2' || aal.nextLevel === aal.currentLevel) {
+        return
+      }
+      const { data: factors } = await supabase.auth.mfa.listFactors()
+      const totp = factors?.totp?.find((f) => f.status === 'verified')
+      if (!totp) return
+      const { data: challenge } = await supabase.auth.mfa.challenge({ factorId: totp.id })
+      if (cancelled || !challenge) return
+      setMfaFactorId(totp.id)
+      setMfaChallengeId(challenge.id)
+      setMfaRequired(true)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Profile-aware redirect, shared by the password path and the post-2FA path.
+  // Under the no-card trial flow, trialing users with no Stripe customer are
+  // allowed into the dashboard as long as their trial_ends_at hasn't passed.
+  const completeLogin = async (userId: string) => {
+    if (!supabase) {
+      setError('Service temporarily unavailable')
+      return
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('business_name, google_review_url, stripe_customer_id, subscription_status, trial_ends_at')
+      .eq('id', userId)
+      .single() as { data: { business_name: string | null, google_review_url: string | null, stripe_customer_id: string | null, subscription_status: string | null, trial_ends_at: string | null } | null }
+
+    const now = new Date()
+    const trialIsActive =
+      profile?.subscription_status === 'trialing' &&
+      profile.trial_ends_at !== null &&
+      new Date(profile.trial_ends_at) > now
+    const subscriptionIsActive =
+      (profile?.subscription_status === 'active' ||
+        profile?.subscription_status === 'cancelled') &&
+      !!profile?.stripe_customer_id
+
+    if (!profile?.business_name) {
+      router.push('/onboarding')
+    } else if (!trialIsActive && !subscriptionIsActive) {
+      router.push('/billing/setup')
+    } else {
+      router.push('/dashboard')
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,12 +104,6 @@ export default function LoginPage() {
       })
 
       if (error) {
-        console.log('Login error details:', {
-          message: error.message,
-          code: error.code || 'no_code',
-          status: error.status || 'no_status'
-        })
-
         // Check for specific unconfirmed email error patterns
         if (error.message.includes('Email not confirmed') ||
             error.message.includes('email not confirmed') ||
@@ -53,59 +112,85 @@ export default function LoginPage() {
             error.message.includes('not confirmed')) {
           setError('Please confirm your email address before signing in. Check your inbox for the confirmation email.')
           setShowResendOption(true)
-          console.log('Showing resend option for unconfirmed email')
         } else if (error.message.includes('Invalid login credentials')) {
           // Could be wrong password OR unconfirmed account
           setError('Invalid email or password. If you haven\'t confirmed your email yet, please check your inbox.')
           setShowResendOption(true)
-          console.log('Showing resend option for invalid credentials (might be unconfirmed)')
         } else {
           setError(error.message)
-          console.log('Not showing resend option, error was:', error.message)
         }
         return
       }
 
       if (data.user) {
-        // Check if user has completed onboarding and has an active trial or
-        // subscription. Under the no-card trial flow, trialing users with no
-        // Stripe customer are allowed into the dashboard as long as their
-        // trial_ends_at hasn't passed.
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('business_name, google_review_url, stripe_customer_id, subscription_status, trial_ends_at')
-          .eq('id', data.user.id)
-          .single() as { data: { business_name: string | null, google_review_url: string | null, stripe_customer_id: string | null, subscription_status: string | null, trial_ends_at: string | null } | null }
+        // If the account has a verified second factor, password alone only gets
+        // us to aal1 — we must challenge for a TOTP code before proceeding.
+        const { data: aal, error: aalError } =
+          await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
 
-        const now = new Date()
-        const trialIsActive =
-          profile?.subscription_status === 'trialing' &&
-          profile.trial_ends_at !== null &&
-          new Date(profile.trial_ends_at) > now
-        const subscriptionIsActive =
-          (profile?.subscription_status === 'active' ||
-            profile?.subscription_status === 'cancelled') &&
-          !!profile?.stripe_customer_id
+        if (!aalError && aal?.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) {
+          const { data: factors, error: factorError } = await supabase.auth.mfa.listFactors()
+          const totp = factors?.totp?.find((f) => f.status === 'verified')
 
-        console.log('Login redirect logic - profile status:', {
-          hasBusinessName: !!profile?.business_name,
-          hasGoogleUrl: !!profile?.google_review_url,
-          hasStripeId: !!profile?.stripe_customer_id,
-          subscriptionStatus: profile?.subscription_status,
-          trialIsActive,
-          subscriptionIsActive,
-        })
+          if (factorError || !totp) {
+            setError('Could not start two-factor verification. Please try again.')
+            return
+          }
 
-        if (!profile?.business_name) {
-          console.log('Incomplete onboarding - redirecting to /onboarding')
-          router.push('/onboarding')
-        } else if (!trialIsActive && !subscriptionIsActive) {
-          console.log('No active trial or subscription - redirecting to /billing/setup')
-          router.push('/billing/setup')
-        } else {
-          console.log('All complete - redirecting to /dashboard')
-          router.push('/dashboard')
+          const { data: challenge, error: challengeError } =
+            await supabase.auth.mfa.challenge({ factorId: totp.id })
+          if (challengeError) {
+            setError(challengeError.message)
+            return
+          }
+
+          setMfaFactorId(totp.id)
+          setMfaChallengeId(challenge.id)
+          setMfaCode('')
+          setMfaRequired(true)
+          return
         }
+
+        await completeLogin(data.user.id)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+      console.error(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleVerifyMfa = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
+
+    if (!supabase) {
+      setError('Service temporarily unavailable')
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: mfaFactorId,
+        challengeId: mfaChallengeId,
+        code: mfaCode.trim(),
+      })
+
+      if (verifyError) {
+        // A challenge is single-use, so mint a fresh one for the retry.
+        const { data: challenge } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId })
+        if (challenge) setMfaChallengeId(challenge.id)
+        setMfaCode('')
+        setError('That code didn\'t match. Please try again.')
+        return
+      }
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await completeLogin(user.id)
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -151,6 +236,53 @@ export default function LoginPage() {
     } finally {
       setIsResending(false)
     }
+  }
+
+  // Two-factor challenge step — shown after a correct password when the account
+  // has a verified authenticator factor.
+  if (mfaRequired) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Two-step verification</CardTitle>
+          <CardDescription>
+            Enter the 6-digit code from your authenticator app to finish signing in.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleVerifyMfa} className="space-y-4">
+            <div>
+              <Label htmlFor="mfa-code">Authentication code</Label>
+              <Input
+                id="mfa-code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]*"
+                maxLength={6}
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                disabled={isLoading}
+                autoFocus
+                required
+              />
+            </div>
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded">
+                {error}
+              </div>
+            )}
+            <Button
+              type="submit"
+              className="w-full !text-black"
+              disabled={isLoading || mfaCode.length !== 6}
+            >
+              {isLoading ? 'Verifying...' : 'Verify'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

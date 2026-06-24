@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
+import { validatePassword, MIN_PASSWORD_LENGTH } from '@/lib/password-validation'
 
 function ConfirmResetPasswordForm() {
   const [password, setPassword] = useState('')
@@ -107,12 +108,15 @@ function ConfirmResetPasswordForm() {
       return
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
+    setIsLoading(true)
+
+    // Enforce strength rules + breach check before updating the password.
+    const passwordError = await validatePassword(password)
+    if (passwordError) {
+      setError(passwordError)
+      setIsLoading(false)
       return
     }
-
-    setIsLoading(true)
 
     if (!supabase) {
       setError('Service temporarily unavailable')
@@ -158,10 +162,13 @@ function ConfirmResetPasswordForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
-              minLength={6}
+              minLength={MIN_PASSWORD_LENGTH}
               autoComplete="new-password"
               spellCheck="false"
             />
+            <p className="mt-1 text-xs text-gray-500">
+              At least {MIN_PASSWORD_LENGTH} characters with an uppercase letter, a number, and a symbol.
+            </p>
           </div>
           <div>
             <Label htmlFor="confirmPassword">Confirm New Password</Label>
@@ -172,7 +179,7 @@ function ConfirmResetPasswordForm() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={isLoading}
-              minLength={6}
+              minLength={MIN_PASSWORD_LENGTH}
               autoComplete="new-password"
               spellCheck="false"
             />
