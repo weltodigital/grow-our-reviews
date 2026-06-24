@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { getTwilioClient } from '@/lib/twilio'
+import { redactPhone } from '@/lib/redact'
 import type { Database } from '@/types/database'
 
 // Validate Twilio webhook signature
@@ -32,16 +33,22 @@ export async function POST(request: NextRequest) {
       params[key] = value.toString()
     })
 
-    // Validate webhook signature (optional but recommended for production)
+    // Validate webhook signature. Twilio always signs its requests, so whenever
+    // our auth token is configured (i.e. production) we REQUIRE a valid
+    // signature and reject anything missing or invalid — otherwise anyone who
+    // discovers this URL could forge opt-outs or delivery-status updates. When
+    // no token is set (local dev), validation is skipped.
     const signature = request.headers.get('x-twilio-signature')
     const url = request.url
 
-    if (signature && !validateTwilioSignature(signature, url, params)) {
-      console.error('Invalid Twilio webhook signature')
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 401 }
-      )
+    if (process.env.TWILIO_AUTH_TOKEN) {
+      if (!signature || !validateTwilioSignature(signature, url, params)) {
+        console.error('Rejecting Twilio webhook: missing or invalid signature')
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 401 }
+        )
+      }
     }
 
     // Create supabase client for webhook operations
@@ -143,7 +150,7 @@ async function handleOptOut(phoneNumber: string, originalMessage: string, supaba
       .eq('customer_id', recentRequest.customer_id)
       .in('status', ['scheduled', 'queued']);
 
-    console.log(`Opt-out processed: ${phoneNumber} for business ${recentRequest.user_id}`);
+    console.log(`Opt-out processed: ${redactPhone(phoneNumber)} for business ${recentRequest.user_id}`);
   } else {
     // Can't determine which business — suppress globally
     const { data: allRequests } = await supabase
@@ -168,7 +175,7 @@ async function handleOptOut(phoneNumber: string, originalMessage: string, supaba
       }
     }
 
-    console.log(`Global opt-out processed: ${phoneNumber} (no specific business identified)`);
+    console.log(`Global opt-out processed: ${redactPhone(phoneNumber)} (no specific business identified)`);
   }
 }
 
@@ -186,7 +193,7 @@ async function handleGeneralReply(phoneNumber: string, messageBody: string, supa
 
   if (recentReply) {
     // Already replied within 24 hours, don't send another auto-reply
-    console.log(`Skipping auto-reply to ${phoneNumber} - already replied within 24 hours`);
+    console.log(`Skipping auto-reply to ${redactPhone(phoneNumber)} - already replied within 24 hours`);
     return;
   }
 
@@ -225,14 +232,14 @@ async function handleGeneralReply(phoneNumber: string, messageBody: string, supa
           replied_at: new Date().toISOString()
         });
 
-      console.log(`Auto-reply sent to ${phoneNumber} for business ${businessName}`);
+      console.log(`Auto-reply sent to ${redactPhone(phoneNumber)} for business ${businessName}`);
     } catch (error) {
-      console.error(`Failed to send auto-reply to ${phoneNumber}:`, error);
+      console.error(`Failed to send auto-reply to ${redactPhone(phoneNumber)}:`, error);
     }
   }
 
   // Log the inbound message for reference (but don't store message content - GDPR)
-  console.log(`Inbound SMS from ${phoneNumber}: [message received but content not stored]`);
+  console.log(`Inbound SMS from ${redactPhone(phoneNumber)}: [message received but content not stored]`);
 }
 
 // Handle delivery status updates (existing functionality)

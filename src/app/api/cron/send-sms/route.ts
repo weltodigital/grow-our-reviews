@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendSMS, createInitialReviewMessage, createCustomInitialMessage } from '@/lib/twilio'
 import { buildReviewUrl } from '@/lib/review-url'
+import { redactPhone } from '@/lib/redact'
 import type { Database } from '@/types/database'
 
 // Protect the cron endpoint - Vercel automatically handles cron authentication
@@ -227,7 +228,7 @@ export async function GET(request: NextRequest) {
           if (suppressError) {
             console.error(`Error marking request ${(request as any).id} as suppressed:`, suppressError)
           } else {
-            console.log(`Request ${(request as any).id} suppressed - customer ${(request as any).customers.phone} has opted out`)
+            console.log(`Request ${(request as any).id} suppressed - customer ${redactPhone((request as any).customers.phone)} has opted out`)
           }
 
           results.push({

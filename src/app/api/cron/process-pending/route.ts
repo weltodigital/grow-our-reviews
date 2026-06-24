@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentBillingPeriod } from '@/lib/billing-cycle'
 import { generateToken } from '@/lib/generate-token'
 import { DEFAULT_TRIAL_LIMIT } from '@/lib/pricing'
+import { redactEmail } from '@/lib/redact'
 import type { Database } from '@/types/database'
 
 // Cron job to process pending customers at the start of each billing cycle
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
         const customersToProcess = userData.customers.slice(0, requestsRemaining)
 
         if (customersToProcess.length === 0) {
-          console.log(`⚠️ User ${userData.profile.business_name} (${userData.profile.email}) has no remaining credits`)
+          console.log(`⚠️ User ${userData.profile.business_name} (${redactEmail(userData.profile.email)}) has no remaining credits`)
           userResults.push({
             userId,
             email: userData.profile.email,
@@ -245,7 +246,7 @@ SUMMARY:
 
 USER BREAKDOWN:
 ${userResults.map(user =>
-  `• ${user.businessName} (${user.email}): ${user.processed} processed, ${user.remaining} remaining - ${user.reason}`
+  `• ${user.businessName} (${redactEmail(user.email)}): ${user.processed} processed, ${user.remaining} remaining - ${user.reason}`
 ).join('\n')}
 
 ${totalRemaining > 0 ? `
