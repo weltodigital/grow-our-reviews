@@ -47,21 +47,13 @@ export interface MessageData {
   template?: CustomSMSTemplate
 }
 
-// UK PECR requires every marketing SMS to offer a simple opt-out. We honour
-// inbound STOP via the Twilio webhook + suppression list, so this line tells
-// recipients how to trigger it. Appended to BOTH default and custom templates
-// so it can never be omitted.
-export const SMS_OPT_OUT_NOTICE = 'Reply STOP to opt out.'
-
 export function createInitialReviewMessage({ customerName, businessName, sentimentGateUrl }: SMSTemplate): string {
   return `Hi ${customerName}, thanks for choosing ${businessName}! If you were happy with our work, we'd really appreciate a quick review — it only takes 30 seconds:
-${sentimentGateUrl}
-${SMS_OPT_OUT_NOTICE}`
+${sentimentGateUrl}`
 }
 
 export function createNudgeMessage({ customerName, businessName, sentimentGateUrl }: SMSTemplate): string {
-  return `Hi ${customerName}, just a quick reminder - would you mind leaving us a review: ${sentimentGateUrl}
-${SMS_OPT_OUT_NOTICE}`
+  return `Hi ${customerName}, just a quick reminder - would you mind leaving us a review: ${sentimentGateUrl}`
 }
 
 export function createCustomInitialMessage({ customerName, businessName, sentimentGateUrl, template }: MessageData): string {
@@ -86,9 +78,6 @@ export function createCustomInitialMessage({ customerName, businessName, sentime
     messageParts.push(template.sign_off)
   }
 
-  // Mandatory opt-out notice (PECR) — always last.
-  messageParts.push(SMS_OPT_OUT_NOTICE)
-
   return messageParts.join('\n')
 }
 
@@ -112,9 +101,6 @@ export function createCustomNudgeMessage({ customerName, businessName, sentiment
   if (template.sign_off && template.sign_off.trim()) {
     messageParts.push(template.sign_off)
   }
-
-  // Mandatory opt-out notice (PECR) — always last.
-  messageParts.push(SMS_OPT_OUT_NOTICE)
 
   return messageParts.join('\n')
 }
