@@ -60,10 +60,11 @@ export function TwoFactorSettings() {
     setBusy(true)
     try {
       // Remove any leftover unverified factors so a re-attempt doesn't collide
-      // on the friendly name or pile up dead factors.
+      // on the friendly name or pile up dead factors. listFactors().totp only
+      // contains verified factors, so unverified ones must be found via .all.
       const { data: list } = await supabase.auth.mfa.listFactors()
-      for (const f of list?.totp ?? []) {
-        if (f.status === 'unverified') {
+      for (const f of list?.all ?? []) {
+        if (f.factor_type === 'totp' && f.status === 'unverified') {
           await supabase.auth.mfa.unenroll({ factorId: f.id })
         }
       }
