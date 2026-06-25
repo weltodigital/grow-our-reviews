@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
         sms_message_sid,
         queued_reason,
         queued_at,
+        customer_id,
         customers(name, phone)
       `)
       .eq('user_id', user.id)
@@ -147,6 +148,7 @@ export async function GET(request: NextRequest) {
     // Format the data for the frontend
     const formattedRequests = requests?.map((request: any) => ({
       id: request.id,
+      customer_id: request.customer_id,
       customer_name: request.customers?.name || 'Unknown Customer',
       customer_phone: request.customers?.phone || '',
       status: request.status,

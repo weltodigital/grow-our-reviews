@@ -13,6 +13,7 @@ import Link from 'next/link'
 
 export interface ReviewRequest {
   id: string
+  customer_id: string
   customer_name: string
   customer_phone: string
   status: 'scheduled' | 'queued' | 'sent' | 'clicked' | 'feedback_given' | 'failed' | 'suppressed'

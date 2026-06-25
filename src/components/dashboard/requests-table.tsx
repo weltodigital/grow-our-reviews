@@ -11,7 +11,8 @@ import {
   EyeIcon,
   RefreshCwIcon,
   ExternalLinkIcon,
-  SendIcon
+  SendIcon,
+  Trash2Icon
 } from 'lucide-react'
 import type { ReviewRequest } from '@/app/dashboard/requests/page'
 
@@ -110,6 +111,44 @@ export function RequestsTable({
       alert('Failed to send SMS. Please try again.')
     }
   }
+
+  const handleDeleteCustomer = async (request: ReviewRequest) => {
+    const confirmed = window.confirm(
+      `Permanently delete all data for ${request.customer_name} (${formatPhone(request.customer_phone)})?\n\n` +
+        `This erases their review requests and feedback and cannot be undone.`,
+    )
+    if (!confirmed) return
+
+    try {
+      const response = await fetch(`/api/customers/${request.customer_id}`, {
+        method: 'DELETE',
+      })
+      const data = await response.json().catch(() => ({}))
+
+      if (response.ok) {
+        onRequestsChange?.()
+      } else {
+        alert(`Failed to delete customer: ${data.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error deleting customer:', error)
+      alert('Failed to delete customer. Please try again.')
+    }
+  }
+
+  // Small destructive action to erase a customer's data (GDPR right to erasure).
+  const deleteCustomerButton = (request: ReviewRequest) => (
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={() => handleDeleteCustomer(request)}
+      className="text-red-600 hover:text-red-700"
+      title="Delete this customer's data"
+    >
+      <Trash2Icon className="h-3 w-3 mr-1" />
+      Delete
+    </Button>
+  )
 
   const getActionButton = (request: ReviewRequest) => {
     const now = new Date()
@@ -273,6 +312,7 @@ export function RequestsTable({
                             Details
                           </Button>
                           {getActionButton(request)}
+                          {deleteCustomerButton(request)}
                         </div>
                       </td>
                     </tr>
@@ -342,7 +382,7 @@ export function RequestsTable({
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-gray-100">
                   <Button
                     size="sm"
                     variant="outline"
@@ -352,6 +392,7 @@ export function RequestsTable({
                     Details
                   </Button>
                   {getActionButton(request)}
+                  {deleteCustomerButton(request)}
                 </div>
               </div>
             ))}
