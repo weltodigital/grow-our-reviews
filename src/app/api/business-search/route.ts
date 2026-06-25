@@ -1,7 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Generous in-memory per-IP rate limit. This endpoint is unauthenticated and
+// each call costs a Google Places query, so this caps scripted quota/cost abuse.
+// The onboarding typeahead is debounced (300ms) and only fires at length >= 2,
+// so a real user makes far fewer than this in a minute — the limit is invisible
+// to legitimate use. In-memory means per serverless instance, which is fine as a
+// cost backstop.
+const RATE_WINDOW_MS = 60_000
+const RATE_MAX = 30
+const rateHits = new Map<string, number[]>()
+
+function withinRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const recent = (rateHits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS)
+  if (recent.length >= RATE_MAX) {
+    rateHits.set(ip, recent)
+    return false
+  }
+  recent.push(now)
+  rateHits.set(ip, recent)
+  return true
+}
+
 export async function GET(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      'unknown'
+    if (!withinRateLimit(ip)) {
+      return NextResponse.json(
+        { error: 'Too many searches. Please wait a moment and try again.' },
+        { status: 429 },
+      )
+    }
+
     const searchParams = request.nextUrl.searchParams
     const query = searchParams.get('query')
 
