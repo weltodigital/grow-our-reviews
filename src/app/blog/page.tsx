@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 const blogArticles = [
   {
     slug: "cannon-steels-case-study",
-    title: "How Cannon Steels Got More Google Reviews in One Month Than They Had in Years",
-    description: "Cannon Steels went from 23 Google reviews to 32 in just one month using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.",
+    title: "How Cannon Steels Got More Google Reviews in Two Months Than They Had in Years",
+    description: "Cannon Steels went from 23 Google reviews to 41 in two months using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.",
     category: "Case Studies",
     publishDate: "2026-05-20",
     readingTime: 6,

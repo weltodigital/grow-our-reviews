@@ -6,7 +6,7 @@ export function TestimonialSection() {
     <section className="section" style={{ backgroundColor: 'var(--accent-light)' }}>
       <div className="container mx-auto px-4">
         <div className="section-header">
-          <h2>Real results from a real business</h2>
+          <h2>Real results from real businesses</h2>
           <p className="page-subtitle mx-auto">
             Here&apos;s what happened when an established business finally started
             asking their customers for reviews.
@@ -25,10 +25,10 @@ export function TestimonialSection() {
             </div>
 
             <blockquote className="text-lg text-gray-700 mb-6 italic leading-relaxed">
-              &quot;We had 23 Google reviews after decades in business. In one month
-              with Grow Our Reviews, we added 9 more, all 5 stars. The bulk upload
-              made it effortless. I just uploaded our customer list and the reviews
-              started coming in.&quot;
+              &quot;We had 23 Google reviews after decades in business. Since using
+              Grow Our Reviews we&apos;ve climbed to 41, and every new one has been
+              5 stars. The bulk upload made it effortless. I just uploaded our
+              customer list and the reviews started coming in.&quot;
             </blockquote>
 
             <div className="border-t pt-4">
@@ -40,7 +40,7 @@ export function TestimonialSection() {
                 <div className="bg-green-50 rounded-lg px-4 py-2">
                   <div className="text-xs font-medium text-green-800">Reviews</div>
                   <div className="text-sm font-semibold text-green-700">
-                    +39% in one month
+                    23 → 41
                   </div>
                 </div>
                 <div className="bg-green-50 rounded-lg px-4 py-2">
