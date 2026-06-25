@@ -13,7 +13,7 @@ export default function PrivacyPage() {
 
         <div className="prose prose-lg max-w-none">
           <p className="text-gray-600 mb-8">
-            <strong>Last updated:</strong> February 2026
+            <strong>Last updated:</strong> June 2026
           </p>
 
           <section className="mb-8">
@@ -57,6 +57,14 @@ export default function PrivacyPage() {
               <li><strong>Communication:</strong> Send service updates, billing notifications, and customer support</li>
               <li><strong>Legal Compliance:</strong> Comply with applicable laws and protect our rights</li>
             </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">Our Legal Bases (UK GDPR)</h3>
+            <ul className="list-disc pl-6 text-gray-700">
+              <li><strong>Contract:</strong> to create your account, deliver the service, and take payment</li>
+              <li><strong>Legitimate interests:</strong> to secure, maintain, and improve the service and prevent abuse</li>
+              <li><strong>Consent:</strong> for optional analytics and marketing cookies, which you can withdraw at any time</li>
+              <li><strong>Legal obligation:</strong> to keep records we are required to keep and to honour opt-out requests</li>
+            </ul>
           </section>
 
           <section className="mb-8">
@@ -65,7 +73,7 @@ export default function PrivacyPage() {
               We do not sell, rent, or trade your personal information. We may share information in these limited circumstances:
             </p>
             <ul className="list-disc pl-6 text-gray-700">
-              <li><strong>Service Providers:</strong> Twilio (SMS delivery), Stripe (payment processing), Supabase (data storage), Resend (email delivery)</li>
+              <li><strong>Service Providers (sub-processors):</strong> Twilio (SMS delivery), Stripe (payment processing), Supabase (database &amp; authentication hosting), Resend (transactional email), Google Places (business search and review data), Microsoft Clarity (website analytics), and Meta (advertising measurement). Each receives only the data needed to perform its function.</li>
               <li><strong>Legal Requirements:</strong> When required by law or to protect our rights and safety</li>
               <li><strong>Business Transfer:</strong> In connection with a merger, acquisition, or sale of assets (with notice to you)</li>
             </ul>
@@ -86,7 +94,7 @@ export default function PrivacyPage() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Your Rights (GDPR Compliance)</h2>
-            <p className="text-gray-700 mb-4">If you are located in the European Economic Area, you have the following rights:</p>
+            <p className="text-gray-700 mb-4">Under the UK GDPR (and the EU GDPR if you are in the European Economic Area), you have the following rights:</p>
             <ul className="list-disc pl-6 text-gray-700">
               <li><strong>Access:</strong> Request a copy of your personal data</li>
               <li><strong>Rectification:</strong> Correct inaccurate or incomplete data</li>
@@ -97,21 +105,21 @@ export default function PrivacyPage() {
               <li><strong>Withdraw Consent:</strong> Withdraw consent at any time where processing is based on consent</li>
             </ul>
             <p className="text-gray-700 mt-4">
-              To exercise these rights, contact us at <a href="mailto:hello@growourreviews.com" className="hover:underline" style={{ color: 'var(--accent)' }}>hello@growourreviews.com</a>
+              You can delete your account and all associated data at any time from your account settings, delete an individual customer&apos;s data from your dashboard, and export your review and feedback data as CSV. To exercise any other right, contact us at <a href="mailto:hello@growourreviews.com" className="hover:underline" style={{ color: 'var(--accent)' }}>hello@growourreviews.com</a> and we will respond within one month.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Data Security</h2>
             <p className="text-gray-700">
-              We implement appropriate technical and organizational measures to protect your information, including encryption in transit and at rest, access controls, and regular security assessments. However, no internet transmission is 100% secure.
+              We implement appropriate technical and organizational measures to protect your information, including encryption in transit and at rest, access controls, optional two-factor authentication on accounts, breach-checked password requirements, and regular security assessments. However, no internet transmission is 100% secure.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Data Retention</h2>
             <p className="text-gray-700">
-              We retain your information for as long as your account is active or as needed to provide services. After account deletion, we may retain certain information for legal compliance, fraud prevention, or legitimate business purposes for up to 7 years.
+              We retain your information for as long as your account is active or as needed to provide services. When you delete your account, your data is removed promptly and any active subscription is cancelled. Short-lived operational logs that contain technical identifiers (such as IP addresses used for rate limiting and abuse prevention) are automatically deleted after 90 days. Limited records may be kept where required for legal compliance, tax, or fraud-prevention purposes for up to 7 years.
             </p>
           </section>
 
