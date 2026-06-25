@@ -1,14 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, Mail, CreditCard, AlertTriangle, Save } from 'lucide-react'
+import { User, Mail, CreditCard, AlertTriangle, Save, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { updateAccountInfo } from './settings-actions'
 import { getPlanByLimit, PRICING_PLANS, formatPrice } from '@/lib/pricing'
+import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
@@ -30,9 +32,39 @@ export function AccountSettings({
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+  const router = useRouter()
 
   const currentPlan = getPlanByLimit(profile.monthly_request_limit)
   const planConfig = PRICING_PLANS[currentPlan]
+
+  // Require an exact "DELETE" to arm the button — guards against accidental clicks.
+  const canDelete = deleteConfirm.trim() === 'DELETE'
+
+  const handleDeleteAccount = async () => {
+    if (!canDelete) return
+    setDeleteError('')
+    setIsDeleting(true)
+    try {
+      const res = await fetch('/api/account/delete', { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setDeleteError(body.error || 'Failed to delete account. Please contact support.')
+        setIsDeleting(false)
+        return
+      }
+      // Account is gone — clear the now-orphaned session and leave the app.
+      if (supabase) {
+        await supabase.auth.signOut()
+      }
+      router.push('/')
+    } catch {
+      setDeleteError('Something went wrong. Please try again or contact support.')
+      setIsDeleting(false)
+    }
+  }
 
   const hasChanges = email !== (user.email || '')
 
@@ -238,6 +270,46 @@ export function AccountSettings({
               Contact Support
             </a>
           </Button>
+        </div>
+
+        {/* Danger Zone — permanent account deletion */}
+        <div className="border-t border-red-200 pt-6">
+          <h4 className="font-medium text-red-700 mb-2 flex items-center gap-2">
+            <Trash2 className="h-4 w-4" />
+            Delete Account
+          </h4>
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-3">
+            <p className="text-sm text-red-700">
+              Permanently delete your account and all associated data — customers, review
+              requests, feedback and templates. Any active subscription is cancelled. This
+              <strong> cannot be undone.</strong>
+            </p>
+            <div>
+              <Label htmlFor="delete-confirm" className="text-red-700">
+                Type <span className="font-mono font-semibold">DELETE</span> to confirm
+              </Label>
+              <Input
+                id="delete-confirm"
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                placeholder="DELETE"
+                disabled={isDeleting}
+                autoComplete="off"
+                className="mt-2 max-w-xs bg-white"
+              />
+            </div>
+            {deleteError && (
+              <p className="text-sm text-red-700 font-medium">{deleteError}</p>
+            )}
+            <Button
+              type="button"
+              onClick={handleDeleteAccount}
+              disabled={!canDelete || isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? 'Deleting…' : 'Permanently delete my account'}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
