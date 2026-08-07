@@ -4,7 +4,7 @@ const BASE = 'https://www.growourreviews.com'
 
 // Mirrors article keys from src/app/blog/[slug]/page.tsx
 const BLOG_ARTICLES: { slug: string; lastmod: string }[] = [
-  { slug: 'cannon-steels-case-study', lastmod: '2026-05-20' },
+  { slug: 'cannon-steels-case-study', lastmod: '2026-08-06' },
   { slug: 'checkatrade-mybuilder-google-reviews-2026', lastmod: '2026-03-16' },
   { slug: 'why-competitor-gets-more-work-than-you', lastmod: '2026-02-15' },
   { slug: 'best-time-to-ask-for-google-review', lastmod: '2026-02-10' },

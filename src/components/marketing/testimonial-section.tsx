@@ -26,7 +26,7 @@ export function TestimonialSection() {
 
             <blockquote className="text-lg text-gray-700 mb-6 italic leading-relaxed">
               &quot;We had 23 Google reviews after decades in business. Since using
-              Grow Our Reviews we&apos;ve climbed to 41, and every new one has been
+              Grow Our Reviews we&apos;ve climbed to 55, and every new one has been
               5 stars. The bulk upload made it effortless. I just uploaded our
               customer list and the reviews started coming in.&quot;
             </blockquote>
@@ -40,12 +40,12 @@ export function TestimonialSection() {
                 <div className="bg-green-50 rounded-lg px-4 py-2">
                   <div className="text-xs font-medium text-green-800">Reviews</div>
                   <div className="text-sm font-semibold text-green-700">
-                    23 → 41
+                    23 → 55
                   </div>
                 </div>
                 <div className="bg-green-50 rounded-lg px-4 py-2">
                   <div className="text-xs font-medium text-green-800">Google rating</div>
-                  <div className="text-sm font-semibold text-green-700">4.7 → 4.8 ★</div>
+                  <div className="text-sm font-semibold text-green-700">4.7 → 4.9 ★</div>
                 </div>
               </div>
             </div>

@@ -17,7 +17,7 @@ export interface BlogArticleRef {
 export const blogArticles: BlogArticleRef[] = [
   {
     slug: 'cannon-steels-case-study',
-    title: 'How Cannon Steels Got More Google Reviews in Two Months Than They Had in Years',
+    title: 'How Cannon Steels Got More Google Reviews in Three Months Than They Had in Years',
     category: 'Case Studies',
   },
   {
