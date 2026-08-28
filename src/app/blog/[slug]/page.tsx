@@ -16,7 +16,7 @@ import CannonSteelsCaseStudy from "@/content/blog/cannon-steels-case-study";
 const articles = {
   "cannon-steels-case-study": {
     title: "How Cannon Steels Got More Google Reviews in Three Months Than They Had in Years",
-    description: "Cannon Steels went from 23 Google reviews to 55 in three months using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.",
+    description: "Cannon Steels went from 23 Google reviews to 65 in three months using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.",
     category: "Case Studies",
     publishDate: "2026-05-20",
     readingTime: 6,

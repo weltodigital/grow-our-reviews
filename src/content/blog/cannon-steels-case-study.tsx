@@ -7,8 +7,8 @@ export default function CannonSteelsCaseStudy() {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
         <h3 className="font-semibold text-blue-900 mb-3">Key Takeaways</h3>
         <ul className="space-y-2 text-blue-800">
-          <li>• Cannon Steels went from 23 to 55 Google reviews in three months</li>
-          <li>• 32 new reviews — every single one 5 stars</li>
+          <li>• Cannon Steels went from 23 to 65 Google reviews in three months</li>
+          <li>• 42 new reviews — every single one 5 stars</li>
           <li>• Google rating improved from 4.7 to 4.9 stars</li>
           <li>• Setup took minutes using the bulk customer upload feature</li>
           <li>• After decades in business, they collected more reviews in three months than in years of asking in person</li>
@@ -51,23 +51,23 @@ export default function CannonSteelsCaseStudy() {
 
       <p><strong>It started with a bulk upload.</strong> Max imported his existing customer list and 67 review requests went out over the following days. After that, he kept adding new customers after each job — so the requests, and the reviews, kept coming.</p>
 
-      <p><strong>32 new five-star reviews received.</strong> Every single review that came back was 5 stars. No negative reviews, no private feedback needed. The sentiment gate was ready to catch unhappy responses, but none came through — a testament to the quality of Cannon Steels' service.</p>
+      <p><strong>42 new five-star reviews received.</strong> Every single review that came back was 5 stars. No negative reviews, no private feedback needed. The sentiment gate was ready to catch unhappy responses, but none came through — a testament to the quality of Cannon Steels' service.</p>
 
-      <p><strong>Google rating improved from 4.7 to 4.9.</strong> An unbroken run of five-star reviews pushed their average rating up two tenths of a point. A 4.9-star rating with 55 reviews looks significantly more trustworthy than a 4.7 with 23.</p>
+      <p><strong>Google rating improved from 4.7 to 4.9.</strong> An unbroken run of five-star reviews pushed their average rating up two tenths of a point. A 4.9-star rating with 65 reviews looks significantly more trustworthy than a 4.7 with 23.</p>
 
-      <p><strong>Review count more than doubled in three months.</strong> After decades of accumulating 23 reviews, they added 32 more in three months — a 139% increase. They've already passed the 50-review mark.</p>
+      <p><strong>Review count nearly tripled in three months.</strong> After decades of accumulating 23 reviews, they added 42 more in three months — a 183% increase. They're already well past the 50-review mark.</p>
 
       <p><strong>Zero effort after initial setup.</strong> Once the bulk upload was done, Max didn't need to do anything. The system sent the requests, the customers responded, and the reviews appeared on Google.</p>
 
       <h2 id="why-it-matters">Why This Matters</h2>
 
-      <p>Thirty-two reviews might not sound like a lot in isolation. But context matters.</p>
+      <p>Forty-two reviews might not sound like a lot in isolation. But context matters.</p>
 
-      <p>Going from 23 to 55 reviews is a 139% increase in three months. If Cannon Steels maintains this pace — even at a slower rate with new customers rather than a bulk upload — they'll be at 100+ within a year.</p>
+      <p>Going from 23 to 65 reviews is a 183% increase in three months. If Cannon Steels maintains this pace — even at a slower rate with new customers rather than a bulk upload — they'll be at 100+ within a year.</p>
 
-      <p>Every new five-star review strengthens their position in Google's local search results. Google rewards businesses with recent, consistent review activity. A business that went from zero new reviews in months to 32 in three months sends a strong signal to Google's algorithm that this is an active, trusted business. If you want the detail on how that ranking works, we cover it in our guide to <Link href="/blog/how-google-local-search-works-tradesmen" className="text-blue-600 hover:text-blue-800 underline">how Google decides which businesses to show in local search</Link>.</p>
+      <p>Every new five-star review strengthens their position in Google's local search results. Google rewards businesses with recent, consistent review activity. A business that went from zero new reviews in months to 42 in three months sends a strong signal to Google's algorithm that this is an active, trusted business. If you want the detail on how that ranking works, we cover it in our guide to <Link href="/blog/how-google-local-search-works-tradesmen" className="text-blue-600 hover:text-blue-800 underline">how Google decides which businesses to show in local search</Link>.</p>
 
-      <p>The rating increase from 4.7 to 4.9 also matters. Above 4.5 stars, every tenth of a point builds customer confidence. A 4.9-star rating with 55 reviews looks significantly more credible than a 4.7 with 23.</p>
+      <p>The rating increase from 4.7 to 4.9 also matters. Above 4.5 stars, every tenth of a point builds customer confidence. A 4.9-star rating with 65 reviews looks significantly more credible than a 4.7 with 23.</p>
 
       <h2 id="bigger-picture">The Bigger Picture</h2>
 
@@ -79,7 +79,7 @@ export default function CannonSteelsCaseStudy() {
 
       <h2 id="whats-next">What's Next for Cannon Steels</h2>
 
-      <p>With 55 reviews and a 4.9-star rating, Cannon Steels is now in a much stronger position for local search visibility. They're past the 50-review mark that puts them ahead of most competitors in their area, and the next milestone is 100. If you're wondering where your own target should sit, our guide on <Link href="/blog/how-many-google-reviews-to-rank-locally" className="text-blue-600 hover:text-blue-800 underline">how many Google reviews you need to rank locally</Link> breaks it down.</p>
+      <p>With 65 reviews and a 4.9-star rating, Cannon Steels is now in a much stronger position for local search visibility. They're past the 50-review mark that puts them ahead of most competitors in their area, and the next milestone is 100. If you're wondering where your own target should sit, our guide on <Link href="/blog/how-many-google-reviews-to-rank-locally" className="text-blue-600 hover:text-blue-800 underline">how many Google reviews you need to rank locally</Link> breaks it down.</p>
 
       <p>Max is now sending review requests to new customers after each job — a process that takes seconds. The bulk upload gave them the initial boost, and consistent requests will keep the momentum going.</p>
 
