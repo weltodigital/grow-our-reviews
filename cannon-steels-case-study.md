@@ -5,9 +5,9 @@
 Publish at: /blog/cannon-steels-case-study
 Follow the same blog article template, styling, schema markup, and CTA structure as all existing articles.
 
-**Title:** How Cannon Steels Got More Google Reviews in Three Months Than They Had in Years
+**Title:** How Cannon Steels Got More Google Reviews in Four Months Than They Had in Years
 **Slug:** cannon-steels-case-study
-**Meta description:** Cannon Steels went from 23 Google reviews to 65 in three months using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.
+**Meta description:** Cannon Steels went from 23 Google reviews to 76 in four months using Grow Our Reviews. Here's exactly how they did it — and what it means for their Google visibility.
 **Target keyword:** google reviews case study
 **Secondary keywords:** grow google reviews fast, automated review requests, google reviews for businesses, review automation case study
 **Category:** Case Studies
@@ -15,14 +15,14 @@ Follow the same blog article template, styling, schema markup, and CTA structure
 
 ---
 
-**H1:** How Cannon Steels Got More Google Reviews in Three Months Than They Had in Years
+**H1:** How Cannon Steels Got More Google Reviews in Four Months Than They Had in Years
 
 **Key Takeaways box:**
-- Cannon Steels went from 23 to 65 Google reviews in three months
-- 42 new reviews — every single one 5 stars
+- Cannon Steels went from 23 to 76 Google reviews in four months
+- 53 new reviews — every single one 5 stars
 - Google rating improved from 4.7 to 4.9 stars
 - Setup took minutes using the bulk customer upload feature
-- After decades in business, they collected more reviews in three months than in years of asking in person
+- After decades in business, they collected more reviews in four months than in years of asking in person
 
 ---
 
@@ -56,17 +56,17 @@ No phone calls. No awkward in-person asks. No chasing. Just an automated text th
 
 ---
 
-**H2: The Results After Three Months**
+**H2: The Results After Four Months**
 
 The numbers speak for themselves:
 
 **It started with a bulk upload.** Max uploaded his customer list and 67 review requests went out over the following days — staggered sending, appropriate timing, one polite request per customer. He then kept adding new customers after each job.
 
-**42 new five-star reviews received.** Every single review that came back was 5 stars. No negative reviews, no private feedback needed. The sentiment gate was ready to catch unhappy responses, but none came through — a testament to the quality of Cannon Steels' service.
+**53 new five-star reviews received.** Every single review that came back was 5 stars. No negative reviews, no private feedback needed. The sentiment gate was ready to catch unhappy responses, but none came through — a testament to the quality of Cannon Steels' service.
 
-**Google rating improved from 4.7 to 4.9.** An unbroken run of five-star reviews pushed their average rating up two tenths of a point. A 4.9-star rating with 65 reviews looks significantly more trustworthy than a 4.7 with 23.
+**Google rating improved from 4.7 to 4.9.** An unbroken run of five-star reviews pushed their average rating up two tenths of a point. A 4.9-star rating with 76 reviews looks significantly more trustworthy than a 4.7 with 23.
 
-**Review count nearly tripled in three months.** After decades of accumulating 23 reviews, they added 42 more in three months — a 183% increase. They're already well past the 50-review mark.
+**Review count more than tripled in four months.** After decades of accumulating 23 reviews, they added 53 more in four months — a 230% increase. They're already three-quarters of the way to 100.
 
 **Zero effort after initial setup.** Once the bulk upload was done, Max didn't need to do anything. The system sent the requests, the customers responded, and the reviews appeared on Google.
 
@@ -74,13 +74,13 @@ The numbers speak for themselves:
 
 **H2: Why This Matters**
 
-Forty-two reviews might not sound like a lot in isolation. But context matters.
+Fifty-three reviews might not sound like a lot in isolation. But context matters.
 
-Going from 23 to 65 reviews is a 183% increase in three months. If Cannon Steels maintains this pace — even at a slower rate with new customers rather than a bulk upload — they'll be at 100+ within a year.
+Going from 23 to 76 reviews is a 230% increase in four months. If Cannon Steels maintains this pace — even at a slower rate with new customers rather than a bulk upload — they'll pass 100 reviews before the year is out.
 
-Every new five-star review strengthens their position in Google's local search results. Google rewards businesses with recent, consistent review activity. A business that went from zero new reviews in months to 42 in three months sends a strong signal to Google's algorithm that this is an active, trusted business.
+Every new five-star review strengthens their position in Google's local search results. Google rewards businesses with recent, consistent review activity. A business that went from zero new reviews in months to 53 in four months sends a strong signal to Google's algorithm that this is an active, trusted business.
 
-The rating increase from 4.7 to 4.9 also matters. Above 4.5 stars, every tenth of a point builds customer confidence. A 4.9-star rating with 65 reviews looks significantly more credible than a 4.7 with 23.
+The rating increase from 4.7 to 4.9 also matters. Above 4.5 stars, every tenth of a point builds customer confidence. A 4.9-star rating with 76 reviews looks significantly more credible than a 4.7 with 23.
 
 ---
 
@@ -96,7 +96,7 @@ From there, the habit is simple: after every job, enter the customer's name and 
 
 **H2: What's Next for Cannon Steels**
 
-With 65 reviews and a 4.9-star rating, Cannon Steels is now in a much stronger position for local search visibility. They're past the 50-review mark that puts them ahead of most competitors in their area, and the next milestone is 100.
+With 76 reviews and a 4.9-star rating, Cannon Steels is now in a much stronger position for local search visibility. They're past the 50-review mark that puts them ahead of most competitors in their area, and the next milestone is 100.
 
 Max is now sending review requests to new customers after each job — a process that takes seconds. The bulk upload gave them the initial boost, and consistent requests will keep the momentum going.
 
@@ -122,17 +122,17 @@ Internal links:
 Add this to the landing page in place of any placeholder testimonials. Use the existing testimonial card styling.
 
 ```
-Quote: "We had 23 Google reviews after decades in business. Since using Grow Our Reviews we've climbed to 65, and every new one has been 5 stars. The bulk upload made it effortless. I just uploaded our customer list and the reviews started coming in."
+Quote: "We had 23 Google reviews after decades in business. Since using Grow Our Reviews we've climbed to 76, and every new one has been 5 stars. The bulk upload made it effortless. I just uploaded our customer list and the reviews started coming in."
 
 Name: Max
 Business: Cannon Steels, London
-Result: 23 → 65 reviews in three months | Rating: 4.7 → 4.9 ★
+Result: 23 → 76 reviews in four months | Rating: 4.7 → 4.9 ★
 ```
 
 Also add a shorter version for use in tighter spaces (e.g. near pricing, in the sidebar, in email footers):
 
 ```
-"42 new five-star reviews in three months. After decades of only having 23."
+"53 new five-star reviews in four months. After decades of only having 23."
 — Max, Cannon Steels
 ```
 
@@ -148,14 +148,14 @@ Also add a shorter version for use in tighter spaces (e.g. near pricing, in the 
 23 Google reviews.
 After decades in business.
 
-Then 42 new five-star reviews.
-In three months.
+Then 53 new five-star reviews.
+In four months.
 ```
 
 **Primary text:**
-Cannon Steels had been in business for decades but only had 23 Google reviews. Max uploaded his customer list to Grow Our Reviews, and over three months, 42 new five-star reviews came in automatically. No chasing, no awkward asks. Just a simple text to each customer with a link to leave a review. Their rating went from 4.7 to 4.9 stars. If a business with decades of happy customers can grow their reviews this fast, imagine what it could do for yours.
+Cannon Steels had been in business for decades but only had 23 Google reviews. Max uploaded his customer list to Grow Our Reviews, and over four months, 53 new five-star reviews came in automatically. No chasing, no awkward asks. Just a simple text to each customer with a link to leave a review. Their rating went from 4.7 to 4.9 stars. If a business with decades of happy customers can grow their reviews this fast, imagine what it could do for yours.
 
-**Headline:** 42 New Five-Star Reviews in Three Months
+**Headline:** 53 New Five-Star Reviews in Four Months
 **CTA:** Start Free Trial
 
 ---
@@ -167,13 +167,13 @@ Cannon Steels had been in business for decades but only had 23 Google reviews. M
 Decades in business.
 23 Google reviews.
 
-3 months on Grow Our Reviews.
-65 Google reviews.
+4 months on Grow Our Reviews.
+76 Google reviews.
 All five stars.
 ```
 
 **Primary text:**
-Most businesses have hundreds of happy customers but barely any Google reviews. Sound familiar? Cannon Steels had the same problem. Decades of great work, 23 reviews to show for it. They uploaded their customer list, Grow Our Reviews sent a friendly text to each one, and 42 new five-star reviews came back over three months. No effort after setup. Your happy customers are already willing to leave a review. They just need to be asked.
+Most businesses have hundreds of happy customers but barely any Google reviews. Sound familiar? Cannon Steels had the same problem. Decades of great work, 23 reviews to show for it. They uploaded their customer list, Grow Our Reviews sent a friendly text to each one, and 53 new five-star reviews came back over four months. No effort after setup. Your happy customers are already willing to leave a review. They just need to be asked.
 
 **Headline:** Your Happy Customers Are Waiting to Review You
 **CTA:** Start Free Trial
@@ -187,12 +187,12 @@ Most businesses have hundreds of happy customers but barely any Google reviews. 
 Setup: 5 minutes
 Effort after that: zero
 
-Result: 42 new five-star
-Google reviews in three months
+Result: 53 new five-star
+Google reviews in four months
 ```
 
 **Primary text:**
-Max from Cannon Steels uploaded his customer list, and Grow Our Reviews did the rest. 67 customers received a friendly text asking for a review, and he kept adding new customers after each job. 42 reviews came back — all five stars. His Google rating went from 4.7 to 4.9. The whole thing took minutes to set up and zero effort afterwards. If you've got happy customers who never leave reviews, this is the easiest fix you'll ever make.
+Max from Cannon Steels uploaded his customer list, and Grow Our Reviews did the rest. 67 customers received a friendly text asking for a review, and he kept adding new customers after each job. 53 reviews came back — all five stars. His Google rating went from 4.7 to 4.9. The whole thing took minutes to set up and zero effort afterwards. If you've got happy customers who never leave reviews, this is the easiest fix you'll ever make.
 
 **Headline:** Your Reviews on Autopilot. From £19/Month.
 **CTA:** Start Free Trial
